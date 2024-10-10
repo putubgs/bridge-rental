@@ -1,3 +1,3 @@
-export default async function HomePage() {
-  return <main>asdsa</main>;
+export default function HomePage() {
+  return <main>Home page</main>;
 }

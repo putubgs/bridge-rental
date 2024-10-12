@@ -1,3 +1,9 @@
+import Footer from "@/components/shared/footer/footer";
+import Navbar from "@/components/shared/navigation/navbar";
+import MuiThemeProvider from "@/components/shared/wrapper/mui-theme-provider";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/scrollbar";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -17,7 +23,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground">{children}</body>
+      <body className="bg-background text-foreground">
+        <MuiThemeProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </MuiThemeProvider>
+      </body>
     </html>
   );
 }

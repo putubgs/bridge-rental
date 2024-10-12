@@ -6,6 +6,6 @@
 
 @layer base {
   body {
-    @apply font-overpass;
+    @apply font-overpass leading-tight;
   }
 }

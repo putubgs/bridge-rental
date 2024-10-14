@@ -8,4 +8,8 @@
   body {
     @apply font-overpass leading-tight;
   }
+
+  .MuiPaper-rounded {
+    @apply !rounded-none;
+  }
 }

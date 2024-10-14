@@ -1,7 +1,13 @@
-import { Button } from "@mui/material";
+"use client";
+
+import useDialog from "@/hooks/useDialog";
+import { Button, Dialog, IconButton } from "@mui/material";
+import { XIcon } from "lucide-react";
 import Image from "next/image";
 
 export default function BestDealSection() {
+  const { open, handleOpen, handleClose } = useDialog();
+
   return (
     <section className="px-20 py-12">
       <div className="relative mx-auto w-full max-w-screen-2xl space-y-5 px-16 pb-20 pt-14 text-white">
@@ -34,12 +40,34 @@ export default function BestDealSection() {
         <p>Your adventure is just a click away. enjoy worry-free travels.</p>
         <div className="pt-14">
           <Button
+            onClick={handleOpen}
             variant="outlined"
             className="border-white px-14 font-medium text-white"
           >
             LEARN MORE
           </Button>
         </div>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{ className: "rounded-none border-2 border-black" }}
+        >
+          <div className="space-y-1 rounded-none bg-primary">
+            <div className="flex w-full justify-end p-3 pb-0">
+              <IconButton onClick={handleClose} className="border-2">
+                <XIcon />
+              </IconButton>
+            </div>
+            <div className="p-5">
+              <h3 className="text-5xl font-semibold">
+                BUNDLE COMPARISON POSTER
+              </h3>
+              <p>(WILL BE EDITED SOON)</p>
+            </div>
+          </div>
+        </Dialog>
       </div>
     </section>
   );

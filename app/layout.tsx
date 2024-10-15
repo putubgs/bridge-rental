@@ -1,5 +1,6 @@
 import Footer from "@/components/shared/footer/footer";
 import Navbar from "@/components/shared/navigation/navbar";
+import MuiLocalizationProvider from "@/components/shared/wrapper/mui-localization-provider";
 import MuiThemeProvider from "@/components/shared/wrapper/mui-theme-provider";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -24,11 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <MuiThemeProvider>
-          <Navbar />
-          {children}
-          <Footer />
-        </MuiThemeProvider>
+        <MuiLocalizationProvider>
+          <MuiThemeProvider>
+            <Navbar />
+            {children}
+            <Footer />
+          </MuiThemeProvider>
+        </MuiLocalizationProvider>
       </body>
     </html>
   );

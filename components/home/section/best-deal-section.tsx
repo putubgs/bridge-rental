@@ -60,11 +60,11 @@ export default function BestDealSection() {
                 <XIcon />
               </IconButton>
             </div>
-            <div className="p-5">
+            <div className="p-20 pt-10">
               <h3 className="text-5xl font-semibold">
                 BUNDLE COMPARISON POSTER
               </h3>
-              <p>(WILL BE EDITED SOON)</p>
+              <p className="text-3xl font-medium">(WILL BE EDITED SOON)</p>
             </div>
           </div>
         </Dialog>

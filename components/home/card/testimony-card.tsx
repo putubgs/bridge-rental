@@ -18,7 +18,7 @@ export default function TestimonyCard({
   return (
     <div className="bg-white p-5 shadow-md">
       <h3 className="text-xl font-semibold">{customer_name}</h3>
-      <Rating value={rating} precision={0.5} />
+      <Rating value={rating} precision={0.5} readOnly />
       <p className="font-semibold">Highly recommend</p>
       <p className="font-light text-neutral-400">{review_text}</p>
       <p className="mt-5 text-sm">

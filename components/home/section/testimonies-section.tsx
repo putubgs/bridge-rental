@@ -7,6 +7,7 @@ import { Swiper as SwiperType } from "swiper/types";
 import TestimonyCard from "../card/testimony-card";
 import { testimonies } from "@/lib/static/testimonies-dummy";
 import dayjs from "dayjs";
+import { IconButton } from "@mui/material";
 
 export default function TestimoniesSection() {
   const swiperRef = useRef<SwiperType | null>(null);
@@ -32,13 +33,13 @@ export default function TestimoniesSection() {
           </p>
         </div>
 
-        <div className="flex justify-between gap-5">
-          <button
-            className={isBeginning ? "text-neutral-200" : "text-neutral-700"}
+        <div className="flex items-center justify-between gap-5">
+          <IconButton
+            disabled={isBeginning}
             onClick={() => swiperRef.current?.slidePrev()}
           >
             <ChevronLeftIcon className="size-10" strokeWidth={0.8} />
-          </button>
+          </IconButton>
           <Swiper
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
@@ -59,12 +60,12 @@ export default function TestimoniesSection() {
               </SwiperSlide>
             ))}
           </Swiper>
-          <button
-            className={isEnd ? "text-neutral-200" : "text-neutral-700"}
+          <IconButton
+            disabled={isEnd}
             onClick={() => swiperRef.current?.slideNext()}
           >
             <ChevronRightIcon className="size-10" strokeWidth={0.8} />
-          </button>
+          </IconButton>
         </div>
       </div>
     </section>

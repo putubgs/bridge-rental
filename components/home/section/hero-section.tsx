@@ -1,6 +1,6 @@
-import { Button, Switch } from "@mui/material";
-import { SearchIcon } from "lucide-react";
+import { Switch } from "@mui/material";
 import Image from "next/image";
+import CarSearchForm from "../form/car-search-form";
 
 export default function HeroSection() {
   return (
@@ -20,18 +20,7 @@ export default function HeroSection() {
           Looking for a vehicle in Jordan?
         </p>
         <div className="space-y-3">
-          <div className="flex justify-between gap-4 bg-neutral-100 bg-opacity-20 p-[6px]">
-            <div className="h-10 basis-2/5 bg-white"></div>
-            <div className="h-10 grow bg-white"></div>
-            <div className="h-10 grow bg-white"></div>
-            <Button
-              variant="contained"
-              className="space-x-1 font-overpass font-bold"
-            >
-              <SearchIcon className="size-[18px]" />
-              <span className="translate-y-[1px]">Search</span>
-            </Button>
-          </div>
+          <CarSearchForm />
           <div className="flex items-start justify-between gap-14 text-[11px]">
             <div className="flex items-center font-bold">
               <Switch color="primary" defaultChecked />

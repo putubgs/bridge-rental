@@ -6,6 +6,9 @@ export const theme = createTheme({
       main: "#BAF0E2",
     },
   },
+  typography: {
+    fontFamily: "'Overpass', 'sans-serif'",
+  },
   components: {
     MuiButton: {
       styleOverrides: {

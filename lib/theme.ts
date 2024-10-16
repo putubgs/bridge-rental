@@ -18,6 +18,7 @@ export const theme = createTheme({
           "&.MuiButton-contained": {
             backgroundColor: "#BAF0E2",
           },
+          boxShadow: "none",
         },
       },
     },

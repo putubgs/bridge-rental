@@ -15,10 +15,6 @@ export default function DateTimePicker({
   dateLabel = "DATE",
   timeLabel = "TIME",
 }: IDateTimePicker) {
-  const isMounted = useMounted();
-
-  if (!isMounted) return;
-
   return (
     <div className="relative flex basis-[30%] justify-between border border-neutral-400 bg-white text-black">
       <div className="flex h-full items-end p-2 pb-2.5 pr-0">
@@ -31,15 +27,14 @@ export default function DateTimePicker({
           format="MMM DD, YYYY"
           minDate={dayjs()}
           slots={{
-            openPickerIcon: () => <SvgIcon component={ChevronDownIcon} />,
+            openPickerIcon: () => (
+              <SvgIcon
+                component={ChevronDownIcon}
+                className="size-4 stroke-none"
+              />
+            ),
           }}
           slotProps={{
-            openPickerIcon: {
-              width: "15px",
-              height: "15px",
-              color: "transparent",
-              fill: "#999999",
-            },
             openPickerButton: {
               size: "small",
             },
@@ -67,15 +62,14 @@ export default function DateTimePicker({
         <TimePicker
           defaultValue={defaultDateTime}
           slots={{
-            openPickerIcon: () => <SvgIcon component={ChevronDownIcon} />,
+            openPickerIcon: () => (
+              <SvgIcon
+                component={ChevronDownIcon}
+                className="size-4 stroke-none"
+              />
+            ),
           }}
           slotProps={{
-            openPickerIcon: {
-              width: "15px",
-              height: "15px",
-              color: "transparent",
-              fill: "#999999",
-            },
             openPickerButton: {
               size: "small",
             },

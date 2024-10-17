@@ -16,6 +16,7 @@ export default function BestDealSection() {
           alt="Banner Image"
           fill
           className="-z-10 object-cover"
+          sizes="(max-width: 768px) 90vw, 100vw"
         />
         <div className="absolute -top-5 right-0 bg-gradient-to-r from-[#FF8181] to-[#FF4040] px-7 py-3 text-lg font-bold">
           BEST DEAL!

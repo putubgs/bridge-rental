@@ -13,7 +13,7 @@ export default function ExperienceCard({ img, text }: IExperienceCard) {
           src={img}
           alt="Card Icon"
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
       <p className="font-bold leading-none text-neutral-400">{text}</p>

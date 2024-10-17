@@ -16,6 +16,7 @@ export default function BookingSection() {
         alt="Banner Image"
         fill
         className="-z-10 object-cover"
+        sizes="(max-width: 768px) 100vw, 50vw"
       />
       <section className="flex h-full flex-col items-center justify-end gap-3 text-center">
         <Button

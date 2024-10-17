@@ -21,7 +21,7 @@ export default function Navbar() {
             src={`/assets/img/brand-logo-${isHomePage || isScrolled ? "white" : "black"}.png`}
             alt="Brand Logo"
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
       </Link>
@@ -31,13 +31,13 @@ export default function Navbar() {
       >
         <Link
           href="/contact"
-          className={`hover:underline ${pathName === "/contact" && "text-primary-variant-2"}`}
+          className={`${pathName === "/contact" && "text-primary-variant-2"}`}
         >
           Contact
         </Link>
         <Link
           href="/help"
-          className={`hover:underline ${pathName === "/help" && "text-primary-variant-2"}`}
+          className={`${pathName === "/help" && "text-primary-variant-2"}`}
         >
           Help
         </Link>

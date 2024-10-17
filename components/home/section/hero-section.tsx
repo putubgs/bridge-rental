@@ -10,6 +10,7 @@ export default function HeroSection() {
         alt="Banner Image"
         fill
         className="-z-10 object-cover"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />
 
       <div className="mx-auto flex h-full max-w-screen-2xl flex-col justify-end gap-6">

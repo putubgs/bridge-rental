@@ -8,7 +8,12 @@ export default function Footer() {
         <div className="grid grid-cols-3 divide-x divide-neutral-700 [&>div]:py-5">
           <div className="flex flex-col items-center justify-center">
             <div className="relative h-[33px] w-[109px]">
-              <Image src="/assets/img/brand-logo.png" alt="Brand Logo" fill />
+              <Image
+                src="/assets/img/brand-logo-white.png"
+                alt="Brand Logo"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
             </div>
           </div>
           <div className="flex flex-col items-center justify-center">

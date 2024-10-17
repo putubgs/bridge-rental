@@ -14,6 +14,7 @@ export default function FaqCard({ question, answer }: IFaqCard) {
             src={"/assets/img/call-center-agent-icon.png"}
             alt="Call Center Agent Icon"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
       </div>

@@ -21,6 +21,7 @@ export default function Navbar() {
             src={`/assets/img/brand-logo-${isHomePage || isScrolled ? "white" : "black"}.png`}
             alt="Brand Logo"
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
       </Link>

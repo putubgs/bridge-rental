@@ -51,9 +51,8 @@ export default function TestimoniesSection() {
             className="!px-2"
           >
             {testimonies.map(({ review_id, review_date, ...resProps }) => (
-              <SwiperSlide className="overflow-y-visible py-2">
+              <SwiperSlide key={review_id} className="overflow-y-visible py-2">
                 <TestimonyCard
-                  key={review_id}
                   review_date={dayjs(review_date).format("MMM YYYY")}
                   {...resProps}
                 />

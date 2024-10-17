@@ -1,3 +1,5 @@
+import useMounted from "@/hooks/useMounted";
+import { SvgIcon } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
@@ -13,6 +15,10 @@ export default function DateTimePicker({
   dateLabel = "DATE",
   timeLabel = "TIME",
 }: IDateTimePicker) {
+  const isMounted = useMounted();
+
+  if (!isMounted) return;
+
   return (
     <div className="relative flex basis-[30%] justify-between border border-neutral-400 bg-white text-black">
       <div className="flex h-full items-end p-2 pb-2.5 pr-0">
@@ -23,10 +29,10 @@ export default function DateTimePicker({
         <DatePicker
           defaultValue={defaultDateTime}
           format="MMM DD, YYYY"
-          slots={{
-            openPickerIcon: ChevronDownIcon,
-          }}
           minDate={dayjs()}
+          slots={{
+            openPickerIcon: () => <SvgIcon component={ChevronDownIcon} />,
+          }}
           slotProps={{
             openPickerIcon: {
               width: "15px",
@@ -61,7 +67,7 @@ export default function DateTimePicker({
         <TimePicker
           defaultValue={defaultDateTime}
           slots={{
-            openPickerIcon: ChevronDownIcon,
+            openPickerIcon: () => <SvgIcon component={ChevronDownIcon} />,
           }}
           slotProps={{
             openPickerIcon: {

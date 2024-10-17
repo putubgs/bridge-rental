@@ -12,7 +12,7 @@ export default function LocationInput({ sameReturnLocation }: ILocationInput) {
       <div className="flex h-full items-end p-2 pb-2.5 pr-1">
         <MapPinIcon className="size-[14px]" strokeWidth={1.5} />
       </div>
-      <div className="flex w-full flex-col pb-0 pt-2">
+      <div className="flex w-full flex-col pb-0 pr-2 pt-2">
         <span className="text-[10px] text-neutral-400">
           CAR DELIVERY LOCATION
         </span>

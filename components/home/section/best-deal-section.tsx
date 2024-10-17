@@ -21,7 +21,12 @@ export default function BestDealSection() {
           BEST DEAL!
         </div>
         <div className="absolute bottom-11 right-12 h-[33px] w-[109px]">
-          <Image src="/assets/img/brand-logo.png" alt="Brand Logo" fill />
+          <Image
+            src="/assets/img/brand-logo-white.png"
+            alt="Brand Logo"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
         </div>
 
         <h2 className="font-poppins text-[58px] font-semibold italic">

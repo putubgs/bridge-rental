@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 export default function useScrolledNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 60) {
         setIsScrolled(true);
@@ -12,6 +12,7 @@ export default function useScrolledNavbar() {
       }
     };
 
+    setIsScrolled(window?.scrollY > 60);
     window.addEventListener("scroll", handleScroll);
 
     return () => {

@@ -3,18 +3,47 @@ import { SvgIcon } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
+import { useEffect } from "react";
 
 interface IDateTimePicker {
   defaultDateTime?: Dayjs;
   dateLabel?: string;
   timeLabel?: string;
+  setDate: (date: Dayjs) => void;
+  setTime: (time: Dayjs) => void;
+  currentDate: Dayjs | null;
+  currentTime: Dayjs | null;
 }
 
 export default function DateTimePicker({
   defaultDateTime,
   dateLabel = "DATE",
   timeLabel = "TIME",
+  setDate,
+  setTime,
+  currentDate,
+  currentTime,
 }: IDateTimePicker) {
+
+  useEffect(() => {
+    if (defaultDateTime != null) {
+      if (!currentDate || !currentDate.isSame(defaultDateTime, 'day')) {
+        setDate(defaultDateTime);
+      }
+      if (!currentTime || !currentTime.isSame(defaultDateTime, 'minute')) {
+        setTime(defaultDateTime);
+      }
+    }
+  }, [defaultDateTime, setDate, setTime, currentDate, currentTime]);
+
+  const handleDateChange = (newDate: Dayjs | null) => {
+    if (newDate) setDate(newDate);
+  };
+
+  const handleTimeChange = (newTime: Dayjs | null) => {
+    if (newTime) setTime(newTime);
+  };
+
   return (
     <div className="relative flex basis-[30%] justify-between border border-neutral-400 bg-white text-black">
       <div className="flex h-full items-end p-2 pb-2.5 pr-0">
@@ -26,6 +55,7 @@ export default function DateTimePicker({
           defaultValue={defaultDateTime}
           format="MMM DD, YYYY"
           minDate={dayjs()}
+          onChange={handleDateChange}
           slots={{
             openPickerIcon: () => (
               <SvgIcon
@@ -61,6 +91,7 @@ export default function DateTimePicker({
         <span className="text-[10px] text-neutral-400">{timeLabel}</span>
         <TimePicker
           defaultValue={defaultDateTime}
+          onChange={handleTimeChange}
           slots={{
             openPickerIcon: () => (
               <SvgIcon

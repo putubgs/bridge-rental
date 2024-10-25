@@ -1,4 +1,3 @@
-import { Switch } from "@mui/material";
 import Image from "next/image";
 import CarSearchForm from "../form/car-search-form";
 

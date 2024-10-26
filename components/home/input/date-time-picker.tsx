@@ -9,7 +9,6 @@ import dayjs, { Dayjs } from "dayjs";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 
 interface IDateTimePicker {
-  defaultDateTime?: Dayjs;
   dateLabel?: string;
   timeLabel?: string;
   minDate?: Dayjs;
@@ -25,7 +24,6 @@ interface IDateTimePicker {
 }
 
 export default function DateTimePicker({
-  defaultDateTime,
   value,
   onDateChange,
   minTime,
@@ -80,7 +78,8 @@ export default function DateTimePicker({
       <div className="flex w-fit flex-col p-2 pb-1 pl-3">
         <span className="text-[10px] text-neutral-400">{timeLabel}</span>
         <TimePicker
-          defaultValue={defaultDateTime}
+          ampm={false}
+          value={value}
           minTime={minTime}
           onChange={onTimeChange}
           slots={{

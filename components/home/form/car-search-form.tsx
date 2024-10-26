@@ -22,7 +22,7 @@ export default function CarSearchForm() {
       delivery_location: "",
       return_location: "",
       delivery_date: dayjs.tz(),
-      return_date: null,
+      return_date: dayjs.tz().add(24, "hour"),
       same_return_location: true,
     },
     validationSchema: carSearchSchema,

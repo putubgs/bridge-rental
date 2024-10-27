@@ -78,7 +78,7 @@ export default function DateTimePicker({
       <div className="flex w-fit flex-col p-2 pb-1 pl-3">
         <span className="text-[10px] text-neutral-400">{timeLabel}</span>
         <TimePicker
-          ampm={false}
+          // ampm={false}
           value={value}
           minTime={minTime}
           onChange={onTimeChange}
@@ -91,6 +91,9 @@ export default function DateTimePicker({
             ),
           }}
           slotProps={{
+            popper: {
+              className: minTime && minTime.hour() >= 12 ? "hide-am" : "",
+            },
             openPickerButton: {
               size: "small",
             },

@@ -13,3 +13,9 @@
     @apply !rounded-none;
   }
 }
+
+@layer utilities {
+  .hide-am li[aria-label="AM"] {
+    @apply hidden;
+  }
+}

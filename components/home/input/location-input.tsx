@@ -3,29 +3,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
 
-interface ILocationInput {
-  sameReturnLocation: boolean;
-}
-
-export default function LocationInput({ sameReturnLocation }: ILocationInput) {
-  const { setDeliveryLocation, setReturnLocation } = useRentDetailsStore();
-
-  const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
-    if (newLocation) {
-      setDeliveryLocation(newLocation);
-
-      if (sameReturnLocation) {
-        setReturnLocation(newLocation);
-      }
-    }
-  };
-
-  const handleReturnLocationChange = (_: any, newLocation: string | null) => {
-    if (!sameReturnLocation && newLocation) {
-      setReturnLocation(newLocation);
-    }
-  };
-
+export default function LocationInput({ formik }: { formik: any }) {
   return (
     <div className="h-13 flex basis-[40%] gap-1 border border-neutral-400 bg-white text-black items-center">
       <div className="flex h-full items-end p-2 pb-2.5 pr-1">
@@ -36,13 +14,16 @@ export default function LocationInput({ sameReturnLocation }: ILocationInput) {
           CAR DELIVERY LOCATION
         </span>
         <Autocomplete
+          value={formik.values ? formik.values["delivery_location"] : ""}
+          onChange={(_, newVal) =>
+            formik.setFieldValue("delivery_location", newVal)
+          }
           disablePortal
           options={locationOptions}
-          onChange={handleDeliveryLocationChange}
           renderOption={(props, option) => {
-            const { key, ...restProps } = props;
+            const { key, ...otherProps } = props;
             return (
-              <li key={key} {...restProps} style={{ fontSize: "14px" }}>
+              <li key={key} {...otherProps} style={{ fontSize: "14px" }}>
                 {option}
               </li>
             );
@@ -50,6 +31,10 @@ export default function LocationInput({ sameReturnLocation }: ILocationInput) {
           renderInput={(params) => (
             <TextField
               {...params}
+              error={
+                formik.touched["delivery_location"] &&
+                Boolean(formik.errors["delivery_location"])
+              }
               placeholder="Search location"
               size="small"
               variant="standard"
@@ -73,19 +58,22 @@ export default function LocationInput({ sameReturnLocation }: ILocationInput) {
           )}
         />
       </div>
-      {!sameReturnLocation && (
+      {!formik?.values["same_return_location"] && (
         <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
           <span className="text-[10px] text-neutral-400">
             CAR RETURN LOCATION
           </span>
           <Autocomplete
+            value={formik.values ? formik.values["return_location"] : ""}
+            onChange={(_, newVal) =>
+              formik.setFieldValue("return_location", newVal)
+            }
             disablePortal
             options={locationOptions}
-            onChange={handleReturnLocationChange}
             renderOption={(props, option) => {
-              const { key, ...restProps } = props;
+              const { key, ...otherProps } = props;
               return (
-                <li key={key} {...restProps} style={{ fontSize: "14px" }}>
+                <li key={key} {...otherProps} style={{ fontSize: "14px" }}>
                   {option}
                 </li>
               );
@@ -93,6 +81,10 @@ export default function LocationInput({ sameReturnLocation }: ILocationInput) {
             renderInput={(params) => (
               <TextField
                 {...params}
+                error={
+                  formik.touched["return_location"] &&
+                  Boolean(formik.errors["return_location"])
+                }
                 placeholder="Search location"
                 size="small"
                 variant="standard"

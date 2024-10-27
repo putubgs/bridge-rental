@@ -3,13 +3,22 @@ import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
 import AirConditionerIcon from "@/components/shared/icons/air-conditioner";
+import { useRentDetailsStore } from "@/store/reservation-store";
 import { ICarModel } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 interface CarCardsSectionProps {
   filteredCars: ICarModel[];
 }
 
 export default function CarCardsSection({ filteredCars }: CarCardsSectionProps) {
+    const router = useRouter();
+    const {setCarId} = useRentDetailsStore();
+
+    const handleClick = (car_id: string) => {
+        setCarId(car_id);
+        router.push("/reservation/car-bundle");
+    }
   return (
     <div className="flex w-full items-center justify-center">
       <div className="grid w-full grid-cols-4 gap-3">
@@ -17,6 +26,7 @@ export default function CarCardsSection({ filteredCars }: CarCardsSectionProps) 
           <div
             key={car.car_id}
             className="group relative flex h-auto w-full cursor-pointer flex-col border p-2"
+            onClick={() => handleClick(car.car_id)} 
           >
             <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
             <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-2">

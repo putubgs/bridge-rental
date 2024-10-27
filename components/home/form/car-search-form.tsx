@@ -7,8 +7,8 @@ import Link from "next/link";
 import { useState } from "react";
 import DateTimePicker from "../input/date-time-picker";
 import LocationInput from "../input/location-input";
-import { useCarSearchStore } from "@/store/reservation-store";
-import { useRouter } from "next/navigation"; // Use router to navigate
+import { useRentDetailsStore, useCarSearchStore } from "@/store/reservation-store";
+import { useRouter } from "next/navigation";
 
 export default function CarSearchForm() {
   const router = useRouter();
@@ -22,7 +22,10 @@ export default function CarSearchForm() {
     setDeliveryTime,
     setReturnDate,
     setReturnTime,
-    setSearchCompleted,
+  } = useRentDetailsStore();
+
+  const {
+    setSearchCompleted
   } = useCarSearchStore();
 
   const handleSearch = () => {

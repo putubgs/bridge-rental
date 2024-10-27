@@ -1,14 +1,14 @@
 import { locationOptions } from "@/lib/static/locations-dummy";
 import { Autocomplete, TextField } from "@mui/material";
 import { MapPinIcon } from "lucide-react";
-import { useCarSearchStore } from "@/store/reservation-store";
+import { useRentDetailsStore } from "@/store/reservation-store";
 
 interface ILocationInput {
   sameReturnLocation: boolean;
 }
 
 export default function LocationInput({ sameReturnLocation }: ILocationInput) {
-  const { setDeliveryLocation, setReturnLocation } = useCarSearchStore();
+  const { setDeliveryLocation, setReturnLocation } = useRentDetailsStore();
 
   const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
     if (newLocation) {

@@ -21,6 +21,7 @@ const config = {
       fontFamily: {
         overpass: ["Overpass", "sans-serif"],
         poppins: ["Poppins", "sans-serif"],
+        outfit: ["Outfit", "sans-serif"]
       },
       colors: {
         primary: {

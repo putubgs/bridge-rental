@@ -1,19 +1,28 @@
 "use client";
 
-import { useState } from "react"
 import { Button, Switch } from "@mui/material";
 import { useFormik } from "formik";
 import { SearchIcon } from "lucide-react";
 import * as yup from "yup";
+import dayjs from "dayjs";
 import DateRangePicker from "../input/date-range-picker";
 import LocationInput from "../input/location-input";
-import { useRentDetailsStore, useCarSearchStore } from "@/store/reservation-store";
 import { useRouter } from "next/navigation";
-import dayjs, { Dayjs } from "dayjs";
+import { useCarSearchStore, useRentDetailsStore } from "@/store/reservation-store";
+
+const carSearchSchema = yup.object({
+  delivery_location: yup.string().required("Delivery location is required"),
+  return_location: yup.string(),
+  delivery_date: yup.date().required("Delivery date is required"),
+  return_date: yup.date().nullable(),
+  same_return_location: yup.boolean(),
+});
 
 export default function CarSearchForm() {
   const router = useRouter();
-  const [sameReturnLocation, setSameReturnLocation] = useState<boolean>(true);
+
+  const { setSearchCompleted } = useCarSearchStore();
+
   const {
     deliveryDate,
     deliveryTime,
@@ -25,49 +34,40 @@ export default function CarSearchForm() {
     setReturnTime,
   } = useRentDetailsStore();
 
-  const {
-    setSearchCompleted
-  } = useCarSearchStore();
-
-  const handleSearch = () => {
+  const handleInputSearch = () => {
     setSearchCompleted(true);
     router.push("/reservation/car-choices");
   };
 
-const carSearchSchema = yup.object({
-  delivery_location: yup.string(),
-  return_location: yup.string(),
-  delivery_date: yup.date(),
-  return_date: yup.date().nullable(),
-  same_return_location: yup.boolean(),
-});
-
-export default function CarSearchForm() {
   const formik = useFormik({
     initialValues: {
       delivery_location: "",
       return_location: "",
-      delivery_date: dayjs.tz(),
-      return_date: dayjs.tz().add(24, "hour"),
+      delivery_date: deliveryDate || dayjs(),
+      delivery_time: deliveryTime || dayjs().hour(9).minute(0),
+      return_date: returnDate || dayjs().add(24, "hour"),
+      return_time: returnTime || dayjs().hour(9).minute(0).add(1, "hour"),
       same_return_location: true,
     },
     validationSchema: carSearchSchema,
-    onSubmit: ({
-      delivery_location,
-      return_location,
-      delivery_date,
-      return_date,
-    }) => {
+    onSubmit: (values) => {
       const formattedValues = {
-        delivery_location,
-        return_location:
-          return_location === "" ? delivery_location : return_location,
-        delivery_date: delivery_date.toString(),
-        return_date: (return_date as Dayjs | null)?.toString() ?? null,
+        delivery_location: values.delivery_location,
+        return_location: values.return_location || values.delivery_location,
+        delivery_date: values.delivery_date.toString(),
+        delivery_time: values.delivery_time.format("HH:mm"),
+        return_date: values.return_date?.toString() ?? null,
+        return_time: values.return_time.format("HH:mm"),
       };
 
-      //TODO handle the form submission
       console.log(formattedValues);
+
+      setDeliveryDate(values.delivery_date);
+      setDeliveryTime(values.delivery_time);
+      setReturnDate(values.return_date);
+      setReturnTime(values.return_time);
+
+      handleInputSearch();
     },
   });
 
@@ -76,13 +76,19 @@ export default function CarSearchForm() {
       <div className="flex h-max justify-between gap-2 bg-neutral-100 bg-opacity-20 p-[6px]">
         <LocationInput formik={formik} />
         <DateRangePicker formik={formik} />
-        <Button type="submit" variant="contained" className="basis-[12%]" onClick={() => handleSearch}>
+        <Button
+          type="submit"
+          variant="contained"
+          className="basis-[12%]"
+          onClick={handleInputSearch}
+        >
           <div className="flex items-center gap-1 font-overpass font-bold hover:bg-primary/90">
             <SearchIcon className="size-[18px] shrink-0" />
             <span className="translate-y-[1px]">Search</span>
           </div>
         </Button>
       </div>
+
       <div className="flex items-start justify-between gap-14 text-[11px]">
         <div className="flex items-center font-bold">
           <Switch

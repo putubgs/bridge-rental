@@ -1,9 +1,28 @@
-import { locationOptions } from "@/lib/static/locations-dummy";
 import { Autocomplete, TextField } from "@mui/material";
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
+import { locationOptions } from "@/lib/static/locations-dummy";
 
 export default function LocationInput({ formik }: { formik: any }) {
+  const { 
+    setDeliveryLocation, 
+    setReturnLocation,
+    deliveryLocation,
+    returnLocation 
+  } = useRentDetailsStore();
+
+  const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
+    if (newLocation) {
+      setDeliveryLocation(newLocation);
+      formik.setFieldValue("delivery_location", newLocation);
+
+      if (formik.values.same_return_location) {
+        setReturnLocation(newLocation);
+        formik.setFieldValue("return_location", newLocation);
+      }
+    }
+  };
+
   return (
     <div className="h-13 flex basis-[40%] gap-1 border border-neutral-400 bg-white text-black items-center">
       <div className="flex h-full items-end p-2 pb-2.5 pr-1">
@@ -14,10 +33,8 @@ export default function LocationInput({ formik }: { formik: any }) {
           CAR DELIVERY LOCATION
         </span>
         <Autocomplete
-          value={formik.values ? formik.values["delivery_location"] : ""}
-          onChange={(_, newVal) =>
-            formik.setFieldValue("delivery_location", newVal)
-          }
+          value={formik.values["delivery_location"] || deliveryLocation || ""}
+          onChange={handleDeliveryLocationChange}
           disablePortal
           options={locationOptions}
           renderOption={(props, option) => {
@@ -64,10 +81,11 @@ export default function LocationInput({ formik }: { formik: any }) {
             CAR RETURN LOCATION
           </span>
           <Autocomplete
-            value={formik.values ? formik.values["return_location"] : ""}
-            onChange={(_, newVal) =>
-              formik.setFieldValue("return_location", newVal)
-            }
+            value={formik.values["return_location"] || returnLocation || ""}
+            onChange={(_, newVal) => {
+              setReturnLocation(newVal);
+              formik.setFieldValue("return_location", newVal);
+            }}
             disablePortal
             options={locationOptions}
             renderOption={(props, option) => {

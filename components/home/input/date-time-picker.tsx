@@ -7,25 +7,21 @@ import {
 } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
-import { useEffect } from "react";
 
 interface IDateTimePicker {
   dateLabel?: string;
   timeLabel?: string;
-  setDate: (date: Dayjs) => void;
-  setTime: (time: Dayjs) => void;
-  currentDate: Dayjs | null;
-  currentTime: Dayjs | null;
   minDate?: Dayjs;
   minTime?: Dayjs;
   value: Dayjs;
+  timeValue: Dayjs | null;
   onDateChange:
     | ((
-        value: dayjs.Dayjs | null,
+        value: Dayjs | null,
         context: PickerChangeHandlerContext<DateValidationError>,
       ) => void)
     | undefined;
-  onTimeChange: (value: dayjs.Dayjs | null) => void;
+  onTimeChange: (value: Dayjs | null) => void;
 }
 
 export default function DateTimePicker({
@@ -35,32 +31,8 @@ export default function DateTimePicker({
   onTimeChange,
   dateLabel = "DATE",
   timeLabel = "TIME",
-  setDate,
-  setTime,
-  currentDate,
-  currentTime,
   minDate = dayjs.tz(),
 }: IDateTimePicker) {
-
-  useEffect(() => {
-    if (defaultDateTime != null) {
-      if (!currentDate || !currentDate.isSame(defaultDateTime, 'day')) {
-        setDate(defaultDateTime);
-      }
-      if (!currentTime || !currentTime.isSame(defaultDateTime, 'minute')) {
-        setTime(defaultDateTime);
-      }
-    }
-  }, [defaultDateTime, setDate, setTime, currentDate, currentTime]);
-
-  const handleDateChange = (newDate: Dayjs | null) => {
-    if (newDate) setDate(newDate);
-  };
-
-  const handleTimeChange = (newTime: Dayjs | null) => {
-    if (newTime) setTime(newTime);
-  };
-
   return (
     <div className="relative flex basis-[30%] justify-between border border-neutral-400 bg-white text-black">
       <div className="flex h-full items-end p-2 pb-2.5 pr-0">
@@ -72,7 +44,6 @@ export default function DateTimePicker({
           value={value}
           onChange={onDateChange}
           format="MMM DD, YYYY"
-          onChange={handleDateChange}
           minDate={minDate}
           slots={{
             openPickerIcon: () => (

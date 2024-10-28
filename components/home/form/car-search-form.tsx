@@ -8,7 +8,10 @@ import dayjs from "dayjs";
 import DateRangePicker from "../input/date-range-picker";
 import LocationInput from "../input/location-input";
 import { useRouter } from "next/navigation";
-import { useCarSearchStore, useRentDetailsStore } from "@/store/reservation-store";
+import {
+  useCarSearchStore,
+  useRentDetailsStore,
+} from "@/store/reservation-store";
 
 const carSearchSchema = yup.object({
   delivery_location: yup.string().required("Delivery location is required"),
@@ -59,8 +62,6 @@ export default function CarSearchForm() {
         return_date: values.return_date?.toString() ?? null,
         return_time: values.return_time.format("HH:mm"),
       };
-
-      console.log(formattedValues);
 
       setDeliveryDate(values.delivery_date);
       setDeliveryTime(values.delivery_time);

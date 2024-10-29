@@ -22,8 +22,7 @@ export default function ReservationPage() {
         (!showMoreThanFiveSeats || car.passengers_capacity > 5),
     );
     setFilteredCars(filtered);
-    setCarId('');
-  }, [selectedType, showMoreThanFiveSeats, setCarId]);
+  }, [selectedType, showMoreThanFiveSeats]);
 
   return (
     <main className="space-y-12 p-20">

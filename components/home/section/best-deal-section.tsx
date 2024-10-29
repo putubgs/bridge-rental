@@ -1,7 +1,7 @@
 "use client";
 
 import useDialog from "@/hooks/useDialog";
-import { Button, Dialog, IconButton } from "@mui/material";
+import { Dialog, IconButton } from "@mui/material";
 import { XIcon } from "lucide-react";
 import Image from "next/image";
 
@@ -18,7 +18,7 @@ export default function BestDealSection() {
           className="-z-10 object-cover"
           sizes="(max-width: 768px) 90vw, 100vw"
         />
-        <div className="absolute -top-5 right-0 bg-gradient-to-r from-[#FF8181] to-[#FF4040] px-7 py-3 text-lg font-bold">
+        <div className="absolute -top-5 right-1 bg-gradient-to-r from-[#FF8181] to-[#FF4040] px-7 py-3 text-lg font-bold">
           BEST DEAL!
         </div>
         <div className="absolute bottom-11 right-12 h-[33px] w-[109px]">
@@ -45,13 +45,12 @@ export default function BestDealSection() {
         </ul>
         <p>Your adventure is just a click away. enjoy worry-free travels.</p>
         <div className="pt-14">
-          <Button
+          <button
             onClick={handleOpen}
-            variant="outlined"
-            className="border-white px-14 font-medium text-white"
+            className="border pt-3 pb-2 border-white px-14 font-medium text-white text-[20px]"
           >
             LEARN MORE
-          </Button>
+          </button>
         </div>
         <Dialog
           open={open}

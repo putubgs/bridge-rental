@@ -18,15 +18,15 @@ export default function BookingSection() {
         className="-z-10 object-cover"
         sizes="(max-width: 768px) 90vw, 100vw"
       />
-      <section className="flex h-full flex-col items-center justify-end gap-3 text-center">
-        <Button
+      <section className="flex h-full flex-col items-center justify-end gap-4 pb-8 text-center">
+        <button
           onClick={handleScrollToTop}
-          className="bg-white px-14 font-medium uppercase text-black hover:bg-neutral-200"
+          className="rounded-sm bg-white px-16 pb-2 pt-3 text-[20px] font-medium uppercase text-black hover:bg-neutral-200"
         >
           Book Now
-        </Button>
-        <p className="w-1/4 leading-none">
-          Your adventure is just a click away, enjoy worry-free travels.
+        </button>
+        <p className="w-1/4 leading-normal">
+          Your adventure is just a click away, <br /> enjoy worry-free travels.
         </p>
       </section>
     </div>

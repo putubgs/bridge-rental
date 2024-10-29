@@ -94,7 +94,7 @@ export default function CarSearchForm() {
       <div className="flex items-start justify-between gap-14 text-[11px]">
         <div className="flex items-center gap-2 font-bold">
           <Toggle
-            size="30px"
+            size="20px"
             onColor="#BAF0E2"
             offColor="#ddd"
             handleColor="#fff"
@@ -103,7 +103,7 @@ export default function CarSearchForm() {
               formik.setFieldValue("same_return_location", isChecked)
             }
           />
-          <span className="whitespace-nowrap text-sm">
+          <span className="whitespace-nowrap text-sm pt-1">
             RETURN TO SAME LOCATION
           </span>
         </div>

@@ -24,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground">
+      <body className="mx-auto max-w-[1920px]">
         <MuiLocalizationProvider>
           <MuiThemeProvider>
             <Navbar />

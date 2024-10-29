@@ -21,7 +21,7 @@ export default function HomePage() {
   }, [setSearchCompleted]);
 
   return (
-    <main>
+    <main className="relative -top-20">
       <HeroSection />
       <ExperienceSection />
       <BookingSection />

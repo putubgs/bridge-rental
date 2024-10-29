@@ -49,7 +49,7 @@ export default function ReservationLayout({
 
   if (!searchCompleted) {
     return (
-      <div className="flex items-center justify-center relative -top-20">
+      <div className="flex items-center justify-center relative -top-20 h-screen">
         <div className="flex flex-col items-center p-8">
           <h1 className="text-xl font-bold">Page Error!</h1>
           <p className="mt-4 text-center">

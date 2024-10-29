@@ -1,3 +1,4 @@
+import dayjs, { Dayjs } from "dayjs";
 import { redirect } from "next/navigation";
 
 /**
@@ -13,4 +14,24 @@ export function encodedRedirect(
   message: string,
 ) {
   return redirect(`${path}?${type}=${encodeURIComponent(message)}`);
+}
+
+export function countDays(
+  deliveryDate: Dayjs | null,
+  deliveryTime: Dayjs | null,
+  returnDate: Dayjs | null,
+  returnTime: Dayjs | null,
+) {
+  if (!deliveryDate || !deliveryTime || !returnDate || !returnTime) return 0;
+
+  const startDateTime = dayjs(deliveryDate).set(
+    "hour",
+    dayjs(deliveryTime).hour(),
+  );
+  const endDateTime = dayjs(returnDate).set("hour", dayjs(returnTime).hour());
+
+  const totalHours = endDateTime.diff(startDateTime, "hour");
+  const totalDays = Math.ceil(totalHours / 24);
+
+  return totalDays;
 }

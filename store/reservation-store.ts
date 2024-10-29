@@ -1,6 +1,12 @@
-import { create } from "zustand";
+import {
+  BundleType,
+  ChildrenExtrasType,
+  ExtrasType,
+  ProtectionType,
+} from "@/lib/enums";
+import { IChildrenSeatsQuantity } from "@/lib/types";
 import { Dayjs } from "dayjs";
-import { BundleType } from "@/lib/enums";
+import { create } from "zustand";
 
 interface CarSearchState {
   searchCompleted: boolean;
@@ -24,6 +30,12 @@ interface RentDetailsState {
   selected_bundle: BundleType | null;
   totalBundlePrice: number;
   rent_status: string;
+  selected_protection: ProtectionType | null;
+  totalProtectionPrice: number;
+  selected_extras: ExtrasType[];
+  selected_children_extras: ChildrenExtrasType[];
+  totalExtrasPrice: number;
+  childrenSeatsQuantity: IChildrenSeatsQuantity;
 
   setCarId: (id: string) => void;
   setCustomerFirstname: (firstname: string) => void;
@@ -41,6 +53,12 @@ interface RentDetailsState {
   setSelectedBundle: (bundle: BundleType | null) => void;
   setTotalBundlePrice: (price: number) => void;
   setRentStatus: (status: string) => void;
+  setSelectedProtection: (protection: ProtectionType) => void;
+  setTotalProtectionPrice: (price: number) => void;
+  setSelectedExtras: (extras: ExtrasType[]) => void;
+  setTotalExtrasPrice: (price: number) => void;
+  setSelectedChildrenExtras: (extras: ChildrenExtrasType[]) => void;
+  setChildrenSeatsQuantity: (extras: IChildrenSeatsQuantity) => void;
 }
 
 export const useCarSearchStore = create<CarSearchState>((set) => ({
@@ -66,6 +84,15 @@ export const useRentDetailsStore = create<RentDetailsState>((set) => ({
   selected_bundle: null,
   totalBundlePrice: 0,
   rent_status: "",
+  selected_protection: ProtectionType.protection1,
+  totalProtectionPrice: 0,
+  selected_extras: [],
+  selected_children_extras: [],
+  totalExtrasPrice: 0,
+  childrenSeatsQuantity: {
+    infant_car_seats: 1,
+    booster_car_seats: 1,
+  },
 
   setCarId: (id) => set({ car_id: id }),
   setCustomerFirstname: (firstname) => set({ customer_firstname: firstname }),
@@ -84,4 +111,12 @@ export const useRentDetailsStore = create<RentDetailsState>((set) => ({
   setSelectedBundle: (bundle) => set({ selected_bundle: bundle }),
   setTotalBundlePrice: (price) => set({ totalBundlePrice: price }),
   setRentStatus: (status) => set({ rent_status: status }),
+  setSelectedProtection: (protection) =>
+    set({ selected_protection: protection }),
+  setTotalProtectionPrice: (price) => set({ totalProtectionPrice: price }),
+  setSelectedExtras: (extras) => set({ selected_extras: extras }),
+  setSelectedChildrenExtras: (extras) =>
+    set({ selected_children_extras: extras }),
+  setTotalExtrasPrice: (price) => set({ totalExtrasPrice: price }),
+  setChildrenSeatsQuantity: (extras) => set({ childrenSeatsQuantity: extras }),
 }));

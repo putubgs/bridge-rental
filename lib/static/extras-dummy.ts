@@ -59,11 +59,13 @@ export const extras = [
 
 export const childrenExtras = [
   {
-    name: "Infant Car Seats (0-13 kg)",
+    name: "infant_car_seats",
+    supported_weight: "0-13 kg",
     price: 5,
   },
   {
-    name: "Booster Car Seats (14-36 kg)",
+    name: "booster_car_seats",
+    supported_weight: "14-36 kg",
     price: 5,
   },
 ];

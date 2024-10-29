@@ -7,6 +7,7 @@ interface ToggleProps {
   offColor?: string;
   handleColor?: string;
   onToggle?: (checked: boolean) => void;
+  defaultChecked?: boolean;
 }
 
 const Toggle: FC<ToggleProps> = ({
@@ -15,6 +16,7 @@ const Toggle: FC<ToggleProps> = ({
   offColor,
   handleColor,
   onToggle,
+  defaultChecked = false,
 }) => {
   const width = `calc(${size} * 2)`;
 
@@ -38,7 +40,11 @@ const Toggle: FC<ToggleProps> = ({
         } as React.CSSProperties
       }
     >
-      <input type="checkbox" onChange={handleChange} />
+      <input
+        defaultChecked={defaultChecked}
+        type="checkbox"
+        onChange={handleChange}
+      />
       <div className="toggle-switch-background">
         <div className="toggle-switch-handle"></div>
       </div>

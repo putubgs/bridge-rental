@@ -10,9 +10,19 @@ import { vehiclesData } from "@/lib/static/vehicles-dummy";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
+import { BundleType } from "@/lib/enums";
 
 export default function CarBundle() {
-  const { car_id, deliveryDate, deliveryTime, returnDate, returnTime, totalBundlePrice, setTotalBundlePrice } = useRentDetailsStore();
+  const {
+    car_id,
+    deliveryDate,
+    deliveryTime,
+    returnDate,
+    returnTime,
+    totalBundlePrice,
+    setTotalBundlePrice,
+    setSelectedBundle,
+  } = useRentDetailsStore();
   const router = useRouter();
 
   const car = vehiclesData.find((vehicle) => vehicle.car_id === car_id);
@@ -23,10 +33,13 @@ export default function CarBundle() {
 
   useEffect(() => {
     setTotalBundlePrice(0);
-  }, [setTotalBundlePrice])
+  }, [setTotalBundlePrice]);
 
-  const selectPackage = (pricePerDay: number) => {
-    const startDateTime = dayjs(deliveryDate).set("hour", dayjs(deliveryTime).hour());
+  const selectPackage = (pricePerDay: number, bundleType: BundleType) => {
+    const startDateTime = dayjs(deliveryDate).set(
+      "hour",
+      dayjs(deliveryTime).hour(),
+    );
     const endDateTime = dayjs(returnDate).set("hour", dayjs(returnTime).hour());
 
     const totalHours = endDateTime.diff(startDateTime, "hour");
@@ -34,10 +47,10 @@ export default function CarBundle() {
 
     const totalPrice = totalDays * pricePerDay;
     setTotalBundlePrice(totalPrice);
+    setSelectedBundle(bundleType);
 
     router.push("/reservation/protection-and-extras");
   };
-
 
   return (
     <div className="mt-10 w-full bg-white px-20 py-10">
@@ -105,9 +118,12 @@ export default function CarBundle() {
             <div className="bg-[#BAF0E2] py-5 text-center">
               <p>GRAB AND DRIVE</p>
             </div>
-            <div className="font-outfit flex flex-col pt-7">
+            <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
-                <span className="text-[32px]">{car.grab_and_drive_price_per_day}</span>.00/day
+                <span className="text-[32px]">
+                  {car.grab_and_drive_price_per_day}
+                </span>
+                .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
                 ({car.grab_and_drive_price_per_day * 2}.00 JOD for 2 days)
@@ -144,7 +160,15 @@ export default function CarBundle() {
               </ul>
             </div>
 
-            <button className="m-4 mt-6 rounded-md bg-gradient-to-r from-[#8BD6D6] to-[#BAF0E2] py-2 text-white" onClick={() => selectPackage(car.grab_and_drive_price_per_day)}>
+            <button
+              className="m-4 mt-6 rounded-md bg-gradient-to-r from-[#8BD6D6] to-[#BAF0E2] py-2 text-white"
+              onClick={() =>
+                selectPackage(
+                  car.grab_and_drive_price_per_day,
+                  BundleType.bundle1,
+                )
+              }
+            >
               <p className="pt-1">SELECT</p>
             </button>
           </div>
@@ -153,9 +177,12 @@ export default function CarBundle() {
             <div className="bg-[#EEEEEE] py-5 text-center">
               <p>COMPLETE FEE RATE</p>
             </div>
-            <div className="font-outfit flex flex-col pt-7">
+            <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
-                <span className="text-[32px]">{car.complete_fee_rate_price_per_day}</span>.00/day
+                <span className="text-[32px]">
+                  {car.complete_fee_rate_price_per_day}
+                </span>
+                .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
                 ({car.complete_fee_rate_price_per_day * 2}.00 JOD for 2 days)
@@ -192,7 +219,15 @@ export default function CarBundle() {
               </ul>
             </div>
 
-            <button className="m-4 mt-6 rounded-md bg-[#A0A0A0] py-2 text-white" onClick={() => selectPackage(car.complete_fee_rate_price_per_day)}>
+            <button
+              className="m-4 mt-6 rounded-md bg-[#A0A0A0] py-2 text-white"
+              onClick={() =>
+                selectPackage(
+                  car.complete_fee_rate_price_per_day,
+                  BundleType.bundle2,
+                )
+              }
+            >
               <p className="pt-1">SELECT</p>
             </button>
           </div>
@@ -201,9 +236,12 @@ export default function CarBundle() {
             <div className="bg-[#EEEEEE] py-5 text-center">
               <p>PACKED TO THE BRIM</p>
             </div>
-            <div className="font-outfit flex flex-col pt-7">
+            <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
-                <span className="text-[32px]">{car.packed_to_the_brim_price_per_day}</span>.00/day
+                <span className="text-[32px]">
+                  {car.packed_to_the_brim_price_per_day}
+                </span>
+                .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
                 ({car.packed_to_the_brim_price_per_day * 2}.00 JOD for 2 days)
@@ -236,7 +274,15 @@ export default function CarBundle() {
               </ul>
             </div>
 
-            <button className="m-4 mt-6 rounded-md bg-[#CBCBCB] py-2 text-white" onClick={() => selectPackage(car.packed_to_the_brim_price_per_day)}>
+            <button
+              className="m-4 mt-6 rounded-md bg-[#CBCBCB] py-2 text-white"
+              onClick={() =>
+                selectPackage(
+                  car.packed_to_the_brim_price_per_day,
+                  BundleType.bundle3,
+                )
+              }
+            >
               <p className="pt-1">SELECT</p>
             </button>
           </div>

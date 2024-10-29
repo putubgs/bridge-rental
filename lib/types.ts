@@ -1,3 +1,5 @@
+import { ExtrasType } from "./enums";
+
 export interface IReview {
   review_id: string;
   customer_name: string;
@@ -20,4 +22,10 @@ export interface ICarModel {
   grab_and_drive_price_per_day: number;
   complete_fee_rate_price_per_day: number;
   packed_to_the_brim_price_per_day: number;
+}
+
+export interface IChildrenSeatsQuantity {
+  [key: string]: number;
+  infant_car_seats: number;
+  booster_car_seats: number;
 }

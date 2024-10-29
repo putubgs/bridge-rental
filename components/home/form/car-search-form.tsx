@@ -12,6 +12,7 @@ import {
   useCarSearchStore,
   useRentDetailsStore,
 } from "@/store/reservation-store";
+import Toggle from "@/components/shared/toggle/toggle";
 
 const carSearchSchema = yup.object({
   delivery_location: yup.string().required("Delivery location is required"),
@@ -91,15 +92,20 @@ export default function CarSearchForm() {
       </div>
 
       <div className="flex items-start justify-between gap-14 text-[11px]">
-        <div className="flex items-center font-bold">
-          <Switch
-            color="primary"
-            checked={formik?.values["same_return_location"]}
-            onChange={(e) =>
-              formik.setFieldValue("same_return_location", e.target.checked)
+        <div className="flex items-center gap-2 font-bold">
+          <Toggle
+            size="30px"
+            onColor="#BAF0E2"
+            offColor="#ddd"
+            handleColor="#fff"
+            defaultChecked
+            onToggle={(isChecked) =>
+              formik.setFieldValue("same_return_location", isChecked)
             }
           />
-          <span className="whitespace-nowrap">RETURN TO SAME LOCATION</span>
+          <span className="whitespace-nowrap text-sm">
+            RETURN TO SAME LOCATION
+          </span>
         </div>
         <div className="text-end">
           <p>

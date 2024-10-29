@@ -49,7 +49,7 @@ export default function ReservationLayout({
 
   if (!searchCompleted) {
     return (
-      <div className="flex items-center justify-center h-screen relative -top-20">
+      <div className="flex items-center justify-center relative -top-20">
         <div className="flex flex-col items-center p-8">
           <h1 className="text-xl font-bold">Page Error!</h1>
           <p className="mt-4 text-center">
@@ -67,7 +67,7 @@ export default function ReservationLayout({
   }
 
   return (
-    <div className="relative -top-20 flex w-screen max-w-[1920px] flex-col bg-[#F9F9F9] pt-32">
+    <div className="relative -top-20 flex max-w-[1920px] flex-col bg-[#F9F9F9] pt-32">
       {pathname !== "/reservation/car-choices" && (
         <div className="flex w-full gap-2 px-20">
           <div

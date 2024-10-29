@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function HelpPage() {
   return (
-    <div className="bg-[#F9F9F9]">
+    <div className="bg-[#F9F9F9] relative -top-20">
       <main className="mx-auto flex max-w-screen-2xl flex-col items-center gap-16 px-20 pb-32 pt-40">
         <section className="text-center">
           <h2 className="font-poppins text-5xl font-semibold">

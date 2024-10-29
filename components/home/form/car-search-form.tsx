@@ -39,6 +39,11 @@ export default function CarSearchForm() {
   } = useRentDetailsStore();
 
   const handleInputSearch = () => {
+    if (!formik.values.delivery_location || !formik.values.return_location) {
+      alert("Please fill the location details.");
+      return;
+    }
+    
     setSearchCompleted(true);
     router.push("/reservation/car-choices");
   };

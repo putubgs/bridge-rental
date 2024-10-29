@@ -75,7 +75,7 @@ export default function PaymentForm() {
         </div>
         <div className="flex gap-3">
           <div className="relative w-1/2 border-2 border-primary bg-white px-6 pb-5 pt-14">
-            <div className="absolute -right-2 top-0 bg-[#FF8181] px-4 py-[1px] text-sm text-white">
+            <div className="absolute right-0 top-0 bg-[#FF8181] px-4 py-[1px] text-sm text-white">
               -5%
             </div>
             <h3 className="font-semibold">Pay Now</h3>

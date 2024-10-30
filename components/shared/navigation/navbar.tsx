@@ -14,7 +14,7 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-30 w-full bg-transparent">
       <div
-        className={`mx-auto max-w-[1560px] w-full px-4 lg:px-20 py-5 transition-colors duration-300 ${
+        className={`mx-auto max-w-[1920px] w-full px-4 lg:px-20 py-5 transition-colors duration-300 ${
           isScrolled ? "bg-black" : ""
         }`}
       >

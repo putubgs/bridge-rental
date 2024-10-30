@@ -67,7 +67,7 @@ export default function ReservationLayout({
   }
 
   return (
-    <div className="relative -top-20 flex max-w-[1560px] flex-col bg-[#F9F9F9] pt-32">
+    <div className="relative -top-20 flex max-w-[1920px] flex-col bg-[#F9F9F9] pt-32">
       {pathname !== "/reservation/car-choices" && (
         <div className="flex w-full gap-2 px-20">
           <div

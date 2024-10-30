@@ -4,7 +4,7 @@ import ExperienceSection from "./experience-section";
 
 export default function HeroSection() {
   return (
-<section className="relative z-0 w-full h-screen max-h-[800px] px-20 pb-16 text-white">
+<section className="relative z-0 w-full h-screen max-h-[850px] px-20 pb-16 text-white">
       <Image
         src={"/assets/img/home-page-hero-banner.png"}
         alt="Banner Image"

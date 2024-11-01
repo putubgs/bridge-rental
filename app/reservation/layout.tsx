@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useRentDetailsStore, useCarSearchStore } from "@/store/reservation-store";
+import {
+  useRentDetailsStore,
+  useCarSearchStore,
+} from "@/store/reservation-store";
 import { vehiclesData } from "@/lib/static/vehicles-dummy";
 
 export default function ReservationLayout({
@@ -12,7 +15,7 @@ export default function ReservationLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  
+
   const {
     deliveryLocation,
     returnLocation,
@@ -22,6 +25,8 @@ export default function ReservationLayout({
     returnTime,
     car_id,
     totalBundlePrice,
+    totalExtrasPrice,
+    totalProtectionPrice,
   } = useRentDetailsStore();
 
   const { searchCompleted } = useCarSearchStore();
@@ -36,7 +41,7 @@ export default function ReservationLayout({
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (!searchCompleted || !car_id || !totalBundlePrice) {
         e.preventDefault();
-        e.returnValue = '';
+        e.returnValue = "";
       }
     };
 
@@ -49,14 +54,14 @@ export default function ReservationLayout({
 
   if (!searchCompleted) {
     return (
-      <div className="flex items-center justify-center relative -top-20 h-screen">
+      <div className="relative -top-20 flex h-screen items-center justify-center">
         <div className="flex flex-col items-center p-8">
           <h1 className="text-xl font-bold">Page Error!</h1>
           <p className="mt-4 text-center">
             Please follow the process properly to avoid this error occur.
           </p>
           <button
-            className="mt-6 px-4 py-2 bg-[#8BD6D6] text-white rounded cursor-pointer"
+            className="mt-6 cursor-pointer rounded bg-[#8BD6D6] px-4 py-2 text-white"
             onClick={() => router.push("/")}
           >
             Go back to Main Page
@@ -137,9 +142,9 @@ export default function ReservationLayout({
             </div>
           )}
 
-          {pathname == "/reservation/protection-and-extras" ? (
+          {pathname === "/reservation/protection-and-extras" ? (
             <div
-              className="flex w-full flex-col justify-between gap-4 bg-white border-2 border-[#BAF0E2] p-3"
+              className="flex w-full flex-col justify-between gap-4 border-2 border-[#BAF0E2] bg-white p-3"
               style={{ flexBasis: "25%" }}
             >
               <div className="flex items-center gap-2">
@@ -148,9 +153,20 @@ export default function ReservationLayout({
                 </p>
                 <p className="pt-1">Protection & Extras</p>
               </div>
-              <p className="pb-3 text-[13px] text-[#D2D2D2]">
-                You can choose extras and protection after selecting a vehicle
-              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <p className="text-[15px]">Protection</p>
+                  <p className="text-[13px]">
+                    {totalProtectionPrice.toFixed(2)} JOD
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[15px]">Extra</p>
+                  <p className="text-[13px]">
+                    {totalExtrasPrice.toFixed(2)} JOD
+                  </p>
+                </div>
+              </div>
             </div>
           ) : (
             <div
@@ -158,27 +174,74 @@ export default function ReservationLayout({
               style={{ flexBasis: "25%" }}
             >
               <div className="flex items-center gap-2">
-                <p className="flex h-[23px] w-[23px] items-center justify-center rounded-full bg-[#E9E9E9] pt-1 text-[#A3A3A3]">
+                <p
+                  className={`flex h-[23px] w-[23px] items-center justify-center rounded-full border pt-1 ${totalBundlePrice ? "border-black bg-transparent" : "bg-[#E9E9E9] text-[#A3A3A3]"}`}
+                >
                   3
                 </p>
-                <p className="pt-1 text-[#A3A3A3]">Protection & Extras</p>
+                <p className={`pt-1 ${!totalBundlePrice && "text-[#A3A3A3]"}`}>
+                  Protection & Extras
+                </p>
               </div>
-              <p className="pb-3 text-[13px] text-[#D2D2D2]">
-                You can choose extras and protection after selecting a vehicle
-              </p>
+              {totalBundlePrice ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-[15px]">Protection</p>
+                    <p className="text-[13px]">
+                      {totalProtectionPrice.toFixed(2)} JOD
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[15px]">Extra</p>
+                    <p className="text-[13px]">
+                      {totalExtrasPrice.toFixed(2)} JOD
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="pb-3 text-[13px] text-[#D2D2D2]">
+                  You can choose extras and protection after selecting a vehicle
+                </p>
+              )}
             </div>
           )}
-          <div
-            className="flex w-full flex-col justify-between gap-4 bg-white p-3"
-            style={{ flexBasis: "17.5%" }}
-          >
-            <div className="flex items-center gap-2">
-              <p className="flex h-[23px] w-[23px] items-center justify-center rounded-full bg-[#E9E9E9] pt-1 text-[#A3A3A3]">
-                4
-              </p>
-              <p className="pt-1 text-[#A3A3A3]">Review & Reserve</p>
+
+          {pathname === "/reservation/review" ? (
+            <div
+              className="flex w-full flex-col justify-between gap-4 border-2 border-[#BAF0E2] bg-white p-3"
+              style={{ flexBasis: "25%" }}
+            >
+              <div className="flex items-center gap-2">
+                <p className="flex h-[23px] w-[23px] items-center justify-center rounded-full bg-[#BAF0E2] pt-1">
+                  4
+                </p>
+                <p className="pt-1">Review & Reserve</p>
+              </div>
+              <div>
+                <p className="text-[15px]">Total Price</p>
+                <p className="text-[13px]">
+                  {(
+                    totalBundlePrice +
+                    totalExtrasPrice +
+                    totalProtectionPrice
+                  ).toFixed(2)}
+                  JOD
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div
+              className="flex w-full flex-col justify-between gap-4 bg-white p-3"
+              style={{ flexBasis: "17.5%" }}
+            >
+              <div className="flex items-center gap-2">
+                <p className="flex h-[23px] w-[23px] items-center justify-center rounded-full bg-[#E9E9E9] pt-1 text-[#A3A3A3]">
+                  4
+                </p>
+                <p className="pt-1 text-[#A3A3A3]">Review & Reserve</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
       <div className="">{children}</div>

@@ -3,7 +3,7 @@ import { Checkbox, TextField } from "@mui/material";
 import Image from "next/image";
 import { FormEvent } from "react";
 
-export default function PaymentForm() {
+export default function PaymentForm({ formik }: { formik: any }) {
   const { totalBundlePrice, totalExtrasPrice, totalProtectionPrice } =
     useRentDetailsStore();
 
@@ -85,7 +85,10 @@ export default function PaymentForm() {
             <p className="mb-5 mt-4 font-semibold">
               {discountedPrice.toFixed(2)} JOD
             </p>
-            <button className="w-full rounded bg-primary-variant-2 px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3">
+            <button
+              onClick={() => formik.submitForm()}
+              className="w-full rounded bg-primary-variant-2 px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3"
+            >
               PAY NOW
             </button>
           </div>

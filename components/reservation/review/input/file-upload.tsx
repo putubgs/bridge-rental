@@ -3,9 +3,13 @@ import Image from "next/image";
 
 interface FileUploadProps {
   onFileSelect: (base64: string) => void;
+  isFieldError?: boolean;
 }
 
-export default function FileUpload({ onFileSelect }: FileUploadProps) {
+export default function FileUpload({
+  onFileSelect,
+  isFieldError = false,
+}: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,11 +84,9 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
 
   return (
     <div
-      className={`cursor-pointer rounded-lg border text-center transition-colors ${
-        isDragging
-          ? "border-primary-variant-3 bg-primary-variant-1"
-          : "border-[#B2B2B2] bg-white hover:border-black"
-      }`}
+      className={`h-full cursor-pointer rounded-lg border text-center transition-colors ${
+        isDragging && "border-primary-variant-3 bg-primary-variant-1"
+      } ${isFieldError ? "border-red-600" : "border-[#B2B2B2] bg-white hover:border-black"}`}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}

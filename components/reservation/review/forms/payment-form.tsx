@@ -1,16 +1,22 @@
 import { useRentDetailsStore } from "@/store/reservation-store";
-import { Checkbox, TextField } from "@mui/material";
+import { Checkbox, Stack, TextField, Typography } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
 import Image from "next/image";
-import { FormEvent } from "react";
 
-export default function PaymentForm({ formik }: { formik: any }) {
+export default function PaymentForm({
+  formik,
+  handlePayNow,
+  handlePayLater,
+}: {
+  formik: any;
+  handlePayNow: () => void;
+  handlePayLater: () => void;
+}) {
   const { totalBundlePrice, totalExtrasPrice, totalProtectionPrice } =
     useRentDetailsStore();
 
   const totalPrice = totalBundlePrice + totalExtrasPrice + totalProtectionPrice;
   const discountedPrice = totalPrice - totalPrice * 0.05;
-
-  const handleSubmit = (e: FormEvent) => e.preventDefault();
 
   return (
     <div className="bg-primary-variant-1 p-5">
@@ -21,38 +27,97 @@ export default function PaymentForm({ formik }: { formik: any }) {
           vehicle
         </p>
       </div>
-      <form onSubmit={handleSubmit} className="mt-5 grid grid-cols-2 gap-10">
+      <div className="mt-5 grid grid-cols-2 gap-10">
         <div>
           <div className="space-y-2">
-            <TextField
-              size="medium"
-              placeholder="Card number"
-              className="w-full bg-white"
-            />
+            <Stack spacing={1}>
+              <TextField
+                size="medium"
+                placeholder="Card number"
+                className="w-full bg-white"
+                required
+                value={formik.values ? formik.values["cardNumber"] : ""}
+                onChange={(event) =>
+                  formik.setFieldValue("cardNumber", event.target.value)
+                }
+                error={Boolean(formik.errors["cardNumber"])}
+              />
+              {formik.errors["cardNumber"] && (
+                <Typography className="text-red-700" fontSize={"12px"}>
+                  {formik.errors["cardNumber"]}
+                </Typography>
+              )}
+            </Stack>
+
             <div className="flex gap-2">
-              <TextField
-                size="medium"
-                placeholder="Expiry date"
-                className="w-4/5 bg-white"
-              />
-              <TextField
-                size="medium"
-                placeholder="CVV"
-                className="w-1/5 bg-white"
-              />
+              <Stack spacing={1} className="basis-4/5">
+                <DatePicker
+                  format="MMM DD, YYYY"
+                  value={formik.values["expiryDate"] || null}
+                  onChange={(value) =>
+                    formik.setFieldValue("expiryDate", value)
+                  }
+                  slotProps={{
+                    textField: {
+                      placeholder: "Expiry date",
+                      InputProps: {
+                        readOnly: true,
+                        sx: {
+                          backgroundColor: "white",
+                        },
+                      },
+                      error: Boolean(formik.errors["expiryDate"]),
+                    },
+                  }}
+                />
+                {formik.errors["expiryDate"] && (
+                  <Typography className="text-red-700" fontSize={"12px"}>
+                    {formik.errors["expiryDate"]}
+                  </Typography>
+                )}
+              </Stack>
+              <Stack spacing={1} className="basis-1/5">
+                <TextField
+                  size="medium"
+                  placeholder="CVV"
+                  className="w-full bg-white"
+                  required
+                  value={formik.values ? formik.values["cvv"] : ""}
+                  onChange={(event) =>
+                    formik.setFieldValue("cvv", event.target.value)
+                  }
+                  error={Boolean(formik.errors["cvv"])}
+                />
+                {formik.errors["cvv"] && (
+                  <Typography className="text-red-700" fontSize={"12px"}>
+                    {formik.errors["cvv"]}
+                  </Typography>
+                )}
+              </Stack>
             </div>
           </div>
           <div className="mt-5 flex items-center justify-between gap-7">
-            <div className="flex gap-2">
-              <Checkbox
-                id="agreement"
-                className="!h-fit !border-2 !bg-white !p-0"
-              />
-              <label htmlFor="agreement" className="text-xs text-neutral-400">
-                I acknowledge that I have read, understood and agree to Bridge
-                Rent-A-Car Terms and Conditions and Privacy Policy
-              </label>
-            </div>
+            <Stack spacing={1}>
+              <div className="flex gap-2">
+                <Checkbox
+                  checked={formik.values ? formik.values["agreement"] : false}
+                  onChange={(e) =>
+                    formik.setFieldValue("agreement", e.target.checked)
+                  }
+                  id="agreement"
+                  className="!h-fit !border-2 !bg-white !p-0"
+                />
+                <label htmlFor="agreement" className="text-xs text-neutral-400">
+                  I acknowledge that I have read, understood and agree to Bridge
+                  Rent-A-Car Terms and Conditions and Privacy Policy
+                </label>
+              </div>
+              {formik.errors["agreement"] && (
+                <Typography className="text-red-700" fontSize={"12px"}>
+                  {formik.errors["agreement"]}
+                </Typography>
+              )}
+            </Stack>
             <div className="flex gap-1">
               <div className="relative h-[38px] w-[59px]">
                 <Image
@@ -86,7 +151,7 @@ export default function PaymentForm({ formik }: { formik: any }) {
               {discountedPrice.toFixed(2)} JOD
             </p>
             <button
-              onClick={() => formik.submitForm()}
+              onClick={handlePayNow}
               className="w-full rounded bg-primary-variant-2 px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3"
             >
               PAY NOW
@@ -100,12 +165,15 @@ export default function PaymentForm({ formik }: { formik: any }) {
             <p className="mb-5 mt-4 font-semibold">
               {totalPrice.toFixed(2)} JOD
             </p>
-            <button className="w-full rounded bg-[#CBCBCB] px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-neutral-400">
+            <button
+              onClick={handlePayLater}
+              className="w-full rounded bg-[#CBCBCB] px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-neutral-400"
+            >
               PAY LATER
             </button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

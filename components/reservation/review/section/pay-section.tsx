@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useFormik } from "formik";
 import IdForm from "../forms/id-form";
 import PaymentForm from "../forms/payment-form";
@@ -17,7 +18,7 @@ const validationSchema = yup.object().shape({
   idDocument: yup.string().required("ID document is required"),
   agreement: yup.boolean().oneOf([true], "You must agree to the terms"),
   cardNumber: yup.string(),
-  expiryDate: yup.string(),
+  expiryDate: yup.date(),
   cvv: yup.string(),
 });
 
@@ -31,6 +32,11 @@ export default function PaySection() {
       dateOfBirth: "",
       phoneNumber: "",
       idDocument: "",
+      agreement: false,
+      cardNumber: "",
+      expiryDate: "",
+      cvv: "",
+      paymentMethod: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -38,10 +44,33 @@ export default function PaySection() {
     },
   });
 
+  const handlePayNow = async () => {
+    const cardNumberValue = formik.values["cardNumber"];
+
+    if (!cardNumberValue || cardNumberValue?.length === 0) {
+      await formik.validateForm();
+      formik.setFieldError("cardNumber", "Card number is required");
+      formik.setFieldError("expiryDate", "Expiry date is required");
+      formik.setFieldError("ccv", "CCV is required");
+
+      return;
+    }
+
+    formik.submitForm();
+  };
+
+  const handlePayLater = () => {
+    formik.submitForm();
+  };
+
   return (
     <section className="mt-5 space-y-5">
       <IdForm formik={formik} />
-      <PaymentForm formik={formik} />
+      <PaymentForm
+        formik={formik}
+        handlePayNow={handlePayNow}
+        handlePayLater={handlePayLater}
+      />
     </section>
   );
 }

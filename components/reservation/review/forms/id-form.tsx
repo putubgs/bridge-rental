@@ -1,5 +1,6 @@
 import { Stack, TextField, Typography } from "@mui/material";
 import FileUpload from "../input/file-upload";
+import { DatePicker } from "@mui/x-date-pickers";
 
 export default function IdForm({ formik }: { formik: any }) {
   return (
@@ -18,16 +19,13 @@ export default function IdForm({ formik }: { formik: any }) {
               placeholder="First name*"
               className="w-full bg-white"
               required
-              value={formik.values ? formik.values["firstName"] : ""}
+              value={formik.values["firstName"] ?? ""}
               onChange={(event) =>
                 formik.setFieldValue("firstName", event.target.value)
               }
-              error={
-                formik.touched["firstName"] &&
-                Boolean(formik.errors["firstName"])
-              }
+              error={Boolean(formik.errors["firstName"])}
             />
-            {formik.touched["firstName"] && formik.errors["firstName"] && (
+            {formik.errors["firstName"] && (
               <Typography className="text-red-700" fontSize={"12px"}>
                 {formik.errors["firstName"]}
               </Typography>
@@ -39,15 +37,13 @@ export default function IdForm({ formik }: { formik: any }) {
               placeholder="Last name*"
               className="w-full bg-white"
               required
-              value={formik.values ? formik.values["lastName"] : ""}
+              value={formik.values["lastName"] ?? ""}
               onChange={(event) =>
                 formik.setFieldValue("lastName", event.target.value)
               }
-              error={
-                formik.touched["lastName"] && Boolean(formik.errors["lastName"])
-              }
+              error={Boolean(formik.errors["lastName"])}
             />
-            {formik.touched["lastName"] && formik.errors["lastName"] && (
+            {formik.errors["lastName"] && (
               <Typography className="text-red-700" fontSize={"12px"}>
                 {formik.errors["lastName"]}
               </Typography>
@@ -59,13 +55,13 @@ export default function IdForm({ formik }: { formik: any }) {
               placeholder="Email address*"
               className="w-full bg-white"
               required
-              value={formik.values ? formik.values["email"] : ""}
+              value={formik.values["email"] ?? ""}
               onChange={(event) =>
                 formik.setFieldValue("email", event.target.value)
               }
-              error={formik.touched["email"] && Boolean(formik.errors["email"])}
+              error={Boolean(formik.errors["email"])}
             />
-            {formik.touched["email"] && formik.errors["email"] && (
+            {formik.errors["email"] && (
               <Typography className="text-red-700" fontSize={"12px"}>
                 {formik.errors["email"]}
               </Typography>
@@ -77,59 +73,56 @@ export default function IdForm({ formik }: { formik: any }) {
               placeholder="Confirm email address*"
               className="w-full bg-white"
               required
-              value={formik.values ? formik.values["confirmEmail"] : ""}
+              value={formik.values["confirmEmail"] ?? ""}
               onChange={(event) =>
                 formik.setFieldValue("confirmEmail", event.target.value)
               }
-              error={
-                formik.touched["confirmEmail"] &&
-                Boolean(formik.errors["confirmEmail"])
-              }
+              error={Boolean(formik.errors["confirmEmail"])}
             />
-            {formik.touched["confirmEmail"] &&
-              formik.errors["confirmEmail"] && (
-                <Typography className="text-red-700" fontSize={"12px"}>
-                  {formik.errors["confirmEmail"]}
-                </Typography>
-              )}
-          </Stack>
-          <Stack spacing={1}>
-            <TextField
-              size="medium"
-              placeholder="Date of birth*"
-              className="w-full bg-white"
-              required
-              value={formik.values ? formik.values["dateOfBirth"] : ""}
-              onChange={(event) =>
-                formik.setFieldValue("dateOfBirth", event.target.value)
-              }
-              error={
-                formik.touched["dateOfBirth"] &&
-                Boolean(formik.errors["dateOfBirth"])
-              }
-            />
-            {formik.touched["dateOfBirth"] && formik.errors["dateOfBirth"] && (
+            {formik.errors["confirmEmail"] && (
               <Typography className="text-red-700" fontSize={"12px"}>
-                {formik.errors["dateOfBirth"]}
+                {formik.errors["confirmEmail"]}
               </Typography>
             )}
           </Stack>
+          <Stack spacing={1}>
+            <DatePicker
+              format="MMM DD, YYYY"
+              value={formik.values["dateOfBirth"] || null}
+              onChange={(value) => formik.setFieldValue("dateOfBirth", value)}
+              slotProps={{
+                textField: {
+                  placeholder: "Date of birth*",
+                  InputProps: {
+                    readOnly: true,
+                    sx: {
+                      backgroundColor: "white",
+                    },
+                  },
+                  error: Boolean(formik.errors["dateOfBirth"]),
+                },
+              }}
+            />
+            {formik.errors.dateOfBirth && (
+              <Typography className="text-red-700" fontSize={"12px"}>
+                {formik.errors.dateOfBirth}
+              </Typography>
+            )}
+          </Stack>
+
           <Stack spacing={1}>
             <TextField
               size="medium"
               placeholder="Phone number*"
               className="w-full bg-white"
               required
-              value={formik.values ? formik.values["phoneNumber"] : ""}
+              value={formik.values["phoneNumber"] ?? ""}
               onChange={(event) =>
                 formik.setFieldValue("phoneNumber", event.target.value)
               }
-              error={
-                formik.touched["phoneNumber"] &&
-                Boolean(formik.errors["phoneNumber"])
-              }
+              error={Boolean(formik.errors["phoneNumber"])}
             />
-            {formik.touched["phoneNumber"] && formik.errors["phoneNumber"] && (
+            {formik.errors["phoneNumber"] && (
               <Typography className="text-red-700" fontSize={"12px"}>
                 {formik.errors["phoneNumber"]}
               </Typography>
@@ -142,12 +135,9 @@ export default function IdForm({ formik }: { formik: any }) {
             onFileSelect={(base64) =>
               formik.setFieldValue("idDocument", base64)
             }
-            isFieldError={
-              formik.touched["idDocument"] &&
-              Boolean(formik.errors["idDocument"])
-            }
+            isFieldError={Boolean(formik.errors["idDocument"])}
           />
-          {formik.touched["idDocument"] && formik.errors["idDocument"] && (
+          {formik.errors["idDocument"] && (
             <Typography className="text-red-700" fontSize={"12px"}>
               {formik.errors["idDocument"]}
             </Typography>

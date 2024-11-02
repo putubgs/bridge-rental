@@ -3,6 +3,9 @@ import FileUpload from "../input/file-upload";
 import { DatePicker } from "@mui/x-date-pickers";
 
 export default function IdForm({ formik }: { formik: any }) {
+  const displayMainIdDocError =
+    formik.errors["dateOfBirth"] || formik.errors["phoneNumber"];
+
   return (
     <div className="space-y-5 bg-[#F9F9F9] p-5">
       <div>
@@ -137,12 +140,21 @@ export default function IdForm({ formik }: { formik: any }) {
             }
             isFieldError={Boolean(formik.errors["idDocument"])}
           />
-          {formik.errors["idDocument"] && (
+          {displayMainIdDocError && formik.errors["idDocument"] && (
+            <div className="">
+              <Typography className="text-red-700" fontSize={"12px"}>
+                {formik.errors["idDocument"]}
+              </Typography>
+            </div>
+          )}
+        </Stack>
+        {!displayMainIdDocError && formik.errors["idDocument"] && (
+          <div className="col-start-3">
             <Typography className="text-red-700" fontSize={"12px"}>
               {formik.errors["idDocument"]}
             </Typography>
-          )}
-        </Stack>
+          </div>
+        )}
       </form>
     </div>
   );

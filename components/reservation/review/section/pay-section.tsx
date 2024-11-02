@@ -2,6 +2,9 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import IdForm from "../forms/id-form";
 import PaymentForm from "../forms/payment-form";
+import { useState } from "react";
+import ProcessingDialog from "../dialogs/processing-dialog";
+import SuccessDialog from "../dialogs/success-dialog";
 
 const emailRegex =
   /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
@@ -28,6 +31,22 @@ const validationSchema = yup.object().shape({
 });
 
 export default function PaySection() {
+  const [isProcessingDialogOpen, setIsProcessingDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+
+  const closeProcessingDialog = () => {
+    setIsProcessingDialogOpen(false);
+  };
+  const openProcessingDialog = () => {
+    setIsProcessingDialogOpen(true);
+  };
+  const closeSuccessDialog = () => {
+    setIsSuccessDialogOpen(false);
+  };
+  const openSuccessDialog = () => {
+    setIsSuccessDialogOpen(true);
+  };
+
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -45,6 +64,12 @@ export default function PaySection() {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       console.log(values);
+      openProcessingDialog();
+
+      setTimeout(() => {
+        closeProcessingDialog();
+        openSuccessDialog();
+      }, 5000);
     },
   });
 
@@ -88,6 +113,15 @@ export default function PaySection() {
         formik={formik}
         handlePayNow={handlePayNow}
         handlePayLater={handlePayLater}
+      />
+      <ProcessingDialog
+        open={isProcessingDialogOpen}
+        email={formik.values["email"]}
+      />
+      <SuccessDialog
+        open={isSuccessDialogOpen}
+        handleClose={() => {}}
+        email={formik.values["email"]}
       />
     </section>
   );

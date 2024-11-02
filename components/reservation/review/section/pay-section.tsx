@@ -1,25 +1,30 @@
-import { useState } from "react";
 import { useFormik } from "formik";
+import * as yup from "yup";
 import IdForm from "../forms/id-form";
 import PaymentForm from "../forms/payment-form";
-import * as yup from "yup";
+
+const emailRegex =
+  /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
 
 const validationSchema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
   lastName: yup.string().required("Last name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
+  email: yup
+    .string()
+    .matches(emailRegex, "Invalid email format")
+    .required("Email is required"),
   confirmEmail: yup
     .string()
-    .email("Invalid email")
+    .matches(emailRegex, "Invalid email format")
     .oneOf([yup.ref("email"), ""], "Emails must match")
     .required("Confirm email is required"),
   dateOfBirth: yup.date().required("Date of birth is required"),
   phoneNumber: yup.string().required("Phone number is required"),
   idDocument: yup.string().required("ID document is required"),
   agreement: yup.boolean().oneOf([true], "You must agree to the terms"),
-  cardNumber: yup.string(),
-  expiryDate: yup.date(),
-  cvv: yup.string(),
+  cardNumber: yup.string().min(19, "Card number must contain 16 digits"),
+  expiryDate: yup.date().typeError("Invalid value"),
+  cvv: yup.string().min(3, "CVV must contain 3 digits"),
 });
 
 export default function PaySection() {
@@ -36,7 +41,6 @@ export default function PaySection() {
       cardNumber: "",
       expiryDate: "",
       cvv: "",
-      paymentMethod: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -46,15 +50,29 @@ export default function PaySection() {
 
   const handlePayNow = async () => {
     const cardNumberValue = formik.values["cardNumber"];
+    const expiryDateValue = formik.values["expiryDate"];
+    const cvvValue = formik.values["cvv"];
 
-    if (!cardNumberValue || cardNumberValue?.length === 0) {
-      await formik.validateForm();
+    let isCCInfoValid = true;
+
+    await formik.validateForm();
+
+    if (!cardNumberValue) {
       formik.setFieldError("cardNumber", "Card number is required");
-      formik.setFieldError("expiryDate", "Expiry date is required");
-      formik.setFieldError("ccv", "CCV is required");
-
-      return;
+      isCCInfoValid = false;
     }
+
+    if (!expiryDateValue) {
+      formik.setFieldError("expiryDate", "Expiry date is required");
+      isCCInfoValid = false;
+    }
+
+    if (!cvvValue) {
+      formik.setFieldError("cvv", "CVV is required");
+      isCCInfoValid = false;
+    }
+
+    if (!isCCInfoValid) return;
 
     formik.submitForm();
   };

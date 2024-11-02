@@ -18,6 +18,28 @@ export default function PaymentForm({
   const totalPrice = totalBundlePrice + totalExtrasPrice + totalProtectionPrice;
   const discountedPrice = totalPrice - totalPrice * 0.05;
 
+  const formatCardNumber = (value: string): string => {
+    return value
+      .replace(/\D/g, "")
+      .replace(/(\d{4})(?=\d)/g, "$1 ")
+      .trim()
+      .slice(0, 19);
+  };
+
+  const handleCardNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const formattedCardNumber = formatCardNumber(event.target.value);
+    formik.setFieldValue("cardNumber", formattedCardNumber);
+  };
+
+  const handleCVVChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.replace(/\D/g, "");
+    if (value.length <= 3) {
+      formik.setFieldValue("cvv", value);
+    }
+  };
+
   return (
     <div className="bg-primary-variant-1 p-5">
       <div>
@@ -37,9 +59,7 @@ export default function PaymentForm({
                 className="w-full bg-white"
                 required
                 value={formik.values ? formik.values["cardNumber"] : ""}
-                onChange={(event) =>
-                  formik.setFieldValue("cardNumber", event.target.value)
-                }
+                onChange={handleCardNumberChange}
                 error={Boolean(formik.errors["cardNumber"])}
               />
               {formik.errors["cardNumber"] && (
@@ -52,7 +72,7 @@ export default function PaymentForm({
             <div className="flex gap-2">
               <Stack spacing={1} className="basis-4/5">
                 <DatePicker
-                  format="MMM DD, YYYY"
+                  format="MM/YYYY"
                   value={formik.values["expiryDate"] || null}
                   onChange={(value) =>
                     formik.setFieldValue("expiryDate", value)
@@ -61,10 +81,10 @@ export default function PaymentForm({
                     textField: {
                       placeholder: "Expiry date",
                       InputProps: {
-                        readOnly: true,
                         sx: {
                           backgroundColor: "white",
                         },
+                        endAdornment: null,
                       },
                       error: Boolean(formik.errors["expiryDate"]),
                     },
@@ -83,9 +103,7 @@ export default function PaymentForm({
                   className="w-full bg-white"
                   required
                   value={formik.values ? formik.values["cvv"] : ""}
-                  onChange={(event) =>
-                    formik.setFieldValue("cvv", event.target.value)
-                  }
+                  onChange={handleCVVChange}
                   error={Boolean(formik.errors["cvv"])}
                 />
                 {formik.errors["cvv"] && (

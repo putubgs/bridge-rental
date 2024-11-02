@@ -85,8 +85,10 @@ export default function FileUpload({
   return (
     <div
       className={`h-full cursor-pointer rounded-lg border text-center transition-colors ${
-        isDragging && "border-primary-variant-3 bg-primary-variant-1"
-      } ${isFieldError ? "border-red-600" : "border-[#B2B2B2] bg-white hover:border-black"}`}
+        isDragging
+          ? "border-primary-variant-3 bg-primary-variant-1"
+          : "bg-white"
+      } ${isFieldError ? "border-red-600" : "border-[#B2B2B2] hover:border-black"}`}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}

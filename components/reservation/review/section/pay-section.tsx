@@ -111,6 +111,7 @@ export default function PaySection() {
 
     if (dayjs(expiryDateValue).set("date", 1).isBefore(currentDate)) {
       formik.setFieldError("expiryDate", "Expiry cannot be in the past");
+      isCCInfoValid = false;
     }
 
     if (!isCCInfoValid) return;

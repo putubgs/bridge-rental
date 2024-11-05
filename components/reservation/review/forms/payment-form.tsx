@@ -46,21 +46,6 @@ export default function PaymentForm({
 
   const handleExpiryDateChange = (value: Dayjs | null) => {
     formik.setFieldValue("expiryDate", value);
-
-    if (!validateExpiryDate(value)) {
-      formik.setFieldError("expiryDate", "Expiry date must be in the future");
-    } else {
-      formik.setFieldError("expiryDate", undefined);
-    }
-  };
-
-  const validateExpiryDate = (date: Dayjs | null): boolean => {
-    if (!date) return false;
-
-    const startOfMonth = date.startOf("month");
-    const now = dayjs().startOf("month");
-
-    return startOfMonth.isSameOrAfter(now);
   };
 
   return (

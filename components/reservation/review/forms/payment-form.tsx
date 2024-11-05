@@ -1,7 +1,11 @@
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { Checkbox, Stack, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import Image from "next/image";
+
+dayjs.extend(isSameOrAfter);
 
 export default function PaymentForm({
   formik,
@@ -40,6 +44,25 @@ export default function PaymentForm({
     }
   };
 
+  const handleExpiryDateChange = (value: Dayjs | null) => {
+    formik.setFieldValue("expiryDate", value);
+
+    if (!validateExpiryDate(value)) {
+      formik.setFieldError("expiryDate", "Expiry date must be in the future");
+    } else {
+      formik.setFieldError("expiryDate", undefined);
+    }
+  };
+
+  const validateExpiryDate = (date: Dayjs | null): boolean => {
+    if (!date) return false;
+
+    const startOfMonth = date.startOf("month");
+    const now = dayjs().startOf("month");
+
+    return startOfMonth.isSameOrAfter(now);
+  };
+
   return (
     <div className="bg-primary-variant-1 p-5">
       <div>
@@ -73,10 +96,9 @@ export default function PaymentForm({
               <Stack spacing={1} className="basis-4/5">
                 <DatePicker
                   format="MM/YYYY"
+                  views={["month", "year"]}
                   value={formik.values["expiryDate"] || null}
-                  onChange={(value) =>
-                    formik.setFieldValue("expiryDate", value)
-                  }
+                  onChange={handleExpiryDateChange}
                   slotProps={{
                     textField: {
                       placeholder: "Expiry date",
@@ -114,7 +136,7 @@ export default function PaymentForm({
               </Stack>
             </div>
           </div>
-          <div className="mt-5 flex items-center justify-between gap-7">
+          <div className="mt-5 flex justify-between gap-7">
             <Stack spacing={1}>
               <div className="flex gap-2">
                 <Checkbox

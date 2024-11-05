@@ -1,6 +1,7 @@
 import { Stack, TextField, Typography } from "@mui/material";
 import FileUpload from "../input/file-upload";
 import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 export default function IdForm({ formik }: { formik: any }) {
   const displayMainIdDocError =
@@ -91,6 +92,7 @@ export default function IdForm({ formik }: { formik: any }) {
           <Stack spacing={1}>
             <DatePicker
               format="MMM DD, YYYY"
+              maxDate={dayjs.tz()}
               value={formik.values["dateOfBirth"] || null}
               onChange={(value) => formik.setFieldValue("dateOfBirth", value)}
               slotProps={{

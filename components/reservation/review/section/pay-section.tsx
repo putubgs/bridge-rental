@@ -5,6 +5,7 @@ import PaymentForm from "../forms/payment-form";
 import { useState } from "react";
 import ProcessingDialog from "../dialogs/processing-dialog";
 import SuccessDialog from "../dialogs/success-dialog";
+import dayjs from "dayjs";
 
 const emailRegex =
   /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
@@ -26,7 +27,10 @@ const validationSchema = yup.object().shape({
   idDocument: yup.string().required("ID document is required"),
   agreement: yup.boolean().oneOf([true], "You must agree to the terms"),
   cardNumber: yup.string().min(19, "Card number must contain 16 digits"),
-  expiryDate: yup.date().typeError("Invalid value"),
+  expiryDate: yup
+    .date()
+    .nonNullable("Expiry date is required")
+    .typeError("Invalid value"),
   cvv: yup.string().min(3, "CVV must contain 3 digits"),
 });
 
@@ -95,6 +99,18 @@ export default function PaySection() {
     if (!cvvValue) {
       formik.setFieldError("cvv", "CVV is required");
       isCCInfoValid = false;
+    }
+
+    const currentDate = dayjs
+      .tz()
+      .set("hour", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .set("date", 1);
+
+    if (dayjs(expiryDateValue).set("date", 1).isBefore(currentDate)) {
+      formik.setFieldError("expiryDate", "Expiry cannot be in te past");
     }
 
     if (!isCCInfoValid) return;

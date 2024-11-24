@@ -1,5 +1,4 @@
-import Footer from "@/components/shared/footer/footer";
-import Navbar from "@/components/shared/navigation/navbar";
+
 import MuiLocalizationProvider from "@/components/shared/wrapper/mui-localization-provider";
 import MuiThemeProvider from "@/components/shared/wrapper/mui-theme-provider";
 import "swiper/css";
@@ -27,9 +26,7 @@ export default function RootLayout({
       <body className="mx-auto max-w-[1920px] border">
         <MuiLocalizationProvider>
           <MuiThemeProvider>
-            <Navbar />
             {children}
-            <Footer />
           </MuiThemeProvider>
         </MuiLocalizationProvider>
       </body>

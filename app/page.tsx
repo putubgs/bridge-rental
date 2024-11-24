@@ -26,7 +26,7 @@ export default function HomePage() {
       <ExperienceSection />
       <BookingSection />
       <BestDealSection />
-      <TestimoniesSection />
+      {/* <TestimoniesSection /> */}
     </main>
   );
 }

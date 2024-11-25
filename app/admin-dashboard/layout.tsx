@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
@@ -16,6 +17,11 @@ export default function AdminLayout({
   const router = useRouter();
 
   const isActive = (route: string) => pathname === route;
+
+  const handleLogout = () => {
+    document.cookie = "isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    router.replace("/admin-dashboard/login");
+  };
 
   if (pathname === "/admin-dashboard/login") {
     return <div>{children}</div>;
@@ -66,7 +72,9 @@ export default function AdminLayout({
           </div>
 
           <div
-            onClick={() => router.push("/admin-dashboard/protection-and-extras")}
+            onClick={() =>
+              router.push("/admin-dashboard/protection-and-extras")
+            }
             className={`flex cursor-pointer items-center gap-3 rounded-md p-2 ${
               isActive("/admin-dashboard/protection-and-extras")
                 ? "bg-[#5E8EFF] text-white"
@@ -138,7 +146,10 @@ export default function AdminLayout({
       <div className="flex w-full flex-col">
         <div className="flex w-full border-b">
           <div className="w-full border-r"></div>
-          <div className="group flex cursor-pointer items-center gap-2 px-8 py-5 hover:bg-gray-100"             onClick={() => router.push("/admin-dashboard/login")}>
+          <div
+            onClick={handleLogout}
+            className="group flex cursor-pointer items-center gap-2 px-8 py-5 hover:bg-gray-100"
+          >
             <LogoutOutlinedIcon
               sx={{
                 color: "#9A9A9A",

@@ -28,7 +28,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <div className="flex flex-col items-start space-y-[70px] border-r p-10">
         <Image
           src="/assets/img/brand-logo-black.png"

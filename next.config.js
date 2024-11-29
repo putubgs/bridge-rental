@@ -7,7 +7,10 @@ const nextConfig = {
         destination: '/reservation/car-choices',
         permanent: true,
       },
-    ]
+    ];
+  },
+  images: {
+    domains: ["ziwgpvyijudfxxlrrsxp.supabase.co"],
   },
 };
 

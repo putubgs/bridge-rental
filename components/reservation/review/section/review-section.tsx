@@ -7,6 +7,7 @@ import { vehiclesData } from "@/lib/static/vehicles-dummy";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import Image from "next/image";
+import { useCarStore } from "@/store/car-store";
 
 export default function ReviewSection() {
   const {
@@ -26,8 +27,10 @@ export default function ReviewSection() {
     returnTime,
     childrenSeatsQuantity,
   } = useRentDetailsStore();
+  
+  const { carModels } = useCarStore();
+  const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
-  const car = vehiclesData.find((vehicle) => vehicle.car_id === car_id);
   const totalDays = countDays(
     deliveryDate,
     deliveryTime,
@@ -78,13 +81,13 @@ export default function ReviewSection() {
                 <div className="relative flex h-fit w-fit items-end text-[12px]">
                   <CarSeatIcon size={23} />
                   <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                    x{car.passengers_capacity}
+                    x{car.passengers}
                   </div>
                 </div>
                 <div className="relative flex h-fit w-fit items-end text-[12px]">
                   <CarLuggageIcon size={23} />
                   <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                    x{car.luggage_capacity}
+                    x{car.luggage}
                   </div>
                 </div>
                 <AirConditionerIcon size={23} />

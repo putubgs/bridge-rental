@@ -15,13 +15,13 @@ export interface ICarModel {
   car_model: string;
   car_type: string;
   car_image: string;
-  availability_status: string;
+  availability: string;
   doors: number;
-  passengers_capacity: number;
-  luggage_capacity: number;
-  grab_and_drive_price_per_day: number;
-  complete_fee_rate_price_per_day: number;
-  packed_to_the_brim_price_per_day: number;
+  passengers: number;
+  luggage: number;
+  grab_and_drive: number;
+  complete_fee_rate: number;
+  packed_to_the_brim: number;
 }
 
 export interface IChildrenSeatsQuantity {

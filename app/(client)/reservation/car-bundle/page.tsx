@@ -1,16 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import AirConditionerIcon from "@/components/shared/icons/air-conditioner";
-import { vehiclesData } from "@/lib/static/vehicles-dummy";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { BundleType } from "@/lib/enums";
+import { createClient } from "@/utils/supabase/client";
+import { useCarStore } from "@/store/car-store";
+
+const supabase = createClient();
 
 export default function CarBundle() {
   const {
@@ -24,12 +27,9 @@ export default function CarBundle() {
     setSelectedBundle,
   } = useRentDetailsStore();
   const router = useRouter();
+  const { carModels } = useCarStore();
 
-  const car = vehiclesData.find((vehicle) => vehicle.car_id === car_id);
-
-  if (!car) {
-    return <p>Car not found</p>;
-  }
+  const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
   useEffect(() => {
     setTotalBundlePrice(0);
@@ -51,6 +51,10 @@ export default function CarBundle() {
 
     router.push("/reservation/protection-and-extras");
   };
+
+  if (!car) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="mt-10 w-full bg-white px-20 py-10">
@@ -87,13 +91,13 @@ export default function CarBundle() {
               <div className="relative flex h-fit w-fit items-end text-[12px]">
                 <CarSeatIcon size={23} />
                 <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                  x{car.passengers_capacity}
+                  x{car.passengers}
                 </div>
               </div>
               <div className="relative flex h-fit w-fit items-end text-[12px]">
                 <CarLuggageIcon size={23} />
                 <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                  x{car.luggage_capacity}
+                  x{car.luggage}
                 </div>
               </div>
               <AirConditionerIcon size={23} />
@@ -121,12 +125,12 @@ export default function CarBundle() {
             <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
                 <span className="text-[32px]">
-                  {car.grab_and_drive_price_per_day}
+                  {car.grab_and_drive}
                 </span>
                 .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
-                ({car.grab_and_drive_price_per_day * 2}.00 JOD for 2 days)
+                ({car.grab_and_drive * 2}.00 JOD for 2 days)
               </p>
             </div>
             <div className="ml-4 flex items-start pt-4 text-[12px]">
@@ -164,7 +168,7 @@ export default function CarBundle() {
               className="m-4 mt-6 rounded-md bg-gradient-to-r from-[#8BD6D6] to-[#BAF0E2] py-2 text-white"
               onClick={() =>
                 selectPackage(
-                  car.grab_and_drive_price_per_day,
+                  car.grab_and_drive,
                   BundleType.bundle1,
                 )
               }
@@ -180,12 +184,12 @@ export default function CarBundle() {
             <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
                 <span className="text-[32px]">
-                  {car.complete_fee_rate_price_per_day}
+                  {car.complete_fee_rate}
                 </span>
                 .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
-                ({car.complete_fee_rate_price_per_day * 2}.00 JOD for 2 days)
+                ({car.complete_fee_rate * 2}.00 JOD for 2 days)
               </p>
             </div>
             <div className="ml-4 flex items-start pt-4 text-[12px]">
@@ -223,7 +227,7 @@ export default function CarBundle() {
               className="m-4 mt-6 rounded-md bg-[#A0A0A0] py-2 text-white"
               onClick={() =>
                 selectPackage(
-                  car.complete_fee_rate_price_per_day,
+                  car.complete_fee_rate,
                   BundleType.bundle2,
                 )
               }
@@ -239,12 +243,12 @@ export default function CarBundle() {
             <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
                 <span className="text-[32px]">
-                  {car.packed_to_the_brim_price_per_day}
+                  {car.packed_to_the_brim}
                 </span>
                 .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
-                ({car.packed_to_the_brim_price_per_day * 2}.00 JOD for 2 days)
+                ({car.packed_to_the_brim * 2}.00 JOD for 2 days)
               </p>
             </div>
             <div className="ml-4 flex items-start pt-4 text-[12px]">
@@ -278,7 +282,7 @@ export default function CarBundle() {
               className="m-4 mt-6 rounded-md bg-[#CBCBCB] py-2 text-white"
               onClick={() =>
                 selectPackage(
-                  car.packed_to_the_brim_price_per_day,
+                  car.packed_to_the_brim,
                   BundleType.bundle3,
                 )
               }

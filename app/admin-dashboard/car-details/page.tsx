@@ -1,191 +1,31 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle, Cancel, Edit, Delete } from "@mui/icons-material";
+import { createClient } from "@/utils/supabase/client";
+import { useCarStore } from "@/store/car-store";
+
+const supabase = createClient();
 
 export default function CarDetails() {
   const router = useRouter();
-
   const [currentPage, setCurrentPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
   const rowsPerPage = 10;
 
-  const carDetails = [
-    {
-      id: "23ba1086-9693-42c0-a5b2-d59dc873fdd2",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "7264b728-39d7-448b-8639-72d0026bfa31",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "85b41c78-7e63-45df-8cd7-63292f469d9e",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "f6f0b04e-df3f-4640-a4ea-6df9f4c81df1",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "a0b11034-ea82-411c-beda-883b0f6432d3",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "ebfe40d4-6f91-4e24-9905-3bc8b1980c3a",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "e512e64b-92e7-4013-a1db-7e78dcde67bc",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "8e96d618-7e62-4eac-8d4b-1f5723e11a87",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "dd4ba5a4-cd8e-4d2f-a9a3-f434dd08bc43",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "35c44ed2-7c14-47cd-aeb2-0ea6c3469e16",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "3e4b179b-0f42-4b4c-a57f-4b77d3e7da37",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "ddae9d2e-80f8-47aa-b4cb-ef07e8c0c93e",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "4f7a2958-5d18-44ec-888f-9a28d38951d8",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "cdd8c64e-495e-4e2f-87f7-dc5e497f36ea",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-  ];
+  const { carModels, fetchCars } = useCarStore();
 
-  const totalPages = Math.ceil(carDetails.length / rowsPerPage);
+  useEffect(() => {
+    if (carModels.length === 0) {
+      fetchCars();
+    }
+  }, [carModels, fetchCars]);
 
-  const currentData = carDetails.slice(
+  const totalPages = Math.ceil(carModels.length / rowsPerPage);
+
+  const currentData = carModels.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage,
   );
@@ -194,9 +34,50 @@ export default function CarDetails() {
     router.push(`/admin-dashboard/car-details/${id}`);
   };
 
-  const handleDelete = (id: string): void => {
-    console.log(`Deleted car with ID: ${id}`);
-    setShowDeleteModal(false);
+  const handleDelete = async (id: string): Promise<void> => {
+    try {
+      const { data: carData, error: fetchError } = await supabase
+        .from("CarModel")
+        .select("car_image")
+        .eq("car_id", id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (carData?.car_image) {
+        const encodedImagePath = carData.car_image.split("car-images/")[1];
+        const imagePath = decodeURIComponent(encodedImagePath);
+
+        if (imagePath) {
+          const { error: deleteError } = await supabase.storage
+            .from("car-images")
+            .remove([imagePath]);
+
+          if (deleteError) {
+            console.error("Error deleting image from storage:", deleteError);
+          } else {
+            console.log("Image deleted successfully from storage.");
+          }
+        }
+      }
+
+      const { error: deleteRecordError } = await supabase
+        .from("CarModel")
+        .delete()
+        .eq("car_id", id);
+
+      if (deleteRecordError) throw deleteRecordError;
+
+      await fetchCars();
+
+      if (currentPage > Math.ceil(carModels.length / rowsPerPage)) {
+        setCurrentPage(1);
+      }
+
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error("Error deleting car:", error);
+    }
   };
 
   const handleDeleteButtonClick = (id: string): void => {
@@ -217,7 +98,12 @@ export default function CarDetails() {
     <div className="flex h-full flex-col gap-8 bg-[#F9F9F9] p-8">
       <div className="flex items-center justify-between">
         <div className="text-[24px]">Car Prices and Info Settings</div>
-        <div className="cursor-pointer rounded-md bg-[#5E8EFF] px-3 py-2 text-white" onClick={() => router.push("/admin-dashboard/car-details/add-new-car")}>
+        <div
+          className="cursor-pointer rounded-md bg-[#5E8EFF] px-3 py-2 text-white"
+          onClick={() =>
+            router.push("/admin-dashboard/car-details/add-new-car")
+          }
+        >
           + Add New Car
         </div>
       </div>
@@ -258,35 +144,35 @@ export default function CarDetails() {
           <tbody>
             {currentData.map((car) => (
               <tr
-                key={car.id}
+                key={car.car_id}
                 className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
               >
                 <td className="px-3 py-4 text-center">
-                  {car.available ? (
+                  {car.availability ? (
                     <CheckCircle className="text-green-500" />
                   ) : (
                     <Cancel className="text-red-500" />
                   )}
                 </td>
-                <th className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
-                  {car.model}
-                </th>
-                <td className="px-6 py-4">{car.type}</td>
-                <td className="px-6 py-4">{car.grabAndDrive}</td>
-                <td className="px-6 py-4">{car.completeFeeRate}</td>
-                <td className="px-6 py-4">{car.packedTheBrim}</td>
+                <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
+                  {car.car_model}
+                </td>
+                <td className="px-6 py-4">{car.car_type}</td>
+                <td className="px-6 py-4">{car.grab_and_drive}</td>
+                <td className="px-6 py-4">{car.complete_fee_rate}</td>
+                <td className="px-6 py-4">{car.packed_to_the_brim}</td>
                 <td className="px-6 py-4">{car.doors}</td>
                 <td className="px-6 py-4">{car.passengers}</td>
                 <td className="px-6 py-4">{car.luggage}</td>
                 <td className="flex gap-2 px-6 py-4">
                   <button
-                    onClick={() => handleEdit(car.id)}
+                    onClick={() => handleEdit(car.car_id)}
                     className="flex cursor-pointer items-center rounded-md bg-blue-600 p-1 text-white hover:bg-blue-700"
                   >
                     <Edit fontSize="small" />
                   </button>
                   <button
-                    onClick={() => handleDeleteButtonClick(car.id)}
+                    onClick={() => handleDeleteButtonClick(car.car_id)}
                     className="flex cursor-pointer items-center rounded-md bg-yellow-500 p-1 text-white hover:bg-yellow-600"
                   >
                     <Delete fontSize="small" />
@@ -375,7 +261,6 @@ export default function CarDetails() {
           </ul>
         </nav>
       </div>
-
       {showDeleteModal && (
         <div
           id="deleteModal"

@@ -8,11 +8,13 @@ export default function CarDetails() {
   const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
   const rowsPerPage = 10;
 
   const carDetails = [
     {
-      id: "afadf",
+      id: "23ba1086-9693-42c0-a5b2-d59dc873fdd2",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -24,7 +26,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
+      id: "7264b728-39d7-448b-8639-72d0026bfa31",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -36,7 +38,7 @@ export default function CarDetails() {
       available: false,
     },
     {
-      id: "afadf",
+      id: "85b41c78-7e63-45df-8cd7-63292f469d9e",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -48,7 +50,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
+      id: "f6f0b04e-df3f-4640-a4ea-6df9f4c81df1",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -60,7 +62,7 @@ export default function CarDetails() {
       available: false,
     },
     {
-      id: "afadf",
+      id: "a0b11034-ea82-411c-beda-883b0f6432d3",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -72,7 +74,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
+      id: "ebfe40d4-6f91-4e24-9905-3bc8b1980c3a",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -84,7 +86,7 @@ export default function CarDetails() {
       available: false,
     },
     {
-      id: "afadf",
+      id: "e512e64b-92e7-4013-a1db-7e78dcde67bc",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -96,7 +98,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
+      id: "8e96d618-7e62-4eac-8d4b-1f5723e11a87",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -108,7 +110,7 @@ export default function CarDetails() {
       available: false,
     },
     {
-      id: "afadf",
+      id: "dd4ba5a4-cd8e-4d2f-a9a3-f434dd08bc43",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -120,7 +122,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
+      id: "35c44ed2-7c14-47cd-aeb2-0ea6c3469e16",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -132,7 +134,7 @@ export default function CarDetails() {
       available: false,
     },
     {
-      id: "afadf",
+      id: "3e4b179b-0f42-4b4c-a57f-4b77d3e7da37",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -144,7 +146,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
+      id: "ddae9d2e-80f8-47aa-b4cb-ef07e8c0c93e",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -156,7 +158,7 @@ export default function CarDetails() {
       available: false,
     },
     {
-      id: "afadf",
+      id: "4f7a2958-5d18-44ec-888f-9a28d38951d8",
       model: "Nissan Sentra",
       type: "Economy Sedan",
       grabAndDrive: 20,
@@ -168,175 +170,7 @@ export default function CarDetails() {
       available: true,
     },
     {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
-      model: "Nissan Altima",
-      type: "Economy Sedan",
-      grabAndDrive: 15,
-      completeFeeRate: 12,
-      packedTheBrim: 10,
-      doors: 4,
-      passengers: 4,
-      luggage: 2,
-      available: false,
-    },
-    {
-      id: "afadf",
-      model: "Nissan Sentra",
-      type: "Economy Sedan",
-      grabAndDrive: 20,
-      completeFeeRate: 18,
-      packedTheBrim: 15,
-      doors: 5,
-      passengers: 5,
-      luggage: 3,
-      available: true,
-    },
-    {
-      id: "sdfgsd",
+      id: "cdd8c64e-495e-4e2f-87f7-dc5e497f36ea",
       model: "Nissan Altima",
       type: "Economy Sedan",
       grabAndDrive: 15,
@@ -351,7 +185,6 @@ export default function CarDetails() {
 
   const totalPages = Math.ceil(carDetails.length / rowsPerPage);
 
-  // Slice data for the current page
   const currentData = carDetails.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage,
@@ -363,6 +196,17 @@ export default function CarDetails() {
 
   const handleDelete = (id: string): void => {
     console.log(`Deleted car with ID: ${id}`);
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteButtonClick = (id: string): void => {
+    setSelectedCarId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleCancelDelete = (): void => {
+    setSelectedCarId(null);
+    setShowDeleteModal(false);
   };
 
   const handlePageChange = (page: number): void => {
@@ -372,8 +216,8 @@ export default function CarDetails() {
   return (
     <div className="flex h-full flex-col gap-8 bg-[#F9F9F9] p-8">
       <div className="flex items-center justify-between">
-        <div className="text-[24px]">Vehicle Price and Info Settings</div>
-        <div className="cursor-pointer rounded-md bg-[#5E8EFF] px-3 py-2 text-white">
+        <div className="text-[24px]">Car Prices and Info Settings</div>
+        <div className="cursor-pointer rounded-md bg-[#5E8EFF] px-3 py-2 text-white" onClick={() => router.push("/admin-dashboard/car-details/add-new-car")}>
           + Add New Car
         </div>
       </div>
@@ -442,7 +286,7 @@ export default function CarDetails() {
                     <Edit fontSize="small" />
                   </button>
                   <button
-                    onClick={() => handleDelete(car.id)}
+                    onClick={() => handleDeleteButtonClick(car.id)}
                     className="flex cursor-pointer items-center rounded-md bg-yellow-500 p-1 text-white hover:bg-yellow-600"
                   >
                     <Delete fontSize="small" />
@@ -531,6 +375,41 @@ export default function CarDetails() {
           </ul>
         </nav>
       </div>
+
+      {showDeleteModal && (
+        <div
+          id="deleteModal"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        >
+          <div className="relative h-auto w-full max-w-md p-4">
+            <div className="relative rounded-lg bg-white p-6 text-center shadow dark:bg-gray-800">
+              <Delete
+                style={{ fontSize: "50px", color: "#9ca3af" }}
+                className="mx-auto mb-4"
+              />
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                Are you sure you want to delete this item?
+              </h3>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={handleCancelDelete}
+                  className="rounded-md bg-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(selectedCarId!)}
+                  className="rounded-md bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

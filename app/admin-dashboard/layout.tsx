@@ -16,10 +16,13 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
 
-  const isActive = (route: string) => pathname === route;
+  const isActive = (path: string): boolean => {
+    return pathname.startsWith(path);
+  };
 
   const handleLogout = () => {
-    document.cookie = "isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie =
+      "isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     router.replace("/admin-dashboard/login");
   };
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import CarForm from "@/components/admin-dashboard/car-details/car-crud-form";
 
-export default function EditCar() {
+export default function AddNewCar() {
   const [carData, setCarData] = useState({
     carModel: "",
     carType: "",
@@ -22,7 +22,7 @@ export default function EditCar() {
 
   return (
     <div className="flex h-full flex-col gap-8 bg-[#F9F9F9] p-8">
-      <div className="text-[24px]">Edit Vehicle Categories</div>
+      <div className="text-[24px]">Add New Car</div>
       <div className="flex w-full gap-6 rounded-md bg-white p-8">
         <CarForm initialValues={carData} onSubmit={handleFormSubmit} />
       </div>

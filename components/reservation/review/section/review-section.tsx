@@ -3,7 +3,6 @@ import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
 import { childrenExtras, extras } from "@/lib/static/extras-dummy";
-import { vehiclesData } from "@/lib/static/vehicles-dummy";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import Image from "next/image";
@@ -27,7 +26,7 @@ export default function ReviewSection() {
     returnTime,
     childrenSeatsQuantity,
   } = useRentDetailsStore();
-  
+
   const { carModels } = useCarStore();
   const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 

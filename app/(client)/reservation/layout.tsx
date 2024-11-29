@@ -6,7 +6,7 @@ import {
   useRentDetailsStore,
   useCarSearchStore,
 } from "@/store/reservation-store";
-import { vehiclesData } from "@/lib/static/vehicles-dummy";
+import { useCarStore } from "@/store/car-store";
 
 export default function ReservationLayout({
   children,
@@ -31,7 +31,9 @@ export default function ReservationLayout({
 
   const { searchCompleted } = useCarSearchStore();
 
-  const car = vehiclesData.find((vehicle) => vehicle.car_id === car_id);
+  const { carModels } = useCarStore();
+
+  const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
   useEffect(() => {
     window.scrollTo(0, 0);

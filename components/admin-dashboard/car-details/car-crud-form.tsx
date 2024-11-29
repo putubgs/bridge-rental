@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import ImageUploader from "../img-uploder";
 
-interface EditCarFormProps {
+interface CarFormProps {
   initialValues: {
     carModel: string;
     carType: string;
@@ -16,13 +16,13 @@ interface EditCarFormProps {
     packedToTheBrim: string;
     vehicleImage?: string | File | null;
   };
-  onSubmit: (formData: EditCarFormProps["initialValues"]) => void;
+  onSubmit: (formData: CarFormProps["initialValues"]) => void;
 }
 
 export default function CarForm({
   initialValues,
   onSubmit,
-}: EditCarFormProps) {
+}: CarFormProps) {
   const [formValues, setFormValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
 

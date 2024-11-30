@@ -1,17 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 interface ImageUploaderProps {
     error?: string;
     onFileChange: (file: File | null) => void;
-    initialImage?: string; // Add this prop
+    initialImage?: string;
   }
   
   export default function ImageUploader({ error, onFileChange, initialImage }: ImageUploaderProps) {
     const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(initialImage || null); // Use initialImage as the default preview
+    const [preview, setPreview] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (initialImage) {
+          setPreview(initialImage);
+        }
+      }, [initialImage]);
   
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
@@ -37,6 +43,7 @@ interface ImageUploaderProps {
     };
   
     const removeFile = () => {
+
       setFile(null);
       setPreview(null);
       onFileChange(null);

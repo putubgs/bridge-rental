@@ -10,7 +10,7 @@ interface ProtectionExtraFormProps {
     type: string;
     availability: string;
     description: string;
-    vehicleImage?: string | File | null;
+    offerImage?: string | File | null;
   };
   onSubmit: (formData: ProtectionExtraFormProps["initialValues"]) => void;
 }
@@ -21,14 +21,23 @@ export default function ProtectionExtraForm({
 }: ProtectionExtraFormProps) {
   const [formValues, setFormValues] = useState({
     ...initialValues,
+    // Default the type value to initialValues.type or "Protection"
     type: initialValues.type || "Protection",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // Handle the case where `type` is "Extras" and both `description` and `offerImage` are null
+    const adjustedType =
+      initialValues.type === "Extras" &&
+      initialValues.description === "" &&
+      initialValues.offerImage === null
+        ? "Extras (Baby Seats)"
+        : initialValues.type;
+
     setFormValues({
       ...initialValues,
-      type: initialValues.type || "Protection",
+      type: adjustedType || "Protection",
     });
   }, [initialValues]);
 
@@ -43,9 +52,8 @@ export default function ProtectionExtraForm({
       setFormValues((prev) => ({
         ...prev,
         [name]: value,
-        description: "",
-        vehicleImage:
-          value === "Extras (Baby Seats)" ? null : prev.vehicleImage,
+        description: "", // Reset description if the type changes
+        offerImage: value === "Extras (Baby Seats)" ? null : prev.offerImage, // Reset offerImage if the type is "Extras (Baby Seats)"
       }));
     } else if (name === "description" && formValues.type === "Protection") {
       const lines = value.split("\n");
@@ -75,9 +83,9 @@ export default function ProtectionExtraForm({
   };
 
   const handleImageChange = (file: File | null) => {
-    setFormValues((prev) => ({ ...prev, vehicleImage: file }));
+    setFormValues((prev) => ({ ...prev, offerImage: file }));
     if (file) {
-      setErrors((prev) => ({ ...prev, vehicleImage: "" }));
+      setErrors((prev) => ({ ...prev, offerImage: "" }));
     }
   };
 
@@ -92,8 +100,8 @@ export default function ProtectionExtraForm({
     if (!formValues.description && !isExtrasBabySeats)
       validationErrors.description = "This field is required";
 
-    if (!formValues.vehicleImage && !isExtrasBabySeats) {
-      validationErrors.vehicleImage = "Vehicle image is required";
+    if (!formValues.offerImage && !isExtrasBabySeats) {
+      validationErrors.offerImage = "Icon image is required";
     }
 
     setErrors(validationErrors);
@@ -105,7 +113,8 @@ export default function ProtectionExtraForm({
 
     const formData = {
       ...formValues,
-      type: formValues.type === "Extras (Baby Seats)" ? "Extras" : formValues.type,
+      type:
+        formValues.type === "Extras (Baby Seats)" ? "Extras" : formValues.type, // Convert back to "Extras" before submission
     };
 
     console.log("Form Submitted:", formData);
@@ -121,12 +130,12 @@ export default function ProtectionExtraForm({
         <p className="text-[20px]">Icon Image</p>
         <div className="relative h-full">
           <ImageUploader
-            error={isExtrasBabySeats ? undefined : errors.vehicleImage}
+            error={isExtrasBabySeats ? undefined : errors.offerImage}
             onFileChange={handleImageChange}
             initialImage={
               isExtrasBabySeats
                 ? null
-                : (formValues.vehicleImage as string | null)
+                : (formValues.offerImage as string | null)
             }
           />
           {isExtrasBabySeats && (

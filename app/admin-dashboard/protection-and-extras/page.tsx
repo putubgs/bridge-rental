@@ -1,113 +1,113 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle, Cancel, Edit, Delete } from "@mui/icons-material";
+import { createClient } from "@/utils/supabase/client";
 
-const dummyData = [
-  {
-    id: "6f1b4a89-a78f-41c2-bbc9-12345abcde01",
-    type: "Cover",
-    name: "Basic Cover",
-    pricePerDay: 0,
-    available: true,
-  },
-  {
-    id: "2e1c3d90-b47a-46f1-bbc9-12345abcde02",
-    type: "Cover",
-    name: "Totally at Ease Cover",
-    pricePerDay: 8,
-    available: true,
-  },
-  {
-    id: "7a9d5e32-c81f-40e5-ace9-12345abcde03",
-    type: "Cover",
-    name: "Supremely Relax Cover",
-    pricePerDay: 12,
-    available: false,
-  },
-  {
-    id: "1d2c4f67-d98a-4bf7-bde9-12345abcde04",
-    type: "Extras",
-    name: "Additional Driver",
-    pricePerDay: 5,
-    available: true,
-  },
-  {
-    id: "8b3a5f68-c71d-49a5-bde9-12345abcde05",
-    type: "Extras",
-    name: "Driver under 21",
-    pricePerDay: 15,
-    available: true,
-  },
-  {
-    id: "3e7f4c91-f20b-46f6-bce9-12345abcde06",
-    type: "Extras",
-    name: "Driver under 25",
-    pricePerDay: 5,
-    available: false,
-  },
-  {
-    id: "5f3b6a92-d32c-49d1-bde9-12345abcde07",
-    type: "Extras",
-    name: "GPS Navigation system",
-    pricePerDay: 10,
-    available: true,
-  },
-  {
-    id: "4d1a5b93-e43d-41b4-bae9-12345abcde08",
-    type: "Extras",
-    name: "Wifi on the go",
-    pricePerDay: 7,
-    available: true,
-  },
-  {
-    id: "9e6c2a94-f54e-45b6-bce9-12345abcde09",
-    type: "Extras",
-    name: "Lifestyle Assistance",
-    pricePerDay: 35,
-    available: true,
-  },
-  {
-    id: "6f8b7d95-a65f-43d7-bde9-12345abcde10",
-    type: "Extras",
-    name: "Roadside Assistance",
-    pricePerDay: 7,
-    available: false,
-  },
-  {
-    id: "2c3a8f96-b76a-49f8-bde9-12345abcde11",
-    type: "Extras",
-    name: "Personal Accident Insurance",
-    pricePerDay: 30,
-    available: true,
-  },
-  {
-    id: "7e5d9b97-c87b-42b9-bae9-12345abcde12",
-    type: "Extras",
-    name: "Infant Car Seats",
-    pricePerDay: 5,
-    available: true,
-  },
-  {
-    id: "1f9d6c98-d98c-46ba-bde9-12345abcde13",
-    type: "Extras",
-    name: "Booster Car Seats",
-    pricePerDay: 5,
-    available: true,
-  },
-];
+const supabase = createClient();
+
+interface AdditionalOffer {
+  id: string;
+  type: string;
+  name: string;
+  pricePerDay: number;
+  available: boolean;
+}
 
 export default function ProtectionAndExtras() {
   const router = useRouter();
+  const [data, setData] = useState<AdditionalOffer[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
   const rowsPerPage = 10;
 
-  const totalPages = Math.ceil(dummyData.length / rowsPerPage);
-  const currentData = dummyData.slice(
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: additionalOffers, error } = await supabase
+          .from("AdditionalOffers")
+          .select("*");
+
+        if (error) {
+          console.error("Error fetching data:", error.message);
+          return;
+        }
+
+        setData(additionalOffers || []);
+      } catch (error) {
+        console.error("Unexpected error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const currentData = data.slice(
     (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
+    currentPage * rowsPerPage,
   );
+
+  const handleDelete = async (id: string): Promise<void> => {
+    try {
+      const { data: offerData, error: fetchError } = await supabase
+        .from("AdditionalOffers")
+        .select("image_url")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (offerData?.image_url) {
+        const encodedImagePath = offerData.image_url.split("extra-images/")[1];
+        const imagePath = decodeURIComponent(encodedImagePath);
+        console.log(imagePath);
+
+        if (imagePath) {
+          const { error: deleteError } = await supabase.storage
+            .from("extra-images")
+            .remove([imagePath]);
+
+          if (deleteError) {
+            console.error("Error deleting image from storage:", deleteError);
+          } else {
+            console.log("Image deleted successfully from storage.");
+          }
+        }
+      }
+
+      const { error: deleteRecordError } = await supabase
+        .from("AdditionalOffers")
+        .delete()
+        .eq("id", id);
+
+      if (deleteRecordError) throw deleteRecordError;
+
+      setData((prevData) => prevData.filter((offer) => offer.id !== id));
+      setShowDeleteModal(false);
+      setSelectedOfferId(null);
+
+      console.log("Item deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+
+  const handleEdit = (id: string): void => {
+    router.push(`/admin-dashboard/protection-and-extras/${id}`);
+  };
+
+  const handleDeleteButtonClick = (id: string): void => {
+    setSelectedOfferId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleCancelDelete = (): void => {
+    setSelectedOfferId(null);
+    setShowDeleteModal(false);
+  };
 
   const handlePageChange = (page: number): void => {
     setCurrentPage(page);
@@ -146,28 +146,34 @@ export default function ProtectionAndExtras() {
             </tr>
           </thead>
           <tbody>
-            {currentData.map((offer) => (
+            {currentData.map((offer: any) => (
               <tr
                 key={offer.id}
                 className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
               >
                 <td className="px-3 py-4 text-center">
-                  {offer.available ? (
+                  {offer.availability ? (
                     <CheckCircle className="text-green-500" />
                   ) : (
                     <Cancel className="text-red-500" />
                   )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
-                  {offer.name}
+                  {offer.offer_name}
                 </td>
                 <td className="px-6 py-4">{offer.type}</td>
-                <td className="px-6 py-4">{offer.pricePerDay} JOD</td>
+                <td className="px-6 py-4">{offer.price} JOD</td>
                 <td className="flex gap-2 px-6 py-4">
-                  <button className="flex cursor-pointer items-center rounded-md bg-blue-600 p-1 text-white hover:bg-blue-700">
+                  <button
+                    className="flex cursor-pointer items-center rounded-md bg-blue-600 p-1 text-white hover:bg-blue-700"
+                    onClick={() => handleEdit(offer.id)}
+                  >
                     <Edit fontSize="small" />
                   </button>
-                  <button className="flex cursor-pointer items-center rounded-md bg-yellow-500 p-1 text-white hover:bg-yellow-600">
+                  <button
+                    className="flex cursor-pointer items-center rounded-md bg-yellow-500 p-1 text-white hover:bg-yellow-600"
+                    onClick={() => handleDeleteButtonClick(offer.id)}
+                  >
                     <Delete fontSize="small" />
                   </button>
                 </td>
@@ -254,6 +260,40 @@ export default function ProtectionAndExtras() {
           </ul>
         </nav>
       </div>
+      {showDeleteModal && (
+        <div
+          id="deleteModal"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        >
+          <div className="relative h-auto w-full max-w-md p-4">
+            <div className="relative rounded-lg bg-white p-6 text-center shadow dark:bg-gray-800">
+              <Delete
+                style={{ fontSize: "50px", color: "#9ca3af" }}
+                className="mx-auto mb-4"
+              />
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                Are you sure you want to delete this item?
+              </h3>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={handleCancelDelete}
+                  className="rounded-md bg-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(selectedOfferId!)}
+                  className="rounded-md bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

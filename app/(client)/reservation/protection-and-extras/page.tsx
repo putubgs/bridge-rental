@@ -4,17 +4,78 @@ import ExtrasSection from "@/components/reservation/protection-and-extras/sectio
 import ProtectionsSection from "@/components/reservation/protection-and-extras/section/protections-section";
 import { ChevronLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useRentDetailsStore } from "@/store/reservation-store";
+
+const supabase = createClient();
+
+export interface AdditionalOffer {
+  id: string;
+  type: "Protection" | "Extras";
+  offer_name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  availability: boolean;
+}
 
 export default function ProtectionAndExtras() {
   const router = useRouter();
+  const [protections, setProtections] = useState<AdditionalOffer[]>([]);
+  const [extras, setExtras] = useState<AdditionalOffer[]>([]);
+  const [childrenExtras, setChildrenExtras] = useState<AdditionalOffer[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchAdditionalOffers = async () => {
+      try {
+        const { data, error } = await supabase.from("AdditionalOffers").select("*");
+  
+        if (error) throw error;
+  
+        // Filter data based on the available status
+        const protectionsData = data.filter(
+          (item: AdditionalOffer) => item.type === "Protection" && item.availability
+        );
+        const extrasData = data.filter(
+          (item: AdditionalOffer) =>
+            item.type === "Extras" &&
+            item.availability &&
+            item.image_url !== null &&
+            item.description !== null
+        );
+        const childrenExtrasData = data.filter(
+          (item: AdditionalOffer) =>
+            item.type === "Extras" &&
+            item.availability &&
+            (item.image_url === null || item.description === null)
+        );
+  
+        setProtections(protectionsData);
+        useRentDetailsStore.getState().setExtras(extrasData);
+        useRentDetailsStore.getState().setChildrenExtras(childrenExtrasData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchAdditionalOffers();
+  }, []);
+  
   const handleBack = () => router.push("/reservation/car-bundle");
   const handleContinue = () => router.push("/reservation/review");
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <main>
       <div className="mt-10 space-y-10 bg-white px-20 py-7">
-        <ProtectionsSection />
+        <ProtectionsSection protections={protections} />
         <ExtrasSection />
       </div>
       <section className="flex justify-center gap-6 bg-primary-variant-1 py-11">

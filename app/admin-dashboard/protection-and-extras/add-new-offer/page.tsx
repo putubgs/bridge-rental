@@ -16,14 +16,14 @@ export default function AddNewOffer() {
     type: string;
     availability: string;
     description: string;
-    vehicleImage?: string | File | null;
+    offerImage?: string | File | null;
   }>({
     offerDetail: "",
     price: "",
     type: "Protection",
     availability: "Not Available",
     description: "",
-    vehicleImage: null,
+    offerImage: null,
   });
 
   const handleFormSubmit = async (formData: typeof offerData) => {
@@ -31,10 +31,10 @@ export default function AddNewOffer() {
 
       let imageUrl = null;
 
-      if (formData.vehicleImage instanceof File) {
+      if (formData.offerImage instanceof File) {
         const { data: existingImage, error: checkError } =
           await supabase.storage.from("extra-images").list("additional-offers", {
-            search: formData.vehicleImage.name,
+            search: formData.offerImage.name,
           });
 
         if (checkError) throw checkError;
@@ -42,25 +42,25 @@ export default function AddNewOffer() {
         if (existingImage && existingImage.length > 0) {
           const { data: publicUrlData } = supabase.storage
             .from("extra-images")
-            .getPublicUrl(`additional-offers/${formData.vehicleImage.name}`);
+            .getPublicUrl(`additional-offers/${formData.offerImage.name}`);
           imageUrl = publicUrlData.publicUrl;
         } else {
           const { data, error: uploadError } = await supabase.storage
             .from("extra-images")
             .upload(
-              `additional-offers/${formData.vehicleImage.name}`,
-              formData.vehicleImage
+              `additional-offers/${formData.offerImage.name}`,
+              formData.offerImage
             );
 
           if (uploadError) throw uploadError;
 
           const { data: publicUrlData } = supabase.storage
             .from("extra-images")
-            .getPublicUrl(`additional-offers/${formData.vehicleImage.name}`);
+            .getPublicUrl(`additional-offers/${formData.offerImage.name}`);
           imageUrl = publicUrlData.publicUrl;
         }
-      } else if (typeof formData.vehicleImage === "string") {
-        imageUrl = formData.vehicleImage;
+      } else if (typeof formData.offerImage === "string") {
+        imageUrl = formData.offerImage;
       }
 
       const newOfferData = {
@@ -69,7 +69,7 @@ export default function AddNewOffer() {
         type: formData.type,
         availability: formData.availability === "Available",
         description: formData.description,
-        vehicle_image: imageUrl,
+        image_url: imageUrl,
       };
 
       const { error: insertError } = await supabase

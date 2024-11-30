@@ -13,6 +13,16 @@ interface CarSearchState {
   setSearchCompleted: (completed: boolean) => void;
 }
 
+interface AdditionalOffer {
+  id: string;
+  type: "Protection" | "Extras";
+  offer_name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  availability: boolean;
+}
+
 interface RentDetailsState {
   car_id: string;
   customer_firstname: string;
@@ -36,6 +46,8 @@ interface RentDetailsState {
   selected_children_extras: ChildrenExtrasType[];
   totalExtrasPrice: number;
   childrenSeatsQuantity: IChildrenSeatsQuantity;
+  extras: AdditionalOffer[];
+  childrenExtras: AdditionalOffer[];
 
   setCarId: (id: string) => void;
   setCustomerFirstname: (firstname: string) => void;
@@ -59,6 +71,8 @@ interface RentDetailsState {
   setTotalExtrasPrice: (price: number) => void;
   setSelectedChildrenExtras: (extras: ChildrenExtrasType[]) => void;
   setChildrenSeatsQuantity: (extras: IChildrenSeatsQuantity) => void;
+  setExtras: (extras: AdditionalOffer[]) => void;
+  setChildrenExtras: (childrenExtras: AdditionalOffer[]) => void;
 }
 
 export const useCarSearchStore = create<CarSearchState>((set) => ({
@@ -93,6 +107,8 @@ export const useRentDetailsStore = create<RentDetailsState>((set) => ({
     infant_car_seats: 1,
     booster_car_seats: 1,
   },
+  extras: [],
+  childrenExtras: [],
 
   setCarId: (id) => set({ car_id: id }),
   setCustomerFirstname: (firstname) => set({ customer_firstname: firstname }),
@@ -119,4 +135,6 @@ export const useRentDetailsStore = create<RentDetailsState>((set) => ({
     set({ selected_children_extras: extras }),
   setTotalExtrasPrice: (price) => set({ totalExtrasPrice: price }),
   setChildrenSeatsQuantity: (extras) => set({ childrenSeatsQuantity: extras }),
+  setExtras: (extras) => set({ extras }),
+  setChildrenExtras: (childrenExtras) => set({ childrenExtras }),
 }));

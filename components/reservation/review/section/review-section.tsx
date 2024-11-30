@@ -1,12 +1,23 @@
+"use client";
+
 import AirConditionerIcon from "@/components/shared/icons/air-conditioner";
 import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
-import { childrenExtras, extras } from "@/lib/static/extras-dummy";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import Image from "next/image";
 import { useCarStore } from "@/store/car-store";
+
+interface AdditionalOffer {
+  id: string;
+  type: "Protection" | "Extras";
+  offer_name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  availability: boolean;
+}
 
 export default function ReviewSection() {
   const {
@@ -25,6 +36,8 @@ export default function ReviewSection() {
     returnDate,
     returnTime,
     childrenSeatsQuantity,
+    extras,
+    childrenExtras,
   } = useRentDetailsStore();
 
   const { carModels } = useCarStore();
@@ -145,21 +158,22 @@ export default function ReviewSection() {
             </p>
             <p>{totalProtectionPrice.toFixed(2)} JOD</p>
           </div>
-          {selected_extras.map((extra, index) => (
+          {selected_extras.map((extra) => (
             <div
-              key={index}
+              key={extra}
               className="flex items-center justify-between gap-5"
             >
               <p>{extra}</p>
               <p>
                 {(
-                  (extras.find(({ name }) => name === extra)?.price ?? 0) *
-                  totalDays
+                  (extras.find(({ offer_name }) => offer_name === extra)
+                    ?.price ?? 0) * totalDays
                 ).toFixed(2)}{" "}
                 JOD
               </p>
             </div>
           ))}
+
           {selected_children_extras.map((extra) => {
             const quantity = childrenSeatsQuantity[extra];
 
@@ -173,10 +187,11 @@ export default function ReviewSection() {
                 </p>
                 <p>
                   {(
-                    (childrenExtras.find(({ name }) => name === extra)?.price ??
-                      0) *
-                    totalDays *
-                    quantity
+                    (childrenExtras.find(
+                      ({ offer_name }) => offer_name === extra,
+                    )?.price ?? 0) *
+                    quantity *
+                    totalDays
                   ).toFixed(2)}{" "}
                   JOD
                 </p>

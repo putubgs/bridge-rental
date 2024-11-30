@@ -1,5 +1,5 @@
-import { ChildrenExtrasType, ExtrasType } from "@/lib/enums";
-import { childrenExtras, extras } from "@/lib/static/extras-dummy";
+"use client";
+
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import { MenuItem, Select } from "@mui/material";
@@ -19,82 +19,81 @@ export default function ExtrasSection() {
     returnTime,
     childrenSeatsQuantity,
     setChildrenSeatsQuantity,
+    extras,
+    childrenExtras,
   } = useRentDetailsStore();
 
-  const handleSelectExtra = (extra: ExtrasType, price: number) => {
-    const totalDays = countDays(
-      deliveryDate,
-      deliveryTime,
-      returnDate,
-      returnTime,
-    );
+  // Calculate total days
+  const totalDays = countDays(deliveryDate, deliveryTime, returnDate, returnTime);
 
-    const isExtraSelected = selected_extras.includes(extra);
-
+  const handleSelectExtra = (extra: string, price: number) => {
+    const isExtraSelected = selected_extras.includes(extra as any);
+  
     if (isExtraSelected) {
-      setSelectedExtras(selected_extras.filter((item) => item !== extra));
-      setTotalExtrasPrice(totalExtrasPrice - totalDays * price);
+      const updatedExtras = selected_extras.filter((item) => item !== extra);
+      setSelectedExtras(updatedExtras);
+      const updatedPrice = totalExtrasPrice - totalDays * price;
+      setTotalExtrasPrice(updatedPrice);
     } else {
-      setSelectedExtras([...selected_extras, extra]);
-      setTotalExtrasPrice(totalExtrasPrice + totalDays * price);
+      const updatedExtras = [...selected_extras, extra];
+      setSelectedExtras(updatedExtras as any);
+      const updatedPrice = totalExtrasPrice + totalDays * price;
+      setTotalExtrasPrice(updatedPrice);
     }
   };
-
-  const handleSelectChildrenExtra = (
-    extra: ChildrenExtrasType,
-    price: number,
-  ) => {
-    const totalDays = countDays(
-      deliveryDate,
-      deliveryTime,
-      returnDate,
-      returnTime,
-    );
-
-    const quantity = childrenSeatsQuantity[extra];
-    const isExtraSelected = selected_children_extras.includes(extra);
-
+  
+  const handleSelectChildrenExtra = (extra: string, price: number) => {
+    const quantity = childrenSeatsQuantity[extra] || 1;
+    const isExtraSelected = selected_children_extras.includes(extra as any);
+  
     if (isExtraSelected) {
-      setSelectedChildrenExtras(
-        selected_children_extras.filter((item) => item !== extra),
+      const updatedChildrenExtras = selected_children_extras.filter(
+        (item) => item !== extra,
       );
-      setTotalExtrasPrice(totalExtrasPrice - totalDays * quantity * price);
+      setSelectedChildrenExtras(updatedChildrenExtras);
+      const updatedPrice = totalExtrasPrice - totalDays * quantity * price;
+      setTotalExtrasPrice(updatedPrice);
     } else {
-      setSelectedChildrenExtras([...selected_children_extras, extra]);
-      setTotalExtrasPrice(totalExtrasPrice + totalDays * quantity * price);
+      const updatedChildrenExtras = [...selected_children_extras, extra];
+      setSelectedChildrenExtras(updatedChildrenExtras as any);
+      const updatedPrice = totalExtrasPrice + totalDays * quantity * price;
+      setTotalExtrasPrice(updatedPrice);
     }
   };
+  
 
   return (
     <section>
       <h2 className="mb-2 text-2xl font-semibold">Available Extras</h2>
 
+      {/* Extras Section */}
       <div className="mt-5 grid grid-cols-4 gap-2">
-        {extras.map(({ icon, name, description, price }) => {
-          const isAdded = selected_extras.findIndex((val) => val === name) > -1;
+        {extras.map(({ id, image_url, offer_name, description, price }) => {
+          const isAdded = selected_extras.includes(offer_name as any);
           return (
-            <div
-              key={name}
-              className="flex flex-col justify-between gap-5 border-2 bg-[#F9F9F9] p-5"
-            >
+            <div key={id} className="flex flex-col justify-between gap-5 border-2 bg-[#F9F9F9] p-5">
               <div>
                 <div className="relative aspect-square w-16">
                   <Image
-                    src={icon}
+                    src={image_url || "/default-extra.png"}
                     alt="Extras Icon"
                     fill
                     sizes="(max-width: 768px) 100vw, 90vw"
                   />
                 </div>
                 <div className="mb-10 mt-10 space-y-2">
-                  <h3 className="font-semibold">{name}</h3>
+                  <h3 className="font-semibold">{offer_name}</h3>
                   <p className="text-sm text-[#727272]">{description}</p>
                 </div>
               </div>
               <div className="mt-5 flex w-full items-end justify-between gap-5">
                 <button
-                  onClick={() => handleSelectExtra(name as ExtrasType, price)}
-                  className={`rounded px-4 py-2 font-medium transition-all duration-150 ${isAdded ? "bg-primary-variant-2 text-white hover:bg-primary-variant-3" : "bg-[#DCDCDC] text-[#7F7F7F] hover:bg-neutral-300"}`}
+                  onClick={() => handleSelectExtra(offer_name, price)}
+                  className={`rounded px-4 py-2 font-medium transition-all ${
+                    isAdded
+                      ? "bg-primary-variant-2 text-white hover:bg-primary-variant-3"
+                      : "bg-[#DCDCDC] text-[#7F7F7F] hover:bg-neutral-300"
+                  }`}
                 >
                   {isAdded ? "ADDED" : "ADD"}
                 </button>
@@ -107,6 +106,7 @@ export default function ExtrasSection() {
         })}
       </div>
 
+      {/* Children Extras Section */}
       <div className="mt-5 border-2 bg-[#F9F9F9] p-5">
         <div className="flex items-center gap-5">
           <div className="relative aspect-square w-16">
@@ -118,33 +118,26 @@ export default function ExtrasSection() {
             />
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold">
-              Traveling with children? Travel Safety
-            </h3>
+            <h3 className="text-xl font-semibold">Travel Safety</h3>
             <p className="text-neutral-400">
-              Select up to 3 baby seats from 0-36kg. Baby seats are fitted with
-              a hygenic disposable cover.
+              Select up to 3 baby seats. Baby seats are fitted with a hygienic disposable cover.
             </p>
           </div>
         </div>
         <div className="mt-6 flex flex-col gap-3 divide-y">
-          {childrenExtras.map(({ name, price, supported_weight }) => {
-            const isAdded =
-              selected_children_extras.findIndex((val) => val === name) > -1;
+          {childrenExtras.map(({ id, offer_name, price }) => {
+            const isAdded = selected_children_extras.includes(offer_name as any);
             return (
-              <div
-                key={name}
-                className="flex items-center justify-between gap-5 pt-3"
-              >
+              <div key={id} className="flex items-center justify-between gap-5 pt-3">
                 <div className="flex items-center gap-3">
                   <Select
                     size="small"
                     className="w-16 !border-none"
-                    value={childrenSeatsQuantity[name]}
+                    value={childrenSeatsQuantity[offer_name] || 1}
                     onChange={(e) =>
                       setChildrenSeatsQuantity({
                         ...childrenSeatsQuantity,
-                        [name]: e.target.value as number,
+                        [offer_name]: e.target.value as number,
                       })
                     }
                     sx={{
@@ -157,24 +150,23 @@ export default function ExtrasSection() {
                       backgroundColor: "#F4F4F4",
                     }}
                   >
-                    <MenuItem value={1}>1</MenuItem>
-                    <MenuItem value={2}>2</MenuItem>
-                    <MenuItem value={3}>3</MenuItem>
+                    {[1, 2, 3].map((num) => (
+                      <MenuItem key={num} value={num}>
+                        {num}
+                      </MenuItem>
+                    ))}
                   </Select>
-                  <h3 className="capitalize">
-                    {name.split("_").join(" ")} ({supported_weight})
-                  </h3>
+                  <h3 className="capitalize">{offer_name}</h3>
                 </div>
                 <div className="flex items-center gap-4">
                   <p>{price.toFixed(2)} JOD/DAY</p>
                   <button
-                    onClick={() =>
-                      handleSelectChildrenExtra(
-                        name as ChildrenExtrasType,
-                        price,
-                      )
-                    }
-                    className={`rounded px-4 py-2 font-medium transition-all duration-150 ${isAdded ? "bg-primary-variant-2 text-white hover:bg-primary-variant-3" : "bg-[#DCDCDC] text-[#7F7F7F] hover:bg-neutral-300"}`}
+                    onClick={() => handleSelectChildrenExtra(offer_name, price)}
+                    className={`rounded px-4 py-2 font-medium transition-all ${
+                      isAdded
+                        ? "bg-primary-variant-2 text-white hover:bg-primary-variant-3"
+                        : "bg-[#DCDCDC] text-[#7F7F7F] hover:bg-neutral-300"
+                    }`}
                   >
                     {isAdded ? "ADDED" : "ADD"}
                   </button>

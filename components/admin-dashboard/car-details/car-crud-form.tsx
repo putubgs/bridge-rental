@@ -127,13 +127,13 @@ export default function CarForm({ initialValues, onSubmit }: CarFormProps) {
                 onChange={handleChange}
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                autoComplete="off" 
+                autoComplete="off"
               />
               {errors.carType && (
                 <p className="mt-1 text-xs text-red-500">{errors.carType}</p>
               )}
               {showSuggestions && filteredSuggestions.length > 0 && (
-                <ul className="absolute z-10 w-[70%] rounded-md border border-gray-300 bg-white shadow-md">
+                <ul className="absolute z-10 max-h-48 w-[70%] overflow-y-auto rounded-md border border-gray-300 bg-white shadow-md">
                   {filteredSuggestions.map((type, index) => (
                     <li
                       key={index}

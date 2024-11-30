@@ -26,7 +26,7 @@ export default function CarForm({ initialValues, onSubmit }: CarFormProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
 
-  const { carTypes } = useCarStore(); // Fetch car types from Zustand store
+  const { carTypes } = useCarStore();
 
   useEffect(() => {
     setFormValues(initialValues);
@@ -239,7 +239,7 @@ export default function CarForm({ initialValues, onSubmit }: CarFormProps) {
         <ImageUploader
           error={errors.vehicleImage}
           onFileChange={handleImageChange}
-          initialImage={formValues.vehicleImage as string} // Pass the initial image
+          initialImage={formValues.vehicleImage as string}
         />
       </div>
 

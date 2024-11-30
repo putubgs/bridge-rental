@@ -31,7 +31,19 @@ export default function ReservationLayout({
 
   const { searchCompleted } = useCarSearchStore();
 
-  const { carModels } = useCarStore();
+  const { carModels, fetchCars } = useCarStore();
+
+  useEffect(() => {
+    if (carModels.length === 0) {
+      fetchCars();
+    }
+  }, [carModels, fetchCars]);
+
+  useEffect(() => {
+    if (pathname.startsWith("/reservation")) {
+      fetchCars();
+    }
+  }, [pathname, fetchCars]);
 
   const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
@@ -52,7 +64,7 @@ export default function ReservationLayout({
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [searchCompleted, car_id, totalBundlePrice]);
+  }, [searchCompleted, car_id, totalBundlePrice, pathname]);
 
   if (!searchCompleted) {
     return (

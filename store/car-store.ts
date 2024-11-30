@@ -24,7 +24,7 @@ export const useCarStore = create<CarStore>((set) => ({
       if (error) throw error;
 
       const carTypes = Array.from(
-        new Set(data?.map((car) => car.car_type).filter(Boolean))
+        new Set(data?.map((car) => car.car_type).filter(Boolean)),
       );
 
       set({ carModels: data || [], carTypes });
@@ -41,18 +41,36 @@ export const useCarStore = create<CarStore>((set) => ({
     set((state) => ({
       carModels: [...state.carModels, newCar],
       carTypes: Array.from(
-        new Set([...state.carTypes, newCar.car_type].filter(Boolean))
+        new Set([...state.carTypes, newCar.car_type].filter(Boolean)),
       ),
     }));
   },
   updateCar: (updatedCar) => {
+    if (!updatedCar?.car_type) {
+      console.error("Invalid car data: Missing car_type");
+      return;
+    }
+
     set((state) => {
-      const updatedCarModels = state.carModels.map((car) =>
-        car.car_id === updatedCar.car_id ? updatedCar : car
+      // Update or add the car to carModels
+      const existingCarIndex = state.carModels.findIndex(
+        (car) => car.car_id === updatedCar.car_id,
       );
+      const updatedCarModels = [...state.carModels];
+
+      if (existingCarIndex >= 0) {
+        // Update existing car
+        updatedCarModels[existingCarIndex] = updatedCar;
+      } else {
+        // Add new car if not found
+        updatedCarModels.push(updatedCar);
+      }
+
+      // Update carTypes to include the updated car's type
       const updatedCarTypes = Array.from(
-        new Set(updatedCarModels.map((car) => car.car_type).filter(Boolean))
+        new Set(updatedCarModels.map((car) => car.car_type).filter(Boolean)),
       );
+
       return { carModels: updatedCarModels, carTypes: updatedCarTypes };
     });
   },

@@ -32,6 +32,7 @@ export default function CarBundle() {
   const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
   useEffect(() => {
+    console.log(car.availability)
     setTotalBundlePrice(0);
   }, [setTotalBundlePrice]);
 
@@ -52,7 +53,7 @@ export default function CarBundle() {
     router.push("/reservation/protection-and-extras");
   };
 
-  if (!car) {
+  if (!car || !car.availability) {
     return <p>Loading...</p>;
   }
 

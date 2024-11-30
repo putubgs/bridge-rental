@@ -19,12 +19,6 @@ export default function ReservationPage() {
   const [filteredCars, setFilteredCars] = useState<ICarModel[]>([]);
 
   useEffect(() => {
-    if (carModels.length === 0) {
-      fetchCars();
-    }
-  }, [carModels, fetchCars]);
-
-  useEffect(() => {
     const filtered = carModels.filter(
       (car) =>
         (!selectedType || car.car_type === selectedType) &&

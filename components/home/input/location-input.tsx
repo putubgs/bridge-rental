@@ -1,15 +1,34 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
-import { locationOptions } from "@/lib/static/locations-dummy";
+import { useState } from "react";
+import debounce from "lodash.debounce";
+import { autocomplete } from "@/lib/google";
 
 export default function LocationInput({ formik }: { formik: any }) {
   const { 
     setDeliveryLocation, 
-    setReturnLocation,
-    deliveryLocation,
+    setReturnLocation, 
+    deliveryLocation, 
     returnLocation 
   } = useRentDetailsStore();
+
+  const [deliveryOptions, setDeliveryOptions] = useState<string[]>([]);
+  const [returnOptions, setReturnOptions] = useState<string[]>([]);  
+
+  const fetchDeliveryOptions = debounce(async (input: string) => {
+    if (input) {
+      const results = await autocomplete(input);
+      setDeliveryOptions(results.map((item) => item.description));
+    }
+  }, 500);
+
+  const fetchReturnOptions = debounce(async (input: string) => {
+    if (input) {
+      const results = await autocomplete(input);
+      setReturnOptions(results.map((item) => item.description));
+    }
+  }, 500);
 
   const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
     if (newLocation) {
@@ -21,6 +40,14 @@ export default function LocationInput({ formik }: { formik: any }) {
         formik.setFieldValue("return_location", newLocation);
       }
     }
+  };
+
+  const handleInputChangeDelivery = (_: any, inputValue: string) => {
+    fetchDeliveryOptions(inputValue);
+  };
+
+  const handleInputChangeReturn = (_: any, inputValue: string) => {
+    fetchReturnOptions(inputValue);
   };
 
   return (
@@ -35,8 +62,9 @@ export default function LocationInput({ formik }: { formik: any }) {
         <Autocomplete
           value={formik.values["delivery_location"] || deliveryLocation || ""}
           onChange={handleDeliveryLocationChange}
+          onInputChange={handleInputChangeDelivery}
           disablePortal
-          options={locationOptions}
+          options={deliveryOptions}
           renderOption={(props, option) => {
             const { key, ...otherProps } = props;
             return (
@@ -75,6 +103,7 @@ export default function LocationInput({ formik }: { formik: any }) {
           )}
         />
       </div>
+
       {!formik?.values["same_return_location"] && (
         <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
           <span className="text-[10px] text-neutral-400">
@@ -86,8 +115,9 @@ export default function LocationInput({ formik }: { formik: any }) {
               setReturnLocation(newVal);
               formik.setFieldValue("return_location", newVal);
             }}
+            onInputChange={handleInputChangeReturn}
             disablePortal
-            options={locationOptions}
+            options={returnOptions}
             renderOption={(props, option) => {
               const { key, ...otherProps } = props;
               return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useCarStore } from "@/store/car-store"; // Import the Zustand store
+import { useCarStore } from "@/store/car-store";
 import ImageUploader from "../img-uploder";
 
 interface CarFormProps {

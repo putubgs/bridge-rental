@@ -164,28 +164,33 @@ export default function PaymentForm({
           </div>
         </div>
         <div className="flex gap-3">
-          <div className="relative w-1/2 border-2 border-primary bg-white px-6 pb-5 pt-14">
-            <div className="absolute right-0 top-0 bg-[#FF8181] px-4 py-[1px] text-sm text-white">
-              -5%
+          <div className="relative flex w-1/2 flex-col justify-between h-full border-2 border-primary bg-white px-6 pb-5 pt-14">
+            <div>
+              <div className="absolute right-0 top-0 bg-[#FF8181] px-4 py-[1px] text-sm text-white">
+                -5%
+              </div>
+              <h3 className="font-semibold">Pay Now</h3>
+              <p className="pt-1 text-sm">
+                Pay your booking now and get a 5% discount
+              </p>
             </div>
-            <h3 className="font-semibold">Pay Now</h3>
-            <p className="text-sm">
-              Pay your booking now and get a 5% discount
-            </p>
-            <p className="mb-5 mt-4 font-semibold">
-              {discountedPrice.toFixed(2)} JOD
-            </p>
-            <button
-              onClick={handlePayNow}
-              className="w-full rounded bg-primary-variant-2 px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3"
-            >
-              PAY NOW
-            </button>
+            <div>
+              <p className="mb-5 mt-4 font-semibold">
+                {discountedPrice.toFixed(2)} JOD
+              </p>
+              <button
+                onClick={handlePayNow}
+                className="w-full rounded bg-primary-variant-2 px-5 py-3 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3"
+              >
+                PAY NOW
+              </button>
+            </div>
           </div>
           <div className="relative w-1/2 border-2 bg-white px-6 pb-5 pt-14">
             <h3 className="font-semibold">Pay on Delivery</h3>
-            <p className="text-sm">
-              Book now and pay when you collect the vehicle
+            <p className="pt-1 text-justify text-sm">
+              Book now and pay by card upon vehicle collection. Cash payments
+              are not accepted
             </p>
             <p className="mb-5 mt-4 font-semibold">
               {totalPrice.toFixed(2)} JOD

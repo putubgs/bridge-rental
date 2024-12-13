@@ -1,7 +1,12 @@
 import { Dialog } from "@mui/material";
 import { ChevronLeftIcon } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+const InvoiceDownloadComponent = dynamic(
+  () => import("@/components/reservation/review/invoice/download-pdf"),
+);
 
 interface ISuccessDialog {
   email: string;
@@ -36,8 +41,7 @@ export default function SuccessDialog({
         </p>
         <div className="flex flex-col items-center space-y-[14px]">
           <div className="text-sm font-medium">
-            download your booking confirmation{" "}
-            <button className="text-primary-variant-3">click here</button>
+            download your booking confirmation <InvoiceDownloadComponent />
           </div>
           <button
             onClick={() => router.push("/")}

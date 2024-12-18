@@ -50,10 +50,10 @@ export default function CarSearchForm() {
   // Ensure the dates and times from the store are set in the Jordan timezone
   const deliveryDateInJordan = deliveryDate
     ? dayjs(deliveryDate).tz(JORDAN_TIMEZONE)
-    : dayjs().tz(JORDAN_TIMEZONE);
+    : dayjs().tz(JORDAN_TIMEZONE).add(2, "hour");
   const returnDateInJordan = returnDate
     ? dayjs(returnDate).tz(JORDAN_TIMEZONE)
-    : dayjs().tz(JORDAN_TIMEZONE).add(24, "hour");
+    : dayjs().tz(JORDAN_TIMEZONE).add(26, "hour");
   const deliveryTimeInJordan = deliveryTime
     ? dayjs(deliveryTime).tz(JORDAN_TIMEZONE)
     : dayjs().tz(JORDAN_TIMEZONE);
@@ -88,8 +88,7 @@ export default function CarSearchForm() {
         dayjs()
           .tz(JORDAN_TIMEZONE)
           .hour(dayjs().hour())
-          .minute(dayjs().minute())
-          .add(1, "hour"),
+          .minute(dayjs().minute()),
       same_return_location: true,
     },
     validationSchema: carSearchSchema,

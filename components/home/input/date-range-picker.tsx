@@ -37,7 +37,7 @@ export default function DateRangePicker({ formik }: { formik: any }) {
   const initialReturnTime =
     formik?.values["return_time"] ||
     returnTime ||
-    dayjs().tz(JORDAN_TIMEZONE).add(1, "hour");
+    dayjs().tz(JORDAN_TIMEZONE);
 
   return (
     <>

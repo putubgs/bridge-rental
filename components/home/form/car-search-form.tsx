@@ -112,18 +112,30 @@ export default function CarSearchForm() {
   });
 
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-3">
-      <div className="flex h-max justify-between gap-2 bg-neutral-100 bg-opacity-20 p-[6px]">
+    <form onSubmit={formik.handleSubmit} className="space-y-3 mt-5">
+      <div className="flex h-max flex-col gap-3 md:gap-2 bg-neutral-100 bg-opacity-20 p-[6px] md:flex-row md:justify-between">
         <LocationInput formik={formik} />
+        <div className="flex items-center gap-2 font-bold md:hidden">
+          <Toggle
+            size="20px"
+            onColor="#BAF0E2"
+            offColor="#ddd"
+            handleColor="#fff"
+            defaultChecked
+            onToggle={(isChecked) =>
+              formik.setFieldValue("same_return_location", isChecked)
+            }
+          />
+          <span className="whitespace-nowrap pt-1 text-sm text-[#868686]">
+            RETURN TO SAME LOCATION
+          </span>
+        </div>
         <DateRangePicker formik={formik} />
         <Button
           type="submit"
           variant="contained"
-          className="basis-[12%]"
+          className="basis-[12%] py-2 md:py-0"
           onClick={handleInputSearch}
-          // disabled={
-          //   !formik.values.delivery_location || !formik.values.delivery_date
-          // }
         >
           <div className="flex items-center gap-1 font-overpass font-bold hover:bg-primary/90">
             <SearchIcon className="size-[18px] shrink-0" />
@@ -133,7 +145,7 @@ export default function CarSearchForm() {
       </div>
 
       <div className="flex items-start justify-between gap-14 text-[11px]">
-        <div className="flex items-center gap-2 font-bold">
+        <div className="hidden items-center gap-2 font-bold md:flex">
           <Toggle
             size="20px"
             onColor="#BAF0E2"
@@ -148,14 +160,14 @@ export default function CarSearchForm() {
             RETURN TO SAME LOCATION
           </span>
         </div>
-        <div className="text-end">
+        <div className="text-start md:text-end md:text-white text-black">
           <p>
             *KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO
             THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE
             CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span>
-            TEAM
+            {" "}TEAM
           </p>
-          <p>*BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)</p>
+          <p className="md:pt-0 pt-2">*BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)</p>
         </div>
       </div>
     </form>

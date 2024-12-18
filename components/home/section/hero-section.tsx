@@ -38,7 +38,7 @@ export default function HeroSection() {
 
   if (error) {
     return (
-      <section className="relative z-0 w-full h-screen max-h-[850px] px-20 pb-16 text-white bg-gray-200 flex items-center justify-center">
+      <section className="relative z-0 flex h-screen max-h-[850px] w-full items-center justify-center bg-gray-200 px-20 pb-16 text-white">
         <p className="text-center text-gray-600">{error}</p>
       </section>
     );
@@ -51,22 +51,37 @@ export default function HeroSection() {
           <link rel="preload" as="image" href={heroImageUrl} />
         </Head>
       )}
-      <section className="relative z-0 w-full h-screen max-h-[850px] px-20 pb-16 text-white">
-        {heroImageUrl && (
-          <Image
-            src={heroImageUrl}
-            alt="Banner Image"
-            fill
-            className="-z-10 object-cover"
-            sizes="(max-width: 768px) 90vw, 100vw"
-            priority
-          />
-        )}
+      <section className="relative z-0 w-full px-0 md:pb-16 pb-5 text-white md:h-screen md:max-h-[850px] md:px-20 pt-10">
+        <div className="hidden md:block">
+          {heroImageUrl && (
+            <Image
+              src={heroImageUrl}
+              alt="Banner Image"
+              fill
+              className="-z-10 md:object-cover"
+              sizes="(max-width: 768px) 90vw, 100vw"
+              priority
+            />
+          )}
+        </div>
+        <h2 className="flex md:hidden text-[20px] text-black my-[15px]">Car rentals at your doorstep</h2>
+        <div className="block md:hidden w-full">
+          {heroImageUrl && (
+            <Image
+              src={heroImageUrl}
+              alt="Banner Image"
+              width={100}
+              height={100}
+              sizes="(max-width: 768px) 90vw, 100vw"
+              className="w-full"
+            />
+          )}
+        </div>
         <div className="mx-auto flex h-full max-w-screen-2xl flex-col justify-end gap-6">
-          <h2 className="font-poppins text-[64px] font-semibold leading-none">
+          <h2 className="hidden font-poppins text-[64px] font-semibold leading-none md:flex">
             Car Rentals <br /> At Your Doorstep
           </h2>
-          <p className="text-[28px] font-medium text-primary">
+          <p className="hidden text-[28px] font-medium text-primary md:flex">
             Looking for a vehicle in Jordan?
           </p>
           <CarSearchForm />

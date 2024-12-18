@@ -21,10 +21,12 @@ export default function HomePage() {
   }, [setSearchCompleted]);
 
   return (
-    <main className="relative -top-20">
+    <main className="relative -top-10 md:-top-20">
       <HeroSection />
       <ExperienceSection />
-      <BookingSection />
+      <div className="md:flex hidden">
+        <BookingSection />
+      </div>
       <BestDealSection />
       {/* <TestimoniesSection /> */}
     </main>

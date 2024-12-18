@@ -1,17 +1,21 @@
 "use client";
 
-import { Button, Switch } from "@mui/material";
+import { Button } from "@mui/material";
 import { useFormik } from "formik";
 import { SearchIcon } from "lucide-react";
 import * as yup from "yup";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+const JORDAN_TIMEZONE = "Asia/Amman";
+dayjs.tz.setDefault(JORDAN_TIMEZONE);
+
 import DateRangePicker from "../input/date-range-picker";
 import LocationInput from "../input/location-input";
 import { useRouter } from "next/navigation";
-import {
-  useCarSearchStore,
-  useRentDetailsStore,
-} from "@/store/reservation-store";
+import { useCarSearchStore, useRentDetailsStore } from "@/store/reservation-store";
 import Toggle from "@/components/shared/toggle/toggle";
 
 const carSearchSchema = yup.object({
@@ -38,6 +42,12 @@ export default function CarSearchForm() {
     setReturnTime,
   } = useRentDetailsStore();
 
+  // Ensure the dates and times from the store are set in the Jordan timezone
+  const deliveryDateInJordan = deliveryDate ? dayjs(deliveryDate).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE);
+  const returnDateInJordan = returnDate ? dayjs(returnDate).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE).add(24, "hour");
+  const deliveryTimeInJordan = deliveryTime ? dayjs(deliveryTime).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE);
+  const returnTimeInJordan = returnTime ? dayjs(returnTime).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE);
+
   const handleInputSearch = () => {
     if (!formik.values.delivery_location || !formik.values.return_location) {
       alert("Please fill the location details.");
@@ -52,10 +62,10 @@ export default function CarSearchForm() {
     initialValues: {
       delivery_location: "",
       return_location: "",
-      delivery_date: deliveryDate || dayjs(),
-      delivery_time: deliveryTime || dayjs().hour(9).minute(0),
-      return_date: returnDate || dayjs().add(24, "hour"),
-      return_time: returnTime || dayjs().hour(9).minute(0).add(1, "hour"),
+      delivery_date: deliveryDateInJordan, // Now using Jordan timezone
+      delivery_time: deliveryTimeInJordan || dayjs().tz(JORDAN_TIMEZONE).hour(dayjs().hour()).minute(dayjs().minute()),
+      return_date: returnDateInJordan, // Now using Jordan timezone
+      return_time: returnTimeInJordan || dayjs().tz(JORDAN_TIMEZONE).hour(dayjs().hour()).minute(dayjs().minute()).add(1, "hour"),
       same_return_location: true,
     },
     validationSchema: carSearchSchema,
@@ -116,7 +126,7 @@ export default function CarSearchForm() {
           <p>
             *KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO
             THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE
-            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span>{" "}
+            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span> 
             TEAM
           </p>
           <p>*BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)</p>

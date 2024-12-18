@@ -1,6 +1,13 @@
 import { useRentDetailsStore } from "@/store/reservation-store";
 import DateTimePicker from "./date-time-picker";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const JORDAN_TIMEZONE = "Asia/Amman";
 
 export default function DateRangePicker({ formik }: { formik: any }) {
   const {
@@ -16,9 +23,21 @@ export default function DateRangePicker({ formik }: { formik: any }) {
 
   const isSameReturnDay = formik?.values["return_date"]?.isSame(
     formik?.values["delivery_date"],
-    "day"
+    "day",
   );
-  const isSameDay = formik?.values["delivery_date"]?.isSame(dayjs(), "day");
+  const isSameDay = formik?.values["delivery_date"]?.isSame(
+    dayjs().tz(JORDAN_TIMEZONE),
+    "day",
+  );
+
+  const initialDeliveryTime =
+    formik?.values["delivery_time"] ||
+    deliveryTime ||
+    dayjs().tz(JORDAN_TIMEZONE);
+  const initialReturnTime =
+    formik?.values["return_time"] ||
+    returnTime ||
+    dayjs().tz(JORDAN_TIMEZONE).add(1, "hour");
 
   return (
     <>
@@ -30,7 +49,7 @@ export default function DateRangePicker({ formik }: { formik: any }) {
           formik.setFieldValue("delivery_date", e);
           formik.setFieldValue("return_date", e?.add(24, "hour"));
         }}
-        minTime={isSameDay ? dayjs() : undefined}
+        minTime={isSameDay ? dayjs().tz(JORDAN_TIMEZONE) : undefined}
         onTimeChange={(time) => {
           if (time) {
             setDeliveryTime(time);
@@ -40,7 +59,7 @@ export default function DateRangePicker({ formik }: { formik: any }) {
               .minute(time.minute());
             const updatedReturnDateTime = updatedDeliveryDateTime.add(
               1,
-              "hour"
+              "hour",
             );
             formik.setFieldValue("delivery_date", updatedDeliveryDateTime);
             formik.setFieldValue("delivery_time", time);
@@ -50,11 +69,11 @@ export default function DateRangePicker({ formik }: { formik: any }) {
             }
           }
         }}
-        timeValue={formik?.values["delivery_time"] || deliveryTime}
+        timeValue={initialDeliveryTime}
       />
       <DateTimePicker
         dateLabel="RETURN DATE"
-        minDate={formik?.values["delivery_date"] ?? dayjs()}
+        minDate={formik?.values["delivery_date"] ?? dayjs().tz(JORDAN_TIMEZONE)}
         minTime={
           isSameReturnDay
             ? formik?.values["delivery_date"].add(1, "hour")
@@ -69,7 +88,7 @@ export default function DateRangePicker({ formik }: { formik: any }) {
           setReturnTime(time);
           formik.setFieldValue("return_time", time);
         }}
-        timeValue={formik?.values["return_time"] || returnTime}
+        timeValue={initialReturnTime}
       />
     </>
   );

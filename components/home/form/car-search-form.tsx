@@ -56,10 +56,10 @@ export default function CarSearchForm() {
     : dayjs().tz(JORDAN_TIMEZONE).add(26, "hour");
   const deliveryTimeInJordan = deliveryTime
     ? dayjs(deliveryTime).tz(JORDAN_TIMEZONE)
-    : dayjs().tz(JORDAN_TIMEZONE);
+    : dayjs().tz(JORDAN_TIMEZONE).add(26, "hour");
   const returnTimeInJordan = returnTime
     ? dayjs(returnTime).tz(JORDAN_TIMEZONE)
-    : dayjs().tz(JORDAN_TIMEZONE);
+    : dayjs().tz(JORDAN_TIMEZONE).add(26, "hour");
 
   const handleInputSearch = () => {
     if (!formik.values.delivery_location || !formik.values.return_location) {
@@ -75,7 +75,7 @@ export default function CarSearchForm() {
     initialValues: {
       delivery_location: deliveryLocation || "",
       return_location: returnLocation || "",
-      delivery_date: deliveryDateInJordan, // Now using Jordan timezone
+      delivery_date: deliveryDateInJordan,
       delivery_time:
         deliveryTimeInJordan ||
         dayjs()

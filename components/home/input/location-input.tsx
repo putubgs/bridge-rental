@@ -25,33 +25,43 @@ export default function LocationInput({ formik }: { formik: any }) {
   const [deliveryInputValue, setDeliveryInputValue] = useState("");
   const [returnInputValue, setReturnInputValue] = useState("");
 
-  const fetchDeliveryOptions = useCallback(debounce(async (input: string) => {
-    if (input) {
-      setIsLoadingDelivery(true);
-      try {
-        const results = await autocomplete(input);
-        setDeliveryOptions(results.map((item) => item.description));
-      } finally {
-        setIsLoadingDelivery(false);
-      }
-    } else {
-      setDeliveryOptions([]);
-    }
-  }, 500), []);
+  const normalizeString = (str: string) => {
+    return str.toLowerCase().replace(/[-\s]/g, "");
+  };
 
-  const fetchReturnOptions = useCallback(debounce(async (input: string) => {
-    if (input) {
-      setIsLoadingReturn(true);
-      try {
-        const results = await autocomplete(input);
-        setReturnOptions(results.map((item) => item.description));
-      } finally {
-        setIsLoadingReturn(false);
+  const fetchDeliveryOptions = useCallback(
+    debounce(async (input: string) => {
+      if (input) {
+        setIsLoadingDelivery(true);
+        try {
+          const results = await autocomplete(input);
+          setDeliveryOptions(results.map((item) => item.description));
+        } finally {
+          setIsLoadingDelivery(false);
+        }
+      } else {
+        setDeliveryOptions([]);
       }
-    } else {
-      setReturnOptions([]);
-    }
-  }, 500), []);
+    }, 500),
+    [],
+  );
+
+  const fetchReturnOptions = useCallback(
+    debounce(async (input: string) => {
+      if (input) {
+        setIsLoadingReturn(true);
+        try {
+          const results = await autocomplete(input);
+          setReturnOptions(results.map((item) => item.description));
+        } finally {
+          setIsLoadingReturn(false);
+        }
+      } else {
+        setReturnOptions([]);
+      }
+    }, 500),
+    [],
+  );
 
   const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
     if (newLocation) {
@@ -59,7 +69,7 @@ export default function LocationInput({ formik }: { formik: any }) {
       formik.setFieldValue("delivery_location", newLocation);
       setIsTypingDelivery(false);
       setDeliveryInputValue(newLocation);
-  
+
       if (formik.values.same_return_location) {
         setReturnLocation(newLocation);
         formik.setFieldValue("return_location", newLocation);
@@ -69,7 +79,7 @@ export default function LocationInput({ formik }: { formik: any }) {
       setDeliveryLocation("");
       formik.setFieldValue("delivery_location", "");
       setDeliveryInputValue("");
-  
+
       if (formik.values.same_return_location) {
         setReturnLocation("");
         formik.setFieldValue("return_location", "");
@@ -93,9 +103,11 @@ export default function LocationInput({ formik }: { formik: any }) {
 
   const handleInputChangeDelivery = (_: any, inputValue: string) => {
     setDeliveryInputValue(inputValue);
-    const shouldOpenDropdown = inputValue !== formik.values["delivery_location"];
+    const shouldOpenDropdown =
+      normalizeString(inputValue) !==
+      normalizeString(formik.values["delivery_location"] || "");
     setIsTypingDelivery(shouldOpenDropdown);
-    
+
     if (shouldOpenDropdown) {
       fetchDeliveryOptions(inputValue);
     } else {
@@ -105,9 +117,11 @@ export default function LocationInput({ formik }: { formik: any }) {
 
   const handleInputChangeReturn = (_: any, inputValue: string) => {
     setReturnInputValue(inputValue);
-    const shouldOpenDropdown = inputValue !== formik.values["return_location"];
+    const shouldOpenDropdown =
+      normalizeString(inputValue) !==
+      normalizeString(formik.values["return_location"] || "");
     setIsTypingReturn(shouldOpenDropdown);
-    
+
     if (shouldOpenDropdown) {
       fetchReturnOptions(inputValue);
     } else {
@@ -144,6 +158,12 @@ export default function LocationInput({ formik }: { formik: any }) {
           open={isTypingDelivery}
           onClose={() => setIsTypingDelivery(false)}
           noOptionsText={renderNoOptions(isLoadingDelivery, isTypingDelivery)}
+          filterOptions={(options, { inputValue }) => {
+            const normalizedInput = normalizeString(inputValue);
+            return options.filter((option) =>
+              normalizeString(option).includes(normalizedInput),
+            );
+          }}
           renderOption={(props, option) => {
             const { key, ...otherProps } = props;
             return (
@@ -217,6 +237,12 @@ export default function LocationInput({ formik }: { formik: any }) {
             open={isTypingReturn}
             onClose={() => setIsTypingReturn(false)}
             noOptionsText={renderNoOptions(isLoadingReturn, isTypingReturn)}
+            filterOptions={(options, { inputValue }) => {
+              const normalizedInput = normalizeString(inputValue);
+              return options.filter((option) =>
+                normalizeString(option).includes(normalizedInput),
+              );
+            }}
             renderOption={(props, option) => {
               const { key, ...otherProps } = props;
               return (

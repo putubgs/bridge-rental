@@ -1,57 +1,116 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import debounce from "lodash.debounce";
 import { autocomplete } from "@/lib/google";
+import Image from "next/image";
 
 export default function LocationInput({ formik }: { formik: any }) {
-  const { 
-    setDeliveryLocation, 
-    setReturnLocation, 
-    deliveryLocation, 
-    returnLocation 
+  const {
+    setDeliveryLocation,
+    setReturnLocation,
+    deliveryLocation,
+    returnLocation,
   } = useRentDetailsStore();
 
   const [deliveryOptions, setDeliveryOptions] = useState<string[]>([]);
-  const [returnOptions, setReturnOptions] = useState<string[]>([]);  
+  const [returnOptions, setReturnOptions] = useState<string[]>([]);
+  const [isLoadingDelivery, setIsLoadingDelivery] = useState(false);
+  const [isLoadingReturn, setIsLoadingReturn] = useState(false);
+  const [isTypingDelivery, setIsTypingDelivery] = useState(false);
+  const [isTypingReturn, setIsTypingReturn] = useState(false);
+  const [deliveryInputValue, setDeliveryInputValue] = useState("");
+  const [returnInputValue, setReturnInputValue] = useState("");
 
-  const fetchDeliveryOptions = debounce(async (input: string) => {
+  const fetchDeliveryOptions = useCallback(debounce(async (input: string) => {
     if (input) {
-      const results = await autocomplete(input);
-      setDeliveryOptions(results.map((item) => item.description));
+      setIsLoadingDelivery(true);
+      try {
+        const results = await autocomplete(input);
+        setDeliveryOptions(results.map((item) => item.description));
+      } finally {
+        setIsLoadingDelivery(false);
+      }
+    } else {
+      setDeliveryOptions([]);
     }
-  }, 500);
+  }, 500), []);
 
-  const fetchReturnOptions = debounce(async (input: string) => {
+  const fetchReturnOptions = useCallback(debounce(async (input: string) => {
     if (input) {
-      const results = await autocomplete(input);
-      setReturnOptions(results.map((item) => item.description));
+      setIsLoadingReturn(true);
+      try {
+        const results = await autocomplete(input);
+        setReturnOptions(results.map((item) => item.description));
+      } finally {
+        setIsLoadingReturn(false);
+      }
+    } else {
+      setReturnOptions([]);
     }
-  }, 500);
+  }, 500), []);
 
   const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
     if (newLocation) {
       setDeliveryLocation(newLocation);
       formik.setFieldValue("delivery_location", newLocation);
+      setIsTypingDelivery(false);
+      setDeliveryInputValue(newLocation);
 
       if (formik.values.same_return_location) {
         setReturnLocation(newLocation);
         formik.setFieldValue("return_location", newLocation);
+        setReturnInputValue(newLocation);
       }
     }
   };
 
+  const handleReturnLocationChange = (_: any, newLocation: string | null) => {
+    if (newLocation) {
+      setReturnLocation(newLocation);
+      formik.setFieldValue("return_location", newLocation);
+      setIsTypingReturn(false);
+      setReturnInputValue(newLocation);
+    }
+  };
+
   const handleInputChangeDelivery = (_: any, inputValue: string) => {
-    fetchDeliveryOptions(inputValue);
+    setDeliveryInputValue(inputValue);
+    const shouldOpenDropdown = inputValue !== formik.values["delivery_location"];
+    setIsTypingDelivery(shouldOpenDropdown);
+    
+    if (shouldOpenDropdown) {
+      fetchDeliveryOptions(inputValue);
+    } else {
+      setDeliveryOptions([]);
+    }
   };
 
   const handleInputChangeReturn = (_: any, inputValue: string) => {
-    fetchReturnOptions(inputValue);
+    setReturnInputValue(inputValue);
+    const shouldOpenDropdown = inputValue !== formik.values["return_location"];
+    setIsTypingReturn(shouldOpenDropdown);
+    
+    if (shouldOpenDropdown) {
+      fetchReturnOptions(inputValue);
+    } else {
+      setReturnOptions([]);
+    }
+  };
+
+  const renderNoOptions = (isLoading: boolean, isTyping: boolean) => {
+    if (isLoading) {
+      return <div className="p-2 text-gray-500">Loading...</div>;
+    }
+    if (isTyping) {
+      return <div className="p-2 text-gray-500">No locations found</div>;
+    }
+    return null;
   };
 
   return (
-    <div className="h-13 flex basis-[40%] gap-1 border border-neutral-400 bg-white text-black items-center">
+    <div className="h-13 flex basis-[40%] items-center gap-1 border border-neutral-400 bg-white text-black">
       <div className="flex h-full items-end p-2 pb-2.5 pr-1">
         <MapPinIcon className="size-[14px]" strokeWidth={1.5} />
       </div>
@@ -60,11 +119,15 @@ export default function LocationInput({ formik }: { formik: any }) {
           CAR DELIVERY LOCATION
         </span>
         <Autocomplete
+          inputValue={deliveryInputValue}
           value={formik.values["delivery_location"] || deliveryLocation || ""}
           onChange={handleDeliveryLocationChange}
           onInputChange={handleInputChangeDelivery}
           disablePortal
           options={deliveryOptions}
+          open={isTypingDelivery}
+          onClose={() => setIsTypingDelivery(false)}
+          noOptionsText={renderNoOptions(isLoadingDelivery, isTypingDelivery)}
           renderOption={(props, option) => {
             const { key, ...otherProps } = props;
             return (
@@ -101,6 +164,25 @@ export default function LocationInput({ formik }: { formik: any }) {
               }}
             />
           )}
+          PaperComponent={({ children, ...props }) => (
+            <div
+              {...props}
+              className="mt-1 flex flex-col rounded-md bg-white shadow-lg"
+            >
+              <div className="flex-grow">{children}</div>
+              <div className="flex items-center justify-between border-t p-2">
+                <span className="text-[10px] text-gray-400">
+                  Powered by Google Maps
+                </span>
+                <Image
+                  src="/assets/img/google-maps-pin.png"
+                  width={10}
+                  height={10}
+                  alt="Maps Pin"
+                />
+              </div>
+            </div>
+          )}
         />
       </div>
 
@@ -110,14 +192,15 @@ export default function LocationInput({ formik }: { formik: any }) {
             CAR RETURN LOCATION
           </span>
           <Autocomplete
+            inputValue={returnInputValue}
             value={formik.values["return_location"] || returnLocation || ""}
-            onChange={(_, newVal) => {
-              setReturnLocation(newVal);
-              formik.setFieldValue("return_location", newVal);
-            }}
+            onChange={handleReturnLocationChange}
             onInputChange={handleInputChangeReturn}
             disablePortal
             options={returnOptions}
+            open={isTypingReturn}
+            onClose={() => setIsTypingReturn(false)}
+            noOptionsText={renderNoOptions(isLoadingReturn, isTypingReturn)}
             renderOption={(props, option) => {
               const { key, ...otherProps } = props;
               return (
@@ -153,6 +236,25 @@ export default function LocationInput({ formik }: { formik: any }) {
                   },
                 }}
               />
+            )}
+            PaperComponent={({ children, ...props }) => (
+              <div
+                {...props}
+                className="mt-1 flex flex-col rounded-md bg-white shadow-lg"
+              >
+                <div className="flex-grow">{children}</div>
+                <div className="flex items-center justify-between border-t p-2">
+                  <span className="text-[10px] text-gray-400">
+                    Powered by Google Maps
+                  </span>
+                  <Image
+                    src="/assets/img/google-maps-pin.png"
+                    width={10}
+                    height={10}
+                    alt="Maps Pin"
+                  />
+                </div>
+              </div>
             )}
           />
         </div>

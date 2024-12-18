@@ -403,7 +403,7 @@ const InvoiceDownloadComponent = () => {
             <h2 className="mb-2 mt-5 text-2xl font-semibold">PAYMENT DETAIL</h2>
             <div className="flex gap-3">
               <div className="flex w-full divide-x-2 border-2">
-                <div className="flex w-full gap-16 p-5 text-xl">
+                <div className="flex w-full gap-14 p-4 text-xl">
                   <div className="flex flex-col">
                     <h3 className="text-xl font-medium">Payment Method</h3>
                     <h3 className="mt-2 text-xl">
@@ -431,6 +431,51 @@ const InvoiceDownloadComponent = () => {
                         : "UNPAID"}
                     </h3>
                   </div>
+                  {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
+                    <>
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-medium">Credit Card</h3>
+                        <h3 className="mt-2 text-xl">
+                          {"******" + paymentData.cardNumber.slice(-6)}
+                        </h3>
+                      </div>
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-medium">Expiry Code</h3>
+                        <h3 className="mt-2 text-xl">
+                          {paymentData.expiryDate.format("MM/YY")}
+                        </h3>
+                      </div>
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-medium">Prepayment</h3>
+                        <h3 className="mt-2 text-xl">
+                          {(
+                            (totalBundlePrice +
+                              totalProtectionPrice +
+                              totalExtrasPrice) *
+                            0.95
+                          ).toFixed(2)}{" "}
+                          JOD
+                        </h3>
+                      </div>
+                    </>
+                  )}
+                  {paymentData.paymentMethod === PaymentMethod.PAYLATER && (
+                    <>
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-medium">
+                          Ammount Paid Locally
+                        </h3>
+                        <h3 className="mt-2 text-xl">
+                          {(
+                            totalBundlePrice +
+                            totalProtectionPrice +
+                            totalExtrasPrice
+                          ).toFixed(2)}{" "}
+                          JOD
+                        </h3>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

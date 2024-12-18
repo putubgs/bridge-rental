@@ -5,7 +5,8 @@ import PaymentForm from "../forms/payment-form";
 import { useState } from "react";
 import ProcessingDialog from "../dialogs/processing-dialog";
 import SuccessDialog from "../dialogs/success-dialog";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import { PaymentMethod, usePayStore } from "@/store/pay-store";
 
 const emailRegex =
   /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
@@ -32,9 +33,13 @@ const validationSchema = yup.object().shape({
     .nonNullable("Expiry date is required")
     .typeError("Invalid value"),
   cvv: yup.string().min(3, "CVV must contain 3 digits"),
+  paymentMethod: yup.string().required("Payment status is required"),
 });
 
 export default function PaySection() {
+  const savePayment = usePayStore((state) => state.savePayment);
+  const resetPayment = usePayStore((state) => state.resetPayment);
+
   const [isProcessingDialogOpen, setIsProcessingDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
@@ -57,17 +62,18 @@ export default function PaySection() {
       lastName: "",
       email: "",
       confirmEmail: "",
-      dateOfBirth: "",
+      dateOfBirth: null as Dayjs | null,
       phoneNumber: "",
       idDocument: "",
       agreement: false,
       cardNumber: "",
-      expiryDate: "",
+      expiryDate: null as Dayjs | null,
       cvv: "",
+      paymentMethod: "" as PaymentMethod,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      savePayment(values);
       openProcessingDialog();
 
       setTimeout(() => {
@@ -116,10 +122,12 @@ export default function PaySection() {
 
     if (!isCCInfoValid) return;
 
+    formik.setFieldValue("paymentMethod", PaymentMethod.PAYNOW);
     formik.submitForm();
   };
 
   const handlePayLater = () => {
+    formik.setFieldValue("paymentMethod", PaymentMethod.PAYLATER);
     formik.submitForm();
   };
 

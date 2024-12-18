@@ -20,3 +20,5 @@
     @apply hidden;
   }
 }
+
+@layer base { img { display: initial; } } 

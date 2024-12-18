@@ -1,3 +1,5 @@
+"use client";
+
 import { Autocomplete, TextField } from "@mui/material";
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
@@ -57,11 +59,21 @@ export default function LocationInput({ formik }: { formik: any }) {
       formik.setFieldValue("delivery_location", newLocation);
       setIsTypingDelivery(false);
       setDeliveryInputValue(newLocation);
-
+  
       if (formik.values.same_return_location) {
         setReturnLocation(newLocation);
         formik.setFieldValue("return_location", newLocation);
         setReturnInputValue(newLocation);
+      }
+    } else {
+      setDeliveryLocation("");
+      formik.setFieldValue("delivery_location", "");
+      setDeliveryInputValue("");
+  
+      if (formik.values.same_return_location) {
+        setReturnLocation("");
+        formik.setFieldValue("return_location", "");
+        setReturnInputValue("");
       }
     }
   };
@@ -72,6 +84,10 @@ export default function LocationInput({ formik }: { formik: any }) {
       formik.setFieldValue("return_location", newLocation);
       setIsTypingReturn(false);
       setReturnInputValue(newLocation);
+    } else {
+      setReturnLocation("");
+      formik.setFieldValue("return_location", "");
+      setReturnInputValue("");
     }
   };
 

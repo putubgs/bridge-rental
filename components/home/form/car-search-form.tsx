@@ -15,7 +15,10 @@ dayjs.tz.setDefault(JORDAN_TIMEZONE);
 import DateRangePicker from "../input/date-range-picker";
 import LocationInput from "../input/location-input";
 import { useRouter } from "next/navigation";
-import { useCarSearchStore, useRentDetailsStore } from "@/store/reservation-store";
+import {
+  useCarSearchStore,
+  useRentDetailsStore,
+} from "@/store/reservation-store";
 import Toggle from "@/components/shared/toggle/toggle";
 
 const carSearchSchema = yup.object({
@@ -32,6 +35,8 @@ export default function CarSearchForm() {
   const { setSearchCompleted } = useCarSearchStore();
 
   const {
+    deliveryLocation,
+    returnLocation,
     deliveryDate,
     deliveryTime,
     returnDate,
@@ -43,29 +48,48 @@ export default function CarSearchForm() {
   } = useRentDetailsStore();
 
   // Ensure the dates and times from the store are set in the Jordan timezone
-  const deliveryDateInJordan = deliveryDate ? dayjs(deliveryDate).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE);
-  const returnDateInJordan = returnDate ? dayjs(returnDate).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE).add(24, "hour");
-  const deliveryTimeInJordan = deliveryTime ? dayjs(deliveryTime).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE);
-  const returnTimeInJordan = returnTime ? dayjs(returnTime).tz(JORDAN_TIMEZONE) : dayjs().tz(JORDAN_TIMEZONE);
+  const deliveryDateInJordan = deliveryDate
+    ? dayjs(deliveryDate).tz(JORDAN_TIMEZONE)
+    : dayjs().tz(JORDAN_TIMEZONE);
+  const returnDateInJordan = returnDate
+    ? dayjs(returnDate).tz(JORDAN_TIMEZONE)
+    : dayjs().tz(JORDAN_TIMEZONE).add(24, "hour");
+  const deliveryTimeInJordan = deliveryTime
+    ? dayjs(deliveryTime).tz(JORDAN_TIMEZONE)
+    : dayjs().tz(JORDAN_TIMEZONE);
+  const returnTimeInJordan = returnTime
+    ? dayjs(returnTime).tz(JORDAN_TIMEZONE)
+    : dayjs().tz(JORDAN_TIMEZONE);
 
   const handleInputSearch = () => {
     if (!formik.values.delivery_location || !formik.values.return_location) {
       alert("Please fill the location details.");
       return;
     }
-    
+
     setSearchCompleted(true);
     router.push("/reservation/car-choices");
   };
 
   const formik = useFormik({
     initialValues: {
-      delivery_location: "",
-      return_location: "",
+      delivery_location: deliveryLocation || "",
+      return_location: returnLocation || "",
       delivery_date: deliveryDateInJordan, // Now using Jordan timezone
-      delivery_time: deliveryTimeInJordan || dayjs().tz(JORDAN_TIMEZONE).hour(dayjs().hour()).minute(dayjs().minute()),
+      delivery_time:
+        deliveryTimeInJordan ||
+        dayjs()
+          .tz(JORDAN_TIMEZONE)
+          .hour(dayjs().hour())
+          .minute(dayjs().minute()),
       return_date: returnDateInJordan, // Now using Jordan timezone
-      return_time: returnTimeInJordan || dayjs().tz(JORDAN_TIMEZONE).hour(dayjs().hour()).minute(dayjs().minute()).add(1, "hour"),
+      return_time:
+        returnTimeInJordan ||
+        dayjs()
+          .tz(JORDAN_TIMEZONE)
+          .hour(dayjs().hour())
+          .minute(dayjs().minute())
+          .add(1, "hour"),
       same_return_location: true,
     },
     validationSchema: carSearchSchema,
@@ -98,6 +122,9 @@ export default function CarSearchForm() {
           variant="contained"
           className="basis-[12%]"
           onClick={handleInputSearch}
+          // disabled={
+          //   !formik.values.delivery_location || !formik.values.delivery_date
+          // }
         >
           <div className="flex items-center gap-1 font-overpass font-bold hover:bg-primary/90">
             <SearchIcon className="size-[18px] shrink-0" />
@@ -118,7 +145,7 @@ export default function CarSearchForm() {
               formik.setFieldValue("same_return_location", isChecked)
             }
           />
-          <span className="whitespace-nowrap text-sm pt-1">
+          <span className="whitespace-nowrap pt-1 text-sm">
             RETURN TO SAME LOCATION
           </span>
         </div>
@@ -126,7 +153,7 @@ export default function CarSearchForm() {
           <p>
             *KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO
             THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE
-            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span> 
+            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span>
             TEAM
           </p>
           <p>*BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)</p>

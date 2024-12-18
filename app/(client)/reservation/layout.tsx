@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useRentDetailsStore,
@@ -66,6 +66,13 @@ export default function ReservationLayout({
     };
   }, [searchCompleted, car_id, totalBundlePrice, pathname]);
 
+  // Helper function to format time
+  const formatTime = (time: any) => {
+    // Assuming 'time' has a .format method similar to Moment.js or Day.js
+    // Replace 'HH:mm A' with 'hh:mm A' for 12-hour format
+    return time ? time.format("hh:mm A") : "No Time";
+  };
+
   if (!searchCompleted) {
     return (
       <div className="relative -top-20 flex h-screen items-center justify-center">
@@ -89,6 +96,7 @@ export default function ReservationLayout({
     <div className="relative -top-20 flex max-w-[1920px] flex-col bg-[#F9F9F9] pt-32">
       {pathname !== "/reservation/car-choices" && (
         <div className="flex w-full gap-2 px-20">
+          {/* Rental Details Section */}
           <div
             className="flex w-full flex-col gap-4 bg-white p-3"
             style={{ flexBasis: "40%" }}
@@ -107,7 +115,7 @@ export default function ReservationLayout({
                 <p className="text-[15px]">{deliveryLocation}</p>
                 <p className="text-[13px]">
                   {deliveryDate ? deliveryDate.format("MM-DD-YYYY") : "No Date"}
-                  , {deliveryTime ? deliveryTime.format("HH:mm A") : "No Time"}
+                  , {formatTime(deliveryTime)}
                 </p>
               </div>
               <div className="flex flex-col space-y-1">
@@ -117,11 +125,13 @@ export default function ReservationLayout({
                 <p className="text-[15px]">{returnLocation}</p>
                 <p className="text-[13px]">
                   {returnDate ? returnDate.format("MM-DD-YYYY") : "No Date"},{" "}
-                  {returnTime ? returnTime.format("HH:mm A") : "No Time"}
+                  {formatTime(returnTime)}
                 </p>
               </div>
             </div>
           </div>
+
+          {/* Vehicle Section */}
           {pathname !== "/reservation/car-bundle" || totalBundlePrice ? (
             <div
               className="flex w-full flex-col justify-between gap-4 bg-white p-3"
@@ -156,6 +166,7 @@ export default function ReservationLayout({
             </div>
           )}
 
+          {/* Protection & Extras Section */}
           {pathname === "/reservation/protection-and-extras" ? (
             <div
               className="flex w-full flex-col justify-between gap-4 border-2 border-[#BAF0E2] bg-white p-3"
@@ -189,7 +200,11 @@ export default function ReservationLayout({
             >
               <div className="flex items-center gap-2">
                 <p
-                  className={`flex h-[23px] w-[23px] items-center justify-center rounded-full border pt-1 ${totalBundlePrice ? "border-black bg-transparent" : "bg-[#E9E9E9] text-[#A3A3A3]"}`}
+                  className={`flex h-[23px] w-[23px] items-center justify-center rounded-full border pt-1 ${
+                    totalBundlePrice
+                      ? "border-black bg-transparent"
+                      : "bg-[#E9E9E9] text-[#A3A3A3]"
+                  }`}
                 >
                   3
                 </p>
@@ -220,6 +235,7 @@ export default function ReservationLayout({
             </div>
           )}
 
+          {/* Review & Reserve Section */}
           {pathname === "/reservation/review" ? (
             <div
               className="flex w-full flex-col justify-between gap-4 border-2 border-[#BAF0E2] bg-white p-3"

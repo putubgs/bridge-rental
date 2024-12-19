@@ -278,9 +278,9 @@ const InvoiceDownloadComponent = () => {
                   </div>
                 </div>
                 <div className="basis-1/3 space-y-5 p-5">
-                  <h3 className="text-xl font-medium">Drop-off & Return</h3>
+                  <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
                   <div>
-                    <p className="mb-1 text-xs text-neutral-400">DROP-OFF :</p>
+                    <p className="mb-1 text-xs text-neutral-400">DELIVERY :</p>
                     <ul className="ml-4 list-disc text-sm marker:text-primary">
                       <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
                       <li>{deliveryTime?.format("hh:mm A")}</li>
@@ -288,7 +288,7 @@ const InvoiceDownloadComponent = () => {
                     </ul>
                   </div>
                   <div>
-                    <p className="mb-1 text-xs text-neutral-400">RETURN :</p>
+                    <p className="mb-1 text-xs text-neutral-400">PICK-UP :</p>
                     <ul className="ml-4 list-disc text-sm marker:text-primary">
                       <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
                       <li>{returnTime?.format("hh:mm A")}</li>

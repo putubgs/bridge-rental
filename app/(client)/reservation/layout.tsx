@@ -110,7 +110,7 @@ export default function ReservationLayout({
             <div className="flex justify-between">
               <div className="flex flex-col space-y-1">
                 <p className="pb-1 text-[12px] text-[#D2D2D2]">
-                  DROP-OFF LOCATION
+                  DELIVERY LOCATION
                 </p>
                 <p className="text-[15px]">{deliveryLocation}</p>
                 <p className="text-[13px]">
@@ -120,7 +120,7 @@ export default function ReservationLayout({
               </div>
               <div className="flex flex-col space-y-1">
                 <p className="pb-1 text-[12px] text-[#D2D2D2]">
-                  RETURN LOCATION
+                  PICK-UP LOCATION
                 </p>
                 <p className="text-[15px]">{returnLocation}</p>
                 <p className="text-[13px]">

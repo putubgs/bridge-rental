@@ -143,7 +143,7 @@ export default function CarSearchForm() {
             }
           />
           <span className="whitespace-nowrap pt-1 text-sm text-[#868686]">
-            RETURN TO SAME LOCATION
+            PICK-UP TO SAME LOCATION
           </span>
         </div>
         <DateRangePicker formik={formik} />
@@ -172,7 +172,7 @@ export default function CarSearchForm() {
             }
           />
           <span className="whitespace-nowrap pt-1 text-sm">
-            RETURN TO SAME LOCATION
+            PICK-UP TO SAME LOCATION
           </span>
         </div>
         <div className="text-start text-black md:text-end md:text-white">

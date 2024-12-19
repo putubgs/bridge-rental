@@ -59,7 +59,7 @@ export default function CarBundle() {
   const selectPackage = (pricePerDay: number, bundleType: BundleType) => {
     if (totalDays <= 0) {
       // Handle invalid totalDays, e.g., show an error message
-      alert("Please select valid delivery and return dates/times.");
+      alert("Please select valid delivery and pick-up dates/times.");
       return;
     }
 

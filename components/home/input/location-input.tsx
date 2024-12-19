@@ -291,7 +291,7 @@ export default function LocationInput({ formik }: { formik: any }) {
         {!formik?.values["same_return_location"] && (
           <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
             <span className="text-[10px] text-neutral-400">
-              CAR RETURN LOCATION
+              CAR PICK-UP LOCATION
             </span>
             <Autocomplete<string>
               inputValue={returnInputValue}
@@ -397,7 +397,7 @@ export default function LocationInput({ formik }: { formik: any }) {
               <span className="text-sm font-medium">
                 {activeField === "delivery"
                   ? "Car Delivery Location"
-                  : "Car Return Location"}
+                  : "Car Pick-up Location"}
               </span>
               <button
                 onClick={() => {

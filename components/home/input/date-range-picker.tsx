@@ -101,7 +101,7 @@ export default function DateRangePicker({ formik }: { formik: any }) {
         timeValue={initialDeliveryTime}
       />
       <DateTimePicker
-        dateLabel="RETURN DATE"
+        dateLabel="PICK-UP DATE"
         minDate={formik?.values["delivery_date"] ?? dayjs().tz(JORDAN_TIMEZONE)}
         minTime={
           isSameReturnDay

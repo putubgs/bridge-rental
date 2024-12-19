@@ -19,6 +19,10 @@ interface AdditionalOffer {
   availability: boolean;
 }
 
+const formatPrice = (price: number): string => {
+  return typeof price === "number" && !isNaN(price) ? price.toFixed(2) : "0.00";
+};
+
 export default function ReviewSection() {
   const {
     car_id,
@@ -43,16 +47,34 @@ export default function ReviewSection() {
   const { carModels } = useCarStore();
   const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
-  const totalDays = countDays(
-    deliveryDate,
-    deliveryTime,
-    returnDate,
-    returnTime,
-  );
+  const totalDays =
+    countDays(deliveryDate, deliveryTime, returnDate, returnTime) || 0;
 
   if (!car) {
     return <p>Car not found</p>;
   }
+
+  const calculateChildExtraPrice = (extraName: string): number => {
+    const quantity = childrenSeatsQuantity[extraName] || 1; // Default to 1 instead of 0
+    const extra = childrenExtras.find(
+      ({ offer_name }) => offer_name === extraName,
+    );
+    const price = extra?.price || 0;
+    return quantity * price * totalDays;
+  };
+
+  const calculateExtraPrice = (extraName: string): number => {
+    const extra = extras.find(({ offer_name }) => offer_name === extraName);
+    const price = extra?.price || 0;
+    return price * totalDays;
+  };
+
+  const calculateTotalPrice = (): number => {
+    const bundlePrice = totalBundlePrice || 0;
+    const protectionPrice = totalProtectionPrice || 0;
+    const extrasPrice = totalExtrasPrice || 0;
+    return bundlePrice + protectionPrice + extrasPrice;
+  };
 
   return (
     <section>
@@ -76,7 +98,7 @@ export default function ReviewSection() {
             <div className="z-10 space-y-5 px-3">
               <div className="flex flex-col gap-2">
                 <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
-                  <p className="pt-1 text-[#535353]">{car.car_type} </p>
+                  <p className="pt-1 text-[#535353]">{car.car_type}</p>
                 </div>
                 <p className="text-[18px]">
                   {car.car_model}
@@ -118,27 +140,33 @@ export default function ReviewSection() {
             <div>
               <p className="mb-1 text-xs text-neutral-400">DROP-OFF :</p>
               <ul className="ml-4 list-disc text-sm marker:text-primary">
-                <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
-                <li>{deliveryTime?.format("hh:mm A")}</li>
-                <li>{deliveryLocation}</li>
+                <li>
+                  {deliveryDate?.format("dddd, MMM DD, YYYY") || "Date not set"}
+                </li>
+                <li>{deliveryTime?.format("hh:mm A") || "Time not set"}</li>
+                <li>{deliveryLocation || "Location not set"}</li>
               </ul>
             </div>
             <div>
               <p className="mb-1 text-xs text-neutral-400">RETURN :</p>
               <ul className="ml-4 list-disc text-sm marker:text-primary">
-                <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
-                <li>{returnTime?.format("hh:mm A")}</li>
-                <li>{returnLocation}</li>
+                <li>
+                  {returnDate?.format("dddd, MMM DD, YYYY") || "Date not set"}
+                </li>
+                <li>{returnTime?.format("hh:mm A") || "Time not set"}</li>
+                <li>{returnLocation || "Location not set"}</li>
               </ul>
             </div>
           </div>
         </div>
         <div className="basis-1/4 border-2 p-5 text-end text-sm">
           <h4 className="text-xl font-medium">
-            {totalBundlePrice.toFixed(2)} JOD
+            {formatPrice(totalBundlePrice)} JOD
           </h4>
           <div className="pb-4 pt-7">
-            <p>{selected_bundle?.split("_").join(" ")}</p>
+            <p>
+              {selected_bundle?.split("_").join(" ") || "No bundle selected"}
+            </p>
             <p>{car.car_model}</p>
           </div>
           <p>*VAT included</p>
@@ -148,35 +176,31 @@ export default function ReviewSection() {
       <div className="my-4 border-2 p-5">
         <div className="flex items-center justify-between gap-5 text-xl font-medium">
           <h3>Protection & Extras</h3>
-          <p>{(totalProtectionPrice + totalExtrasPrice).toFixed(2)} JOD</p>
+          <p>{formatPrice(totalProtectionPrice + totalExtrasPrice)} JOD</p>
         </div>
 
         <div className="mt-5 space-y-3">
           <div className="flex items-center justify-between gap-5">
             <p>
-              {selected_protection} ({totalDays} Day{totalDays > 1 && "s"})
+              {selected_protection || "No protection selected"} ({totalDays} Day
+              {totalDays !== 1 ? "s" : ""})
             </p>
-            <p>{totalProtectionPrice.toFixed(2)} JOD</p>
+            <p>{formatPrice(totalProtectionPrice)} JOD</p>
           </div>
+
           {selected_extras.map((extra) => (
             <div
               key={extra}
               className="flex items-center justify-between gap-5"
             >
               <p>{extra}</p>
-              <p>
-                {(
-                  (extras.find(({ offer_name }) => offer_name === extra)
-                    ?.price ?? 0) * totalDays
-                ).toFixed(2)}{" "}
-                JOD
-              </p>
+              <p>{formatPrice(calculateExtraPrice(extra))} JOD</p>
             </div>
           ))}
 
           {selected_children_extras.map((extra) => {
-            const quantity = childrenSeatsQuantity[extra];
-
+            const quantity = childrenSeatsQuantity[extra] || 1;
+            const price = calculateChildExtraPrice(extra);
             return (
               <div
                 key={extra}
@@ -185,16 +209,7 @@ export default function ReviewSection() {
                 <p className="capitalize">
                   {extra.split("_").join(" ")} ({quantity}x)
                 </p>
-                <p>
-                  {(
-                    (childrenExtras.find(
-                      ({ offer_name }) => offer_name === extra,
-                    )?.price ?? 0) *
-                    quantity *
-                    totalDays
-                  ).toFixed(2)}{" "}
-                  JOD
-                </p>
+                <p>{formatPrice(price)} JOD</p>
               </div>
             );
           })}
@@ -203,12 +218,7 @@ export default function ReviewSection() {
 
       <div className="my-4 flex items-center justify-between gap-5 bg-primary-variant-1 p-5 text-xl font-medium">
         <h3>Total</h3>
-        <p>
-          {(totalBundlePrice + totalProtectionPrice + totalExtrasPrice).toFixed(
-            2,
-          )}{" "}
-          JOD
-        </p>
+        <p>{formatPrice(calculateTotalPrice())} JOD</p>
       </div>
       <hr />
     </section>

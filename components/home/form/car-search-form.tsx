@@ -31,9 +31,7 @@ const carSearchSchema = yup.object({
 
 export default function CarSearchForm() {
   const router = useRouter();
-
   const { setSearchCompleted } = useCarSearchStore();
-
   const {
     deliveryLocation,
     returnLocation,
@@ -43,11 +41,13 @@ export default function CarSearchForm() {
     returnTime,
     setDeliveryDate,
     setDeliveryTime,
+    setDeliveryLocation,
+    setReturnLocation,
     setReturnDate,
     setReturnTime,
+    resetRentDetails,
   } = useRentDetailsStore();
 
-  // Ensure the dates and times from the store are set in the Jordan timezone
   const deliveryDateInJordan = deliveryDate
     ? dayjs(deliveryDate).tz(JORDAN_TIMEZONE)
     : dayjs().tz(JORDAN_TIMEZONE).add(2, "hour");
@@ -61,16 +61,6 @@ export default function CarSearchForm() {
     ? dayjs(returnTime).tz(JORDAN_TIMEZONE)
     : dayjs().tz(JORDAN_TIMEZONE).add(26, "hour");
 
-  const handleInputSearch = () => {
-    if (!formik.values.delivery_location || !formik.values.return_location) {
-      alert("Please fill the location details.");
-      return;
-    }
-
-    setSearchCompleted(true);
-    router.push("/reservation/car-choices");
-  };
-
   const formik = useFormik({
     initialValues: {
       delivery_location: deliveryLocation || "",
@@ -82,7 +72,7 @@ export default function CarSearchForm() {
           .tz(JORDAN_TIMEZONE)
           .hour(dayjs().hour())
           .minute(dayjs().minute()),
-      return_date: returnDateInJordan, // Now using Jordan timezone
+      return_date: returnDateInJordan,
       return_time:
         returnTimeInJordan ||
         dayjs()
@@ -93,27 +83,53 @@ export default function CarSearchForm() {
     },
     validationSchema: carSearchSchema,
     onSubmit: (values) => {
+      // Format the dates with proper timezone handling
+      const deliveryDateTime = values.delivery_date
+        .hour(values.delivery_time.hour())
+        .minute(values.delivery_time.minute())
+        .tz(JORDAN_TIMEZONE);
+
+      const returnDateTime = values.return_date
+        .hour(values.return_time.hour())
+        .minute(values.return_time.minute())
+        .tz(JORDAN_TIMEZONE);
+
+      // Reset the RentDetailsStore before storing new data
+      resetRentDetails();
+
+      // Format the values with the combined date and time
       const formattedValues = {
         delivery_location: values.delivery_location,
-        return_location: values.return_location || values.delivery_location,
-        delivery_date: values.delivery_date.toString(),
-        delivery_time: values.delivery_time.format("HH:mm"),
-        return_date: values.return_date?.toString() ?? null,
-        return_time: values.return_time.format("HH:mm"),
+        return_location: values.same_return_location
+          ? values.delivery_location
+          : values.return_location,
+        delivery_date: deliveryDateTime.format("YYYY-MM-DD"),
+        delivery_time: deliveryDateTime.format("HH:mm"),
+        return_date: returnDateTime.format("YYYY-MM-DD"),
+        return_time: returnDateTime.format("HH:mm"),
       };
 
-      setDeliveryDate(values.delivery_date);
-      setDeliveryTime(values.delivery_time);
-      setReturnDate(values.return_date);
-      setReturnTime(values.return_time);
+      // Set the locations first
+      setDeliveryLocation(formattedValues.delivery_location);
+      setReturnLocation(formattedValues.return_location);
 
-      handleInputSearch();
+      // Then update the dates and times with the combined datetime objects
+      setDeliveryDate(deliveryDateTime);
+      setDeliveryTime(deliveryDateTime);
+      setReturnDate(returnDateTime);
+      setReturnTime(returnDateTime);
+
+      // Mark the search as completed
+      setSearchCompleted(true);
+
+      // Navigate to the next page
+      router.push("/reservation/car-choices");
     },
   });
 
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-3 mt-5">
-      <div className="flex h-max flex-col gap-3 md:gap-2 bg-neutral-100 bg-opacity-20 p-[6px] md:flex-row md:justify-between">
+    <form onSubmit={formik.handleSubmit} className="mt-5 space-y-3">
+      <div className="flex h-max flex-col gap-3 bg-neutral-100 bg-opacity-20 p-[6px] md:flex-row md:justify-between md:gap-2">
         <LocationInput formik={formik} />
         <div className="flex items-center gap-2 font-bold md:hidden">
           <Toggle
@@ -135,7 +151,6 @@ export default function CarSearchForm() {
           type="submit"
           variant="contained"
           className="basis-[12%] py-2 md:py-0"
-          onClick={handleInputSearch}
         >
           <div className="flex items-center gap-1 font-overpass font-bold hover:bg-primary/90">
             <SearchIcon className="size-[18px] shrink-0" />
@@ -160,14 +175,16 @@ export default function CarSearchForm() {
             RETURN TO SAME LOCATION
           </span>
         </div>
-        <div className="text-start md:text-end md:text-white text-black">
+        <div className="text-start text-black md:text-end md:text-white">
           <p>
             *KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO
             THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE
-            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span>
-            {" "}TEAM
+            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span>{" "}
+            TEAM
           </p>
-          <p className="md:pt-0 pt-2">*BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)</p>
+          <p className="pt-2 md:pt-0">
+            *BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)
+          </p>
         </div>
       </div>
     </form>

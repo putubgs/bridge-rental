@@ -1,3 +1,6 @@
+// store/reservation-store.ts
+
+import { create } from "zustand";
 import {
   BundleType,
   ChildrenExtrasType,
@@ -6,14 +9,9 @@ import {
 } from "@/lib/enums";
 import { IChildrenSeatsQuantity } from "@/lib/types";
 import { Dayjs } from "dayjs";
-import { create } from "zustand";
 
-interface CarSearchState {
-  searchCompleted: boolean;
-  setSearchCompleted: (completed: boolean) => void;
-}
-
-interface AdditionalOffer {
+// Define the AdditionalOffer interface directly within the store file
+export interface AdditionalOffer {
   id: string;
   type: "Protection" | "Extras";
   offer_name: string;
@@ -23,6 +21,38 @@ interface AdditionalOffer {
   availability: boolean;
 }
 
+// Define the initial state separately for easy resetting
+const rentDetailsInitialState = {
+  car_id: "",
+  customer_firstname: "",
+  customer_lastname: "",
+  customer_email: "",
+  customer_dob: null as Dayjs | null,
+  customer_phone_number: "",
+  customer_document: "",
+  deliveryLocation: "",
+  returnLocation: "",
+  deliveryDate: null as Dayjs | null,
+  deliveryTime: null as Dayjs | null,
+  returnDate: null as Dayjs | null,
+  returnTime: null as Dayjs | null,
+  selected_bundle: null as BundleType | null,
+  totalBundlePrice: 0,
+  rent_status: "",
+  selected_protection: ProtectionType.protection1,
+  totalProtectionPrice: 0,
+  selected_extras: [] as ExtrasType[],
+  selected_children_extras: [] as ChildrenExtrasType[],
+  totalExtrasPrice: 0,
+  childrenSeatsQuantity: {
+    infant_car_seats: 1,
+    booster_car_seats: 1,
+  } as IChildrenSeatsQuantity,
+  extras: [] as AdditionalOffer[],
+  childrenExtras: [] as AdditionalOffer[],
+};
+
+// Define the RentDetailsState interface
 interface RentDetailsState {
   car_id: string;
   customer_firstname: string;
@@ -49,6 +79,7 @@ interface RentDetailsState {
   extras: AdditionalOffer[];
   childrenExtras: AdditionalOffer[];
 
+  // Action Methods
   setCarId: (id: string) => void;
   setCustomerFirstname: (firstname: string) => void;
   setCustomerLastname: (lastname: string) => void;
@@ -73,43 +104,28 @@ interface RentDetailsState {
   setChildrenSeatsQuantity: (extras: IChildrenSeatsQuantity) => void;
   setExtras: (extras: AdditionalOffer[]) => void;
   setChildrenExtras: (childrenExtras: AdditionalOffer[]) => void;
+  resetRentDetails: () => void;
 }
 
+// Define the CarSearchState interface
+interface CarSearchState {
+  searchCompleted: boolean;
+  setSearchCompleted: (completed: boolean) => void;
+}
+
+// Create the useCarSearchStore
 export const useCarSearchStore = create<CarSearchState>((set) => ({
   searchCompleted: false,
   setSearchCompleted: (completed) =>
     set(() => ({ searchCompleted: completed })),
 }));
 
+// Create the useRentDetailsStore with a reset function
 export const useRentDetailsStore = create<RentDetailsState>((set) => ({
-  car_id: "",
-  customer_firstname: "",
-  customer_lastname: "",
-  customer_email: "",
-  customer_dob: null,
-  customer_phone_number: "",
-  customer_document: "",
-  deliveryLocation: "",
-  returnLocation: "",
-  deliveryDate: null,
-  deliveryTime: null,
-  returnDate: null,
-  returnTime: null,
-  selected_bundle: null,
-  totalBundlePrice: 0,
-  rent_status: "",
-  selected_protection: ProtectionType.protection1,
-  totalProtectionPrice: 0,
-  selected_extras: [],
-  selected_children_extras: [],
-  totalExtrasPrice: 0,
-  childrenSeatsQuantity: {
-    infant_car_seats: 1,
-    booster_car_seats: 1,
-  },
-  extras: [],
-  childrenExtras: [],
+  // Initialize state from rentDetailsInitialState
+  ...rentDetailsInitialState,
 
+  // Define action methods
   setCarId: (id) => set({ car_id: id }),
   setCustomerFirstname: (firstname) => set({ customer_firstname: firstname }),
   setCustomerLastname: (lastname) => set({ customer_lastname: lastname }),
@@ -136,5 +152,9 @@ export const useRentDetailsStore = create<RentDetailsState>((set) => ({
   setTotalExtrasPrice: (price) => set({ totalExtrasPrice: price }),
   setChildrenSeatsQuantity: (extras) => set({ childrenSeatsQuantity: extras }),
   setExtras: (extras) => set({ extras }),
-  setChildrenExtras: (childrenExtras) => set({ childrenExtras }),
+  setChildrenExtras: (childrenExtras) =>
+    set({ childrenExtras: childrenExtras }),
+
+  // Implement the reset function
+  resetRentDetails: () => set({ ...rentDetailsInitialState }),
 }));

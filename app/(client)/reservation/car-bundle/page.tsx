@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
@@ -31,20 +31,37 @@ export default function CarBundle() {
 
   const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
-  useEffect(() => {
-    console.log(car.availability)
-    setTotalBundlePrice(0);
-  }, [setTotalBundlePrice]);
+  // Calculate totalDays using useMemo
+  const totalDays = useMemo(() => {
+    if (!deliveryDate || !deliveryTime || !returnDate || !returnTime) {
+      return 0; // Or handle as per your requirements
+    }
 
-  const selectPackage = (pricePerDay: number, bundleType: BundleType) => {
-    const startDateTime = dayjs(deliveryDate).set(
-      "hour",
-      dayjs(deliveryTime).hour(),
-    );
-    const endDateTime = dayjs(returnDate).set("hour", dayjs(returnTime).hour());
+    const startDateTime = dayjs(deliveryDate)
+      .set("hour", dayjs(deliveryTime).hour())
+      .set("minute", dayjs(deliveryTime).minute());
+
+    const endDateTime = dayjs(returnDate)
+      .set("hour", dayjs(returnTime).hour())
+      .set("minute", dayjs(returnTime).minute());
 
     const totalHours = endDateTime.diff(startDateTime, "hour");
-    const totalDays = Math.ceil(totalHours / 24);
+    const calculatedDays = Math.ceil(totalHours / 24);
+
+    return calculatedDays > 0 ? calculatedDays : 1; // Ensure at least 1 day
+  }, [deliveryDate, deliveryTime, returnDate, returnTime]);
+
+  useEffect(() => {
+    console.log(car?.availability);
+    setTotalBundlePrice(0);
+  }, [setTotalBundlePrice, car?.availability]);
+
+  const selectPackage = (pricePerDay: number, bundleType: BundleType) => {
+    if (totalDays <= 0) {
+      // Handle invalid totalDays, e.g., show an error message
+      alert("Please select valid delivery and return dates/times.");
+      return;
+    }
 
     const totalPrice = totalDays * pricePerDay;
     setTotalBundlePrice(totalPrice);
@@ -62,6 +79,7 @@ export default function CarBundle() {
       <p className="pb-5 text-[24px] font-semibold">Choose your car bundle</p>
       <hr />
       <div className="flex w-full items-center py-10">
+        {/* Car Details Section */}
         <div className="flex w-full flex-col" style={{ flexBasis: "35%" }}>
           <div className="z-10 h-[200px]">
             <div className="relative h-full w-3/4">
@@ -80,7 +98,7 @@ export default function CarBundle() {
               <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
                 <p className="pt-1 text-[#535353]">{car.car_type}</p>
               </div>
-              <p className="text-[18px]">{car.car_model} </p>
+              <p className="text-[18px]">{car.car_model}</p>
             </div>
             <div className="flex w-3/4 justify-between pb-2 pt-3">
               <div className="relative flex h-fit w-fit items-end text-[12px]">
@@ -111,27 +129,33 @@ export default function CarBundle() {
             </div>
           </div>
         </div>
+
+        {/* Spacer */}
         <div className="w-full" style={{ flexBasis: "15%" }}></div>
+
+        {/* Bundles Section */}
         <div
           className="relative flex w-full gap-2"
           style={{ flexBasis: "50%" }}
         >
+          {/* BEST DEAL! Badge */}
           <div className="absolute -left-7 -top-4 rounded-md bg-gradient-to-r from-[#FF8181] to-[#FF4040] text-[14px] text-white">
             <p className="px-4 pb-1 pt-2">BEST DEAL!</p>
           </div>
+
+          {/* GRAB AND DRIVE Bundle */}
           <div className="flex w-full flex-col justify-between border-2 border-[#BAF0E2] text-center">
             <div className="bg-[#BAF0E2] py-5 text-center">
               <p>GRAB AND DRIVE</p>
             </div>
             <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
-                <span className="text-[32px]">
-                  {car.grab_and_drive}
-                </span>
+                <span className="text-[32px]">{car.grab_and_drive}</span>
                 .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
-                ({car.grab_and_drive * 2}.00 JOD for 2 days)
+                ({car.grab_and_drive * totalDays}.00 JOD for {totalDays}{" "}
+                {totalDays > 1 ? "days" : "day"})
               </p>
             </div>
             <div className="ml-4 flex items-start pt-4 text-[12px]">
@@ -159,7 +183,7 @@ export default function CarBundle() {
                 <li className="flex items-start">
                   <span className="mr-2 mt-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
                   <p className="pt-1">
-                    <b>Unlimited Milage</b>
+                    <b>Unlimited Mileage</b>
                   </p>
                 </li>
               </ul>
@@ -168,29 +192,26 @@ export default function CarBundle() {
             <button
               className="m-4 mt-6 rounded-md bg-gradient-to-r from-[#8BD6D6] to-[#BAF0E2] py-2 text-white"
               onClick={() =>
-                selectPackage(
-                  car.grab_and_drive,
-                  BundleType.bundle1,
-                )
+                selectPackage(car.grab_and_drive, BundleType.bundle1)
               }
             >
               <p className="pt-1">SELECT</p>
             </button>
           </div>
 
+          {/* COMPLETE FEE RATE Bundle */}
           <div className="flex w-full flex-col justify-between border-2 border-[#E5E5E5] text-center">
             <div className="bg-[#EEEEEE] py-5 text-center">
               <p>COMPLETE FEE RATE</p>
             </div>
             <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
-                <span className="text-[32px]">
-                  {car.complete_fee_rate}
-                </span>
+                <span className="text-[32px]">{car.complete_fee_rate}</span>
                 .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
-                ({car.complete_fee_rate * 2}.00 JOD for 2 days)
+                ({car.complete_fee_rate * totalDays}.00 JOD for {totalDays}{" "}
+                {totalDays > 1 ? "days" : "day"})
               </p>
             </div>
             <div className="ml-4 flex items-start pt-4 text-[12px]">
@@ -218,7 +239,7 @@ export default function CarBundle() {
                 <li className="flex items-start">
                   <span className="mr-2 mt-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
                   <p className="pt-1">
-                    <b>150 Km milage/day</b>
+                    <b>150 Km Mileage/day</b>
                   </p>
                 </li>
               </ul>
@@ -227,29 +248,26 @@ export default function CarBundle() {
             <button
               className="m-4 mt-6 rounded-md bg-[#A0A0A0] py-2 text-white"
               onClick={() =>
-                selectPackage(
-                  car.complete_fee_rate,
-                  BundleType.bundle2,
-                )
+                selectPackage(car.complete_fee_rate, BundleType.bundle2)
               }
             >
               <p className="pt-1">SELECT</p>
             </button>
           </div>
 
+          {/* PACKED TO THE BRIM Bundle */}
           <div className="flex w-full flex-col justify-between border-2 border-[#E5E5E5] text-center">
             <div className="bg-[#EEEEEE] py-5 text-center">
               <p>PACKED TO THE BRIM</p>
             </div>
             <div className="flex flex-col pt-7 font-outfit">
               <p className="text-[15px]">
-                <span className="text-[32px]">
-                  {car.packed_to_the_brim}
-                </span>
+                <span className="text-[32px]">{car.packed_to_the_brim}</span>
                 .00/day
               </p>
               <p className="text-[12px] text-[#B8B8B8]">
-                ({car.packed_to_the_brim * 2}.00 JOD for 2 days)
+                ({car.packed_to_the_brim * totalDays}.00 JOD for {totalDays}{" "}
+                {totalDays > 1 ? "days" : "day"})
               </p>
             </div>
             <div className="ml-4 flex items-start pt-4 text-[12px]">
@@ -273,7 +291,7 @@ export default function CarBundle() {
                 <li className="flex items-start">
                   <span className="mr-2 mt-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
                   <p className="pt-1">
-                    <b>100 Km milage/day</b>
+                    <b>100 Km Mileage/day</b>
                   </p>
                 </li>
               </ul>
@@ -282,10 +300,7 @@ export default function CarBundle() {
             <button
               className="m-4 mt-6 rounded-md bg-[#CBCBCB] py-2 text-white"
               onClick={() =>
-                selectPackage(
-                  car.packed_to_the_brim,
-                  BundleType.bundle3,
-                )
+                selectPackage(car.packed_to_the_brim, BundleType.bundle3)
               }
             >
               <p className="pt-1">SELECT</p>

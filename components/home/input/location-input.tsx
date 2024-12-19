@@ -131,7 +131,7 @@ export default function LocationInput({ formik }: { formik: any }) {
     [],
   );
 
-  // Replace your handleDeliveryLocationChange with this:
+  // Handle delivery location change
   const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
     if (newLocation) {
       setDeliveryLocation(newLocation);
@@ -152,7 +152,7 @@ export default function LocationInput({ formik }: { formik: any }) {
     }
   };
 
-  // And ensure handleReturnLocationChange remains independent:
+  // Handle return location change
   const handleReturnLocationChange = (_: any, newLocation: string | null) => {
     if (newLocation) {
       // If user explicitly changes return location, they probably want different locations
@@ -168,8 +168,11 @@ export default function LocationInput({ formik }: { formik: any }) {
       setReturnInputValue("");
     }
   };
+
+  // Handle input change for delivery
   const handleInputChangeDelivery = (_: any, inputValue: string) => {
     setDeliveryInputValue(inputValue);
+    setIsTypingDelivery(true); // Start typing
     if (inputValue) {
       fetchDeliveryOptions(inputValue);
     } else {
@@ -177,8 +180,10 @@ export default function LocationInput({ formik }: { formik: any }) {
     }
   };
 
+  // Handle input change for return
   const handleInputChangeReturn = (_: any, inputValue: string) => {
     setReturnInputValue(inputValue);
+    setIsTypingReturn(true); // Start typing
     if (inputValue) {
       fetchReturnOptions(inputValue);
     } else {
@@ -206,7 +211,7 @@ export default function LocationInput({ formik }: { formik: any }) {
           <span className="text-[10px] text-neutral-400">
             CAR DELIVERY LOCATION
           </span>
-          <Autocomplete
+          <Autocomplete<string>
             inputValue={deliveryInputValue}
             value={formik.values["delivery_location"] || deliveryLocation || ""}
             onChange={handleDeliveryLocationChange}
@@ -220,9 +225,7 @@ export default function LocationInput({ formik }: { formik: any }) {
             }}
             disablePortal
             options={deliveryOptions}
-            open={
-              !isMobile && (Boolean(deliveryInputValue) || isTypingDelivery)
-            }
+            open={!isMobile && isTypingDelivery}
             onClose={() => {
               setIsTypingDelivery(false);
               if (isMobile) setShowSharedDropdown(false);
@@ -290,7 +293,7 @@ export default function LocationInput({ formik }: { formik: any }) {
             <span className="text-[10px] text-neutral-400">
               CAR RETURN LOCATION
             </span>
-            <Autocomplete
+            <Autocomplete<string>
               inputValue={returnInputValue}
               value={formik.values["return_location"] || returnLocation || ""}
               onChange={handleReturnLocationChange}
@@ -304,7 +307,7 @@ export default function LocationInput({ formik }: { formik: any }) {
               }}
               disablePortal
               options={returnOptions}
-              open={!isMobile && (Boolean(returnInputValue) || isTypingReturn)}
+              open={!isMobile && isTypingReturn}
               onClose={() => {
                 setIsTypingReturn(false);
                 if (isMobile) setShowSharedDropdown(false);
@@ -316,7 +319,7 @@ export default function LocationInput({ formik }: { formik: any }) {
                   normalizeString(option).includes(normalizedInput),
                 );
               }}
-              renderOption={(props, option) => {
+              renderOption={(props, option: string) => { 
                 const { key, ...otherProps } = props;
                 return (
                   <li key={key} {...otherProps} style={{ fontSize: "14px" }}>

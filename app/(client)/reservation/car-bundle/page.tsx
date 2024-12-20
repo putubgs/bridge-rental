@@ -31,10 +31,9 @@ export default function CarBundle() {
 
   const car = carModels.find((vehicle) => vehicle.car_id === car_id);
 
-  // Calculate totalDays using useMemo
   const totalDays = useMemo(() => {
     if (!deliveryDate || !deliveryTime || !returnDate || !returnTime) {
-      return 0; // Or handle as per your requirements
+      return 0;
     }
 
     const startDateTime = dayjs(deliveryDate)
@@ -48,7 +47,7 @@ export default function CarBundle() {
     const totalHours = endDateTime.diff(startDateTime, "hour");
     const calculatedDays = Math.ceil(totalHours / 24);
 
-    return calculatedDays > 0 ? calculatedDays : 1; // Ensure at least 1 day
+    return calculatedDays > 0 ? calculatedDays : 1;
   }, [deliveryDate, deliveryTime, returnDate, returnTime]);
 
   useEffect(() => {
@@ -58,7 +57,6 @@ export default function CarBundle() {
 
   const selectPackage = (pricePerDay: number, bundleType: BundleType) => {
     if (totalDays <= 0) {
-      // Handle invalid totalDays, e.g., show an error message
       alert("Please select valid delivery and pick-up dates/times.");
       return;
     }

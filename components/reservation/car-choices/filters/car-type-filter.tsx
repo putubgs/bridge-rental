@@ -13,16 +13,16 @@ export default function CarTypeFilter({
   selectedType,
   setSelectedType,
 }: CarTypeFilterProps) {
-  const vehicleTypes = Array.from(new Set(vehiclesData.map((car) => car.car_type)));
+  const vehicleTypes = Array.from(
+    new Set(vehiclesData.map((car) => car.car_type)),
+  );
 
   return (
-    <div
-      className="flex items-center gap-5 border-r border-[#D9D9D9] px-5 py-5"
-      style={{ flexBasis: "25%" }}
-    >
-      <div>
-        <SteeringWheelIcon size={32} />
+    <div className="flex items-center gap-5 px-5 py-5 md:border-r md:border-[#D9D9D9]">
+      <div className="flex-shrink-0">
+        <SteeringWheelIcon className="h-6 w-6 md:h-10 md:w-10" />
       </div>
+
       <Autocomplete
         disablePortal
         options={vehicleTypes}
@@ -36,12 +36,29 @@ export default function CarTypeFilter({
             size="small"
             variant="standard"
             sx={{
-              "& .MuiInputBase-input": { padding: "1px 0", fontWeight: 500, fontSize: "14px" },
+              "& .MuiInputBase-input": {
+                padding: "1px 0",
+                fontWeight: 500,
+                fontSize: { xs: "14px", md: "14px" },
+              },
               "& .MuiInput-underline:before": { borderBottom: "none" },
-              "& .MuiInput-underline:hover:not(.Mui-disabled):before": { borderBottom: "none" },
+              "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
+                borderBottom: "none",
+              },
               "& .MuiInput-underline:after": { borderBottom: "none" },
             }}
           />
+        )}
+        PaperComponent={({ children }) => (
+          <div
+            style={{
+              width: "200%",
+              backgroundColor: "white",
+              boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
+            }}
+          >
+            {children}
+          </div>
         )}
       />
     </div>

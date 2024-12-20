@@ -28,7 +28,7 @@ export default function ReservationPage() {
   }, [selectedType, showMoreThanFiveSeats, carModels]);
 
   return (
-    <main className="space-y-12 p-20">
+    <main className="space-y-12 md:p-20 p-2">
       <HeroSection />
       <FilterSection
         vehiclesData={carModels}

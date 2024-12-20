@@ -1,19 +1,26 @@
 import React, { FC } from "react";
 
-interface SteeringWheelIconProps {
+interface SteeringWheelIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
+  className?: string;
 }
 
-const SteeringWheelIcon: FC<SteeringWheelIconProps> = ({ size }) => (
+const SteeringWheelIcon: FC<SteeringWheelIconProps> = ({
+  size,
+  className,
+  ...props
+}) => (
   <svg
+    className={className}
     style={{
-      width: size ? `${size}px` : "100px",
-      height: "auto",
+      width: size ? `${size}px` : undefined,
+      height: size ? `${size}px` : undefined,
     }}
     viewBox="0 0 24 23"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
+    {...props}
   >
     <rect
       x="0.986328"

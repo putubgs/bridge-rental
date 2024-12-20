@@ -82,7 +82,6 @@ export default function ReviewSection() {
         Review and proceed to booking
       </h2>
       {/* Added the total rental days display here */}
-      <p className="mb-4 text-sm">Total days of rental: {totalDays}</p>
       <hr />
       <div className="mt-5 flex gap-3">
         <div className="flex basis-3/4 divide-x-2 border-2">

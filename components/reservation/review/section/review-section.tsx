@@ -55,7 +55,7 @@ export default function ReviewSection() {
   }
 
   const calculateChildExtraPrice = (extraName: string): number => {
-    const quantity = childrenSeatsQuantity[extraName] || 1; // Default to 1 instead of 0
+    const quantity = childrenSeatsQuantity[extraName] || 1;
     const extra = childrenExtras.find(
       ({ offer_name }) => offer_name === extraName,
     );
@@ -81,6 +81,8 @@ export default function ReviewSection() {
       <h2 className="mb-2 text-2xl font-semibold">
         Review and proceed to booking
       </h2>
+      {/* Added the total rental days display here */}
+      <p className="mb-4 text-sm">Total days of rental: {totalDays}</p>
       <hr />
       <div className="mt-5 flex gap-3">
         <div className="flex basis-3/4 divide-x-2 border-2">
@@ -157,6 +159,14 @@ export default function ReviewSection() {
                 <li>{returnLocation || "Location not set"}</li>
               </ul>
             </div>
+            <div>
+              <p className="mb-1 text-xs text-neutral-400">
+                TOTAL DAYS OF RENTAL :
+              </p>
+              <ul className="ml-4 list-disc text-sm marker:text-primary">
+                <li>{totalDays} Days</li>
+              </ul>
+            </div>
           </div>
         </div>
         <div className="basis-1/4 border-2 p-5 text-end text-sm">
@@ -193,7 +203,9 @@ export default function ReviewSection() {
               key={extra}
               className="flex items-center justify-between gap-5"
             >
-              <p>{extra}</p>
+              <p>
+                {extra} ({totalDays} Day{totalDays !== 1 ? "s" : ""})
+              </p>
               <p>{formatPrice(calculateExtraPrice(extra))} JOD</p>
             </div>
           ))}
@@ -207,7 +219,8 @@ export default function ReviewSection() {
                 className="flex items-center justify-between gap-5"
               >
                 <p className="capitalize">
-                  {extra.split("_").join(" ")} ({quantity}x)
+                  {extra.split("_").join(" ")} ({quantity}x, {totalDays} Day
+                  {totalDays !== 1 ? "s" : ""})
                 </p>
                 <p>{formatPrice(price)} JOD</p>
               </div>

@@ -48,14 +48,14 @@ export default function DateTimePicker({
   }, []);
   return (
     <div className="relative flex basis-[30%] justify-between rounded-md text-black md:gap-0 md:rounded-none md:border md:border-neutral-400">
-      <div className="flex h-[60px] items-end justify-center bg-[#F3F3F3] p-2 pb-3.5 pr-0 md:h-[52.5px] md:bg-white md:pb-2.5">
+      <div className="flex h-[60px] items-end justify-center bg-[#F3F3F3] p-2 pb-3.5 pr-0 md:h-[52.5px] md:bg-white md:pb-2.5 rounded-tl-md rounded-bl-md md:rounded-tl-none md:rounded-bl-none">
         <CalendarIcon
           className="size-[14px]"
           strokeWidth={1.5}
           stroke={isMobile ? "#868686" : "#000000"}
         />
       </div>
-      <div className="r-2 mr-2 flex h-[60px] shrink-0 basis-[50%] flex-col justify-center bg-[#F3F3F3] p-2 pb-0 md:mr-0 md:h-[52.5px] md:border-r md:border-neutral-300 md:bg-white">
+      <div className="r-2 mr-2 flex h-[60px] shrink-0 basis-[50%] flex-col justify-center bg-[#F3F3F3] p-2 pb-0 md:mr-0 md:h-[52.5px] md:border-r md:border-neutral-300 md:bg-white md:rounded-none rounded-tr-md rounded-br-md md:rounded-tr-none md:rounded-br-none">
         <span className="text-[10px] text-[#A0A0A0] md:text-neutral-400">
           {dateLabel}
         </span>
@@ -85,6 +85,7 @@ export default function DateTimePicker({
                   borderRadius: 0,
                   "& .MuiOutlinedInput-input": {
                     padding: "0px",
+                    // Conditional styling for mobile
                     color: isMobile ? "#868686 !important" : "black",
                   },
                   "& .MuiOutlinedInput-notchedOutline": {
@@ -96,7 +97,7 @@ export default function DateTimePicker({
           }}
         />
       </div>
-      <div className="flex h-[60px] w-fit flex-col justify-center bg-[#F3F3F3] p-2 pb-1 pl-3 md:h-[52.5px] md:bg-white">
+      <div className="flex h-[60px] w-fit flex-col justify-center bg-[#F3F3F3] p-2 pb-1 pl-3 md:h-[52.5px] md:bg-white md:rounded-none rounded-md">
         <span className="text-[10px] text-[#A0A0A0] md:text-neutral-400">
           {timeLabel}
         </span>

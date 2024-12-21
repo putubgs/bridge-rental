@@ -169,7 +169,7 @@ export default function BestDealSection() {
         </div>
 
         {/* "BEST DEAL!" Badge */}
-        <div className="absolute -top-5 right-0 rounded-md bg-gradient-to-r from-[#FF8181] to-[#FF4040] px-4 py-2 text-[7px] font-bold">
+        <div className="absolute -top-5 right-0 bg-gradient-to-r from-[#FF8181] to-[#FF4040] px-4 py-2 text-[7px] font-bold rounded-tr-md rounded-bl-md">
           BEST DEAL!
         </div>
 

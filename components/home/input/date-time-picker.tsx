@@ -46,7 +46,6 @@ export default function DateTimePicker({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
   return (
     <div className="relative flex basis-[30%] justify-between rounded-md text-black md:gap-0 md:rounded-none md:border md:border-neutral-400">
       <div className="flex h-[60px] items-end justify-center bg-[#F3F3F3] p-2 pb-3.5 pr-0 md:h-[52.5px] md:bg-white md:pb-2.5">
@@ -69,11 +68,7 @@ export default function DateTimePicker({
             openPickerIcon: () => (
               <SvgIcon
                 component={ChevronDownIcon}
-                // Removed "stroke-none" and adjusted styling
-                sx={{
-                  fontSize: 16,
-                  color: isMobile ? "#868686" : "black",
-                }}
+                className="size-4 stroke-none"
               />
             ),
           }}
@@ -114,10 +109,7 @@ export default function DateTimePicker({
             openPickerIcon: () => (
               <SvgIcon
                 component={ChevronDownIcon}
-                sx={{
-                  fontSize: 16,
-                  color: isMobile ? "#868686" : "black",
-                }}
+                className="size-4 stroke-none"
               />
             ),
           }}

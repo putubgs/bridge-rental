@@ -64,7 +64,7 @@ export default function HeroSection() {
             />
           )}
         </div>
-        <h2 className="flex md:hidden text-[20px] text-black my-[15px]">Car rentals at your doorstep</h2>
+        <h2 className="flex md:hidden text-[20px] text-black my-[15px] px-4">Car rentals at your doorstep</h2>
         <div className="block md:hidden w-full">
           {heroImageUrl && (
             <Image
@@ -77,7 +77,7 @@ export default function HeroSection() {
             />
           )}
         </div>
-        <div className="mx-auto flex h-full max-w-screen-2xl flex-col justify-end gap-6">
+        <div className="mx-auto flex h-full max-w-screen-2xl flex-col justify-end gap-6 px-4">
           <h2 className="hidden font-poppins text-[64px] font-semibold leading-none md:flex">
             Car Rentals <br /> At Your Doorstep
           </h2>

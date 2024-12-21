@@ -2,9 +2,9 @@ import ExperienceCard from "../card/experience-card";
 
 export default function ExperienceSection() {
   return (
-    <div className="z-0 md:px-20 px-1 md:py-12 py-6">
+    <div className="z-0 md:px-20 px-1 md:py-12 pb-6">
       <section className="mx-auto flex max-w-screen-2xl justify-between gap-11">
-        <div className="-z-10 grid grow grid-cols-3 gap-2">
+        <div className="-z-10 grid grow grid-cols-3 gap-2 px-2">
           <ExperienceCard
             img="/assets/img/door.png"
             text="YOUR CAR AT YOUR DOOR"

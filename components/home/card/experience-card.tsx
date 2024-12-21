@@ -42,7 +42,7 @@ export default function ExperienceCard({ img, text }: IExperienceCard) {
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
-      <p className="font-bold leading-none text-[9px] text-center md:text-start text-gray-400">
+      <p className="font-bold leading-none text-[7px] text-center md:text-start text-gray-400">
         {text}
       </p>
     </div>

@@ -9,6 +9,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check"; // Import CheckIcon from MUI
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { useState, useCallback, useEffect, useRef } from "react";
@@ -58,6 +59,9 @@ export default function LocationInput({ formik }: { formik: any }) {
     delivery: 0,
     return: 0,
   });
+
+  // Reference for auto-scrolling to selected option
+  const selectedOptionRef = useRef<HTMLLIElement | null>(null);
 
   // Detect if the device is mobile
   useEffect(() => {
@@ -277,8 +281,46 @@ export default function LocationInput({ formik }: { formik: any }) {
         option.description,
       );
     }
-    handleCloseModal();
+    // Removed the handleCloseModal() to keep the modal open after selection
   };
+
+  // Optional: Retain getSortedOptions() if you have another view that requires sorted options
+  /*
+  const getSortedOptions = () => {
+    const options =
+      activeField === "delivery" ? modalDeliveryOptions : modalReturnOptions;
+    const selectedLocation =
+      activeField === "delivery" ? deliveryLocation : returnLocation;
+
+    if (!selectedLocation) return options;
+
+    const selectedOption = options.find(
+      (option) => option.description === selectedLocation,
+    );
+
+    if (!selectedOption) return options;
+
+    // Move the selected option to the top
+    return [
+      selectedOption,
+      ...options.filter((option) => option.place_id !== selectedOption.place_id),
+    ];
+  };
+  */
+
+  // Auto-scroll to selected option when modal opens or selection changes
+  useEffect(() => {
+    if (modalOpen && activeField) {
+      const selectedOption =
+        activeField === "delivery" ? deliveryLocation : returnLocation;
+      if (selectedOption && selectedOptionRef.current) {
+        selectedOptionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }
+  }, [modalOpen, activeField, deliveryLocation, returnLocation]);
 
   return (
     <>
@@ -327,10 +369,15 @@ export default function LocationInput({ formik }: { formik: any }) {
                   formik.touched["delivery_location"] &&
                   Boolean(formik.errors["delivery_location"])
                 }
-                placeholder="Search location"
+                placeholder={
+                  isMobile ? "Tap to search location" : "Search location"
+                }
                 size="small"
                 variant="standard"
-                disabled={isMobile}
+                inputProps={{
+                  ...params.inputProps,
+                  readOnly: isMobile, // Make input read-only on mobile
+                }}
                 onClick={() => {
                   if (isMobile) {
                     handleOpenModal("delivery");
@@ -413,10 +460,15 @@ export default function LocationInput({ formik }: { formik: any }) {
                     formik.touched["return_location"] &&
                     Boolean(formik.errors["return_location"])
                   }
-                  placeholder="Search location"
+                  placeholder={
+                    isMobile ? "Tap to search location" : "Search location"
+                  }
                   size="small"
                   variant="standard"
-                  disabled={isMobile}
+                  inputProps={{
+                    ...params.inputProps,
+                    readOnly: isMobile, // Make input read-only on mobile
+                  }}
                   onClick={() => {
                     if (isMobile) {
                       handleOpenModal("return");
@@ -495,9 +547,32 @@ export default function LocationInput({ formik }: { formik: any }) {
               alt="Maps Pin"
             />
           </div>
-          <Button onClick={handleCloseModal} color="primary">
+          <Button
+            onClick={handleCloseModal}
+            variant="text"
+            sx={{
+              color: "#166534", // Custom dark blue color
+              "&:hover": { // Slightly lighter shade on hover
+                backgroundColor: "transparent", // Ensures no background on hover
+              },
+            }}
+          >
             Close
           </Button>
+
+          {/* Optional: Add a Confirm button if needed */}
+          {/* 
+          <Button
+            onClick={() => {
+              // Handle any additional confirm logic here if needed
+              handleCloseModal();
+            }}
+            color="primary"
+            variant="contained"
+          >
+            Confirm
+          </Button>
+          */}
         </DialogActions>
         <DialogContent dividers>
           <ul>
@@ -507,10 +582,54 @@ export default function LocationInput({ formik }: { formik: any }) {
             ).map((option) => (
               <li
                 key={option.place_id}
-                className="cursor-pointer border-b border-gray-100 px-4 py-3 text-black hover:bg-gray-100"
-                onClick={() => handleSelectOption(option)}
+                ref={
+                  option.description ===
+                  (activeField === "delivery"
+                    ? deliveryLocation
+                    : returnLocation)
+                    ? selectedOptionRef
+                    : null
+                }
+                role="option"
+                aria-selected={
+                  option.description ===
+                  (activeField === "delivery"
+                    ? deliveryLocation
+                    : returnLocation)
+                }
+                className={`flex cursor-pointer items-center justify-between border-b border-gray-100 px-4 py-3 ${
+                  option.description ===
+                  (activeField === "delivery"
+                    ? deliveryLocation
+                    : returnLocation)
+                    ? "border-l-4 border-green-500 bg-green-200" // Selected item styles
+                    : "hover:bg-gray-100" // Non-selected item hover style
+                }`}
+                onClick={() => {
+                  handleSelectOption(option);
+                  // The modal remains open after selection
+                }}
               >
-                {option.description}
+                <span
+                  className={`${
+                    option.description ===
+                    (activeField === "delivery"
+                      ? deliveryLocation
+                      : returnLocation)
+                      ? "font-semibold text-green-800" // Bold and larger text for selected option
+                      : "font-normal text-black"
+                  }`}
+                >
+                  {option.description}
+                </span>
+                {option.description ===
+                  (activeField === "delivery"
+                    ? deliveryLocation
+                    : returnLocation) && (
+                  <CheckIcon
+                    sx={{ color: "#166534" }} // MUI CheckIcon with green color
+                  />
+                )}
               </li>
             ))}
             {(activeField === "delivery"

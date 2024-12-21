@@ -1,12 +1,25 @@
 "use client";
 
-import { Autocomplete, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import { MapPinIcon } from "lucide-react";
 import { useRentDetailsStore } from "@/store/reservation-store";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
 import { autocomplete } from "@/lib/google";
 import Image from "next/image";
+
+interface PlaceOption {
+  description: string;
+  place_id: string;
+}
 
 export default function LocationInput({ formik }: { formik: any }) {
   const {
@@ -16,178 +29,208 @@ export default function LocationInput({ formik }: { formik: any }) {
     returnLocation,
   } = useRentDetailsStore();
 
-  const [deliveryOptions, setDeliveryOptions] = useState<string[]>([]);
-  const [returnOptions, setReturnOptions] = useState<string[]>([]);
+  // Main Autocomplete States
+  const [deliveryOptions, setDeliveryOptions] = useState<PlaceOption[]>([]);
+  const [returnOptions, setReturnOptions] = useState<PlaceOption[]>([]);
   const [isLoadingDelivery, setIsLoadingDelivery] = useState(false);
   const [isLoadingReturn, setIsLoadingReturn] = useState(false);
   const [isTypingDelivery, setIsTypingDelivery] = useState(false);
   const [isTypingReturn, setIsTypingReturn] = useState(false);
   const [deliveryInputValue, setDeliveryInputValue] = useState("");
   const [returnInputValue, setReturnInputValue] = useState("");
+
+  // Dialog States
   const [isMobile, setIsMobile] = useState(false);
-  const [showSharedDropdown, setShowSharedDropdown] = useState(false);
-  const [dropdownContent, setDropdownContent] = useState<React.ReactNode>(null);
-  const [dropdownProps, setDropdownProps] = useState<any>(null);
   const [activeField, setActiveField] = useState<"delivery" | "return" | null>(
     null,
   );
-  const [inputValue, setInputValue] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalInputValue, setModalInputValue] = useState("");
+  const [modalDeliveryOptions, setModalDeliveryOptions] = useState<
+    PlaceOption[]
+  >([]);
+  const [modalReturnOptions, setModalReturnOptions] = useState<PlaceOption[]>(
+    [],
+  );
 
+  // Reference to track latest fetch requests
+  const latestFetchRef = useRef<{ [key: string]: number }>({
+    delivery: 0,
+    return: 0,
+  });
+
+  // Detect if the device is mobile
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      console.log("Is Mobile:", mobile);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Reset internal states on component mount
   useEffect(() => {
-    if (showSharedDropdown) {
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-    }
+    setDeliveryOptions([]);
+    setReturnOptions([]);
+    setModalDeliveryOptions([]);
+    setModalReturnOptions([]);
+    setIsTypingDelivery(false);
+    setIsTypingReturn(false);
+    setDeliveryInputValue("");
+    setReturnInputValue("");
+    setModalInputValue("");
+    console.log("Internal states reset on mount");
+  }, []);
 
+  // Unified fetch function
+  const fetchOptions = useCallback(
+    debounce(async (input: string, target: "delivery" | "return") => {
+      if (input) {
+        // Increment the request count
+        latestFetchRef.current[target] += 1;
+        const currentRequest = latestFetchRef.current[target];
+
+        if (target === "delivery") {
+          setIsLoadingDelivery(true);
+        } else {
+          setIsLoadingReturn(true);
+        }
+        console.log(`Fetching ${target} options for:`, input);
+        try {
+          const results = await autocomplete(input);
+          console.log(`${target} options fetched:`, results);
+
+          // Only update state if this is the latest request
+          if (currentRequest === latestFetchRef.current[target]) {
+            if (target === "delivery") {
+              setDeliveryOptions(results);
+              setModalDeliveryOptions(results);
+            } else {
+              setReturnOptions(results);
+              setModalReturnOptions(results);
+            }
+          } else {
+            console.log(`Discarding outdated ${target} options`);
+          }
+        } catch (error) {
+          console.error(`Error fetching ${target} options:`, error);
+        } finally {
+          if (currentRequest === latestFetchRef.current[target]) {
+            if (target === "delivery") {
+              setIsLoadingDelivery(false);
+            } else {
+              setIsLoadingReturn(false);
+            }
+            console.log(`${target} loading state set to false`);
+          }
+        }
+      } else {
+        if (target === "delivery") {
+          setDeliveryOptions([]);
+          setModalDeliveryOptions([]);
+          console.log(`Delivery options cleared due to empty input`);
+        } else {
+          setReturnOptions([]);
+          setModalReturnOptions([]);
+          console.log(`Return options cleared due to empty input`);
+        }
+      }
+    }, 500),
+    [],
+  );
+
+  // Cleanup debounced functions on unmount
+  useEffect(() => {
     return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
+      fetchOptions.cancel();
     };
-  }, [showSharedDropdown]);
+  }, [fetchOptions]);
 
   const normalizeString = (str: string) => {
     return str.toLowerCase().replace(/[-\s]/g, "");
   };
 
-  const handlePaperRender = useCallback(
-    ({ children, ...props }: any) => {
-      if (isMobile) {
-        requestAnimationFrame(() => {
-          setDropdownContent(children);
-          setDropdownProps(props);
-        });
-        return null;
-      }
-
-      return (
-        <div
-          {...props}
-          className="mt-1 flex flex-col rounded-md bg-white shadow-lg"
-        >
-          <div className="max-h-[200px] overflow-auto">{children}</div>
-          <div className="flex items-center justify-between border-t p-2">
-            <span className="text-[10px] text-gray-400">
-              Powered by Google Maps
-            </span>
-            <Image
-              src="/assets/img/google-maps-pin.png"
-              width={10}
-              height={10}
-              alt="Maps Pin"
-            />
-          </div>
-        </div>
-      );
-    },
-    [isMobile],
-  );
-
-  const fetchDeliveryOptions = useCallback(
-    debounce(async (input: string) => {
-      if (input) {
-        setIsLoadingDelivery(true);
-        try {
-          const results = await autocomplete(input);
-          setDeliveryOptions(results.map((item) => item.description));
-        } finally {
-          setIsLoadingDelivery(false);
-        }
-      } else {
-        setDeliveryOptions([]);
-      }
-    }, 500),
-    [],
-  );
-
-  const fetchReturnOptions = useCallback(
-    debounce(async (input: string) => {
-      if (input) {
-        setIsLoadingReturn(true);
-        try {
-          const results = await autocomplete(input);
-          setReturnOptions(results.map((item) => item.description));
-        } finally {
-          setIsLoadingReturn(false);
-        }
-      } else {
-        setReturnOptions([]);
-      }
-    }, 500),
-    [],
-  );
-
-  // Handle delivery location change
-  const handleDeliveryLocationChange = (_: any, newLocation: string | null) => {
+  // Handle delivery location change (from Autocomplete)
+  const handleDeliveryLocationChange = (
+    _: any,
+    newLocation: PlaceOption | null,
+  ) => {
+    console.log("Delivery location changed to:", newLocation);
     if (newLocation) {
-      setDeliveryLocation(newLocation);
-      formik.setFieldValue("delivery_location", newLocation);
+      setDeliveryLocation(newLocation.description);
+      formik.setFieldValue("delivery_location", newLocation.description);
       setIsTypingDelivery(false);
-      setDeliveryInputValue(newLocation);
+      setDeliveryInputValue(newLocation.description);
+      console.log("Delivery input value set to:", newLocation.description);
 
       // Only sync return location if same_return_location is true AND user is not actively editing return
       if (formik.values.same_return_location && !isTypingReturn) {
-        setReturnLocation(newLocation);
-        formik.setFieldValue("return_location", newLocation);
-        setReturnInputValue(newLocation);
+        setReturnLocation(newLocation.description);
+        formik.setFieldValue("return_location", newLocation.description);
+        setReturnInputValue(newLocation.description);
+        console.log(
+          "Return location synced to delivery location:",
+          newLocation.description,
+        );
       }
     } else {
       setDeliveryLocation("");
       formik.setFieldValue("delivery_location", "");
       setDeliveryInputValue("");
+      console.log("Delivery location cleared");
     }
   };
 
-  // Handle return location change
-  const handleReturnLocationChange = (_: any, newLocation: string | null) => {
+  // Handle return location change (from Autocomplete)
+  const handleReturnLocationChange = (
+    _: any,
+    newLocation: PlaceOption | null,
+  ) => {
+    console.log("Return location changed to:", newLocation);
     if (newLocation) {
       // If user explicitly changes return location, they probably want different locations
       formik.setFieldValue("same_return_location", false);
+      console.log("Same return location toggled to false");
 
-      setReturnLocation(newLocation);
-      formik.setFieldValue("return_location", newLocation);
+      setReturnLocation(newLocation.description);
+      formik.setFieldValue("return_location", newLocation.description);
       setIsTypingReturn(false);
-      setReturnInputValue(newLocation);
+      setReturnInputValue(newLocation.description);
+      console.log("Return input value set to:", newLocation.description);
     } else {
       setReturnLocation("");
       formik.setFieldValue("return_location", "");
       setReturnInputValue("");
+      console.log("Return location cleared");
     }
   };
 
-  // Handle input change for delivery
+  // Handle input change for delivery Autocomplete
   const handleInputChangeDelivery = (_: any, inputValue: string) => {
+    console.log("Delivery input changed to:", inputValue);
     setDeliveryInputValue(inputValue);
     setIsTypingDelivery(true); // Start typing
     if (inputValue) {
-      fetchDeliveryOptions(inputValue);
+      fetchOptions(inputValue, "delivery");
     } else {
       setDeliveryOptions([]);
+      setModalDeliveryOptions([]);
     }
   };
 
-  // Handle input change for return
+  // Handle input change for return Autocomplete
   const handleInputChangeReturn = (_: any, inputValue: string) => {
+    console.log("Return input changed to:", inputValue);
     setReturnInputValue(inputValue);
     setIsTypingReturn(true); // Start typing
     if (inputValue) {
-      fetchReturnOptions(inputValue);
+      fetchOptions(inputValue, "return");
     } else {
       setReturnOptions([]);
+      setModalReturnOptions([]);
     }
   };
 
@@ -201,6 +244,42 @@ export default function LocationInput({ formik }: { formik: any }) {
     return null;
   };
 
+  // Handle opening the modal
+  const handleOpenModal = (field: "delivery" | "return") => {
+    setActiveField(field);
+    setModalOpen(true);
+    setModalInputValue("");
+    console.log(
+      `${field.charAt(0).toUpperCase() + field.slice(1)} Autocomplete clicked on mobile`,
+    );
+  };
+
+  // Handle closing the modal
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setActiveField(null);
+    setModalInputValue("");
+    console.log("Shared Dropdown closed");
+  };
+
+  // Handle selecting an option from the modal
+  const handleSelectOption = (option: PlaceOption) => {
+    if (activeField === "delivery") {
+      handleDeliveryLocationChange(null, option);
+      console.log(
+        "Selected delivery location from shared dropdown:",
+        option.description,
+      );
+    } else {
+      handleReturnLocationChange(null, option);
+      console.log(
+        "Selected return location from shared dropdown:",
+        option.description,
+      );
+    }
+    handleCloseModal();
+  };
+
   return (
     <>
       <div className="h-13 flex basis-[40%] items-center gap-1 border border-neutral-400 bg-white text-black">
@@ -211,51 +290,138 @@ export default function LocationInput({ formik }: { formik: any }) {
           <span className="text-[10px] text-neutral-400">
             CAR DELIVERY LOCATION
           </span>
-          <Autocomplete<string>
+          <Autocomplete
             inputValue={deliveryInputValue}
-            value={formik.values["delivery_location"] || deliveryLocation || ""}
+            value={
+              deliveryOptions.find(
+                (option) =>
+                  option.description === formik.values["delivery_location"],
+              ) || null
+            }
             onChange={handleDeliveryLocationChange}
             onInputChange={handleInputChangeDelivery}
-            onClick={() => {
-              if (isMobile) {
-                setActiveField("delivery");
-                setShowSharedDropdown(true);
-                setIsTypingDelivery(true);
-              }
-            }}
             disablePortal
             options={deliveryOptions}
             open={!isMobile && isTypingDelivery}
             onClose={() => {
               setIsTypingDelivery(false);
-              if (isMobile) setShowSharedDropdown(false);
+              console.log("Delivery Autocomplete closed");
             }}
             noOptionsText={renderNoOptions(isLoadingDelivery, isTypingDelivery)}
             filterOptions={(options, { inputValue }) => {
               const normalizedInput = normalizeString(inputValue);
               return options.filter((option) =>
-                normalizeString(option).includes(normalizedInput),
+                normalizeString(option.description).includes(normalizedInput),
               );
             }}
+            getOptionLabel={(option) => option.description}
+            renderOption={(props, option) => (
+              <li {...props} key={option.place_id} style={{ fontSize: "14px" }}>
+                {option.description}
+              </li>
+            )}
             renderInput={(params) => (
-              <div
+              <TextField
+                {...params}
+                error={
+                  formik.touched["delivery_location"] &&
+                  Boolean(formik.errors["delivery_location"])
+                }
+                placeholder="Search location"
+                size="small"
+                variant="standard"
+                disabled={isMobile}
                 onClick={() => {
                   if (isMobile) {
-                    setActiveField("delivery");
-                    setShowSharedDropdown(true);
+                    handleOpenModal("delivery");
                   }
                 }}
-              >
+                sx={{
+                  "& .MuiInputBase-input": {
+                    padding: "1px 0",
+                    fontWeight: 500,
+                    fontSize: "14px",
+                    cursor: isMobile ? "pointer" : "text",
+                    opacity: "1 !important",
+                    WebkitTextFillColor: "black !important",
+                  },
+                  "& .MuiInput-underline:before": {
+                    borderBottom: "none",
+                  },
+                  "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
+                    borderBottom: "none",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottom: "none",
+                  },
+                }}
+              />
+            )}
+            PaperComponent={isMobile ? undefined : undefined}
+            ListboxProps={{
+              style: { maxHeight: "200px" },
+            }}
+            slotProps={{
+              listbox: { className: "max-h-[300px] overflow-auto" },
+            }}
+          />
+        </div>
+
+        {!formik?.values["same_return_location"] && (
+          <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
+            <span className="text-[10px] text-neutral-400">
+              CAR PICK-UP LOCATION
+            </span>
+            <Autocomplete
+              inputValue={returnInputValue}
+              value={
+                returnOptions.find(
+                  (option) =>
+                    option.description === formik.values["return_location"],
+                ) || null
+              }
+              onChange={handleReturnLocationChange}
+              onInputChange={handleInputChangeReturn}
+              disablePortal
+              options={returnOptions}
+              open={!isMobile && isTypingReturn}
+              onClose={() => {
+                setIsTypingReturn(false);
+                console.log("Return Autocomplete closed");
+              }}
+              noOptionsText={renderNoOptions(isLoadingReturn, isTypingReturn)}
+              filterOptions={(options, { inputValue }) => {
+                const normalizedInput = normalizeString(inputValue);
+                return options.filter((option) =>
+                  normalizeString(option.description).includes(normalizedInput),
+                );
+              }}
+              getOptionLabel={(option) => option.description}
+              renderOption={(props, option) => (
+                <li
+                  {...props}
+                  key={option.place_id}
+                  style={{ fontSize: "14px" }}
+                >
+                  {option.description}
+                </li>
+              )}
+              renderInput={(params) => (
                 <TextField
                   {...params}
                   error={
-                    formik.touched["delivery_location"] &&
-                    Boolean(formik.errors["delivery_location"])
+                    formik.touched["return_location"] &&
+                    Boolean(formik.errors["return_location"])
                   }
                   placeholder="Search location"
                   size="small"
                   variant="standard"
                   disabled={isMobile}
+                  onClick={() => {
+                    if (isMobile) {
+                      handleOpenModal("return");
+                    }
+                  }}
                   sx={{
                     "& .MuiInputBase-input": {
                       padding: "1px 0",
@@ -276,101 +442,10 @@ export default function LocationInput({ formik }: { formik: any }) {
                     },
                   }}
                 />
-              </div>
-            )}
-            PaperComponent={handlePaperRender}
-            ListboxProps={{
-              style: { maxHeight: isMobile ? "300px" : "200px" },
-            }}
-            slotProps={{
-              listbox: { className: "max-h-[300px] overflow-auto" },
-            }}
-          />
-        </div>
-
-        {!formik?.values["same_return_location"] && (
-          <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
-            <span className="text-[10px] text-neutral-400">
-              CAR PICK-UP LOCATION
-            </span>
-            <Autocomplete<string>
-              inputValue={returnInputValue}
-              value={formik.values["return_location"] || returnLocation || ""}
-              onChange={handleReturnLocationChange}
-              onInputChange={handleInputChangeReturn}
-              onClick={() => {
-                if (isMobile) {
-                  setActiveField("return");
-                  setShowSharedDropdown(true);
-                  setIsTypingReturn(true);
-                }
-              }}
-              disablePortal
-              options={returnOptions}
-              open={!isMobile && isTypingReturn}
-              onClose={() => {
-                setIsTypingReturn(false);
-                if (isMobile) setShowSharedDropdown(false);
-              }}
-              noOptionsText={renderNoOptions(isLoadingReturn, isTypingReturn)}
-              filterOptions={(options, { inputValue }) => {
-                const normalizedInput = normalizeString(inputValue);
-                return options.filter((option) =>
-                  normalizeString(option).includes(normalizedInput),
-                );
-              }}
-              renderOption={(props, option: string) => { 
-                const { key, ...otherProps } = props;
-                return (
-                  <li key={key} {...otherProps} style={{ fontSize: "14px" }}>
-                    {option}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <div
-                  onClick={() => {
-                    if (isMobile) {
-                      setActiveField("return");
-                      setShowSharedDropdown(true);
-                    }
-                  }}
-                >
-                  <TextField
-                    {...params}
-                    error={
-                      formik.touched["return_location"] &&
-                      Boolean(formik.errors["return_location"])
-                    }
-                    placeholder="Search location"
-                    size="small"
-                    variant="standard"
-                    disabled={isMobile}
-                    sx={{
-                      "& .MuiInputBase-input": {
-                        padding: "1px 0",
-                        fontWeight: 500,
-                        fontSize: "14px",
-                        cursor: isMobile ? "pointer" : "text",
-                        opacity: "1 !important",
-                        WebkitTextFillColor: "black !important",
-                      },
-                      "& .MuiInput-underline:before": {
-                        borderBottom: "none",
-                      },
-                      "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-                        borderBottom: "none",
-                      },
-                      "& .MuiInput-underline:after": {
-                        borderBottom: "none",
-                      },
-                    }}
-                  />
-                </div>
               )}
-              PaperComponent={handlePaperRender}
+              PaperComponent={isMobile ? undefined : undefined}
               ListboxProps={{
-                style: { maxHeight: isMobile ? "300px" : "200px" },
+                style: { maxHeight: "200px" },
               }}
               slotProps={{
                 listbox: { className: "max-h-[300px] overflow-auto" },
@@ -380,111 +455,81 @@ export default function LocationInput({ formik }: { formik: any }) {
         )}
       </div>
 
-      {showSharedDropdown && isMobile && (
-        <>
-          <div
-            className="fixed inset-0 z-[999] bg-black bg-opacity-50"
-            onClick={() => {
-              setShowSharedDropdown(false);
-              setIsTypingDelivery(false);
-              setIsTypingReturn(false);
-              setActiveField(null);
+      {/* Shared Dropdown as a Dialog for Mobile */}
+      <Dialog open={modalOpen} onClose={handleCloseModal} fullWidth>
+        <DialogTitle>
+          {activeField === "delivery"
+            ? "Car Delivery Location"
+            : "Car Pick-up Location"}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            autoFocus
+            placeholder="Search location"
+            size="small"
+            value={modalInputValue}
+            onChange={(e) => {
+              const value = e.target.value;
+              setModalInputValue(value);
+              console.log("Shared Dropdown input changed to:", value);
+
+              // Fetch options based on active field
+              if (activeField === "delivery") {
+                fetchOptions(value, "delivery");
+              } else {
+                fetchOptions(value, "return");
+              }
             }}
-          ></div>
-
-          <div className="fixed inset-x-0 top-20 z-[1000] bg-white shadow-lg">
-            <div className="relative z-10 flex items-center justify-between border-b p-4">
-              <span className="text-sm font-medium">
-                {activeField === "delivery"
-                  ? "Car Delivery Location"
-                  : "Car Pick-up Location"}
-              </span>
-              <button
-                onClick={() => {
-                  setShowSharedDropdown(false);
-                  setIsTypingDelivery(false);
-                  setIsTypingReturn(false);
-                  setActiveField(null);
-                }}
-                className="text-neutral-400"
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="p-4">
-              <TextField
-                fullWidth
-                autoFocus
-                placeholder="Search location"
-                size="small"
-                value={inputValue}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setInputValue(value);
-
-                  if (activeField === "delivery") {
-                    setDeliveryInputValue(value);
-                    if (value) fetchDeliveryOptions(value);
-                  } else {
-                    setReturnInputValue(value);
-                    if (value) fetchReturnOptions(value);
-                  }
-                }}
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-b border-t px-4 py-2">
-              <span className="text-[10px] text-gray-400">
-                Powered by Google Maps
-              </span>
-              <Image
-                src="/assets/img/google-maps-pin.png"
-                width={10}
-                height={10}
-                alt="Maps Pin"
-              />
-            </div>
-
-            <div className="h-[calc(100vh-280px)] overflow-y-auto">
-              <ul>
-                {(activeField === "delivery"
-                  ? deliveryOptions
-                  : returnOptions
-                ).map((option, index) => (
-                  <li
-                    key={index}
-                    className="cursor-pointer border-b border-gray-100 px-4 py-3 text-black hover:bg-gray-100"
-                    onClick={() => {
-                      if (activeField === "delivery") {
-                        handleDeliveryLocationChange(null, option);
-                      } else {
-                        handleReturnLocationChange(null, option);
-                      }
-                      setShowSharedDropdown(false);
-                      setActiveField(null);
-                    }}
-                  >
-                    {option}
-                  </li>
-                ))}
-                {(activeField === "delivery" ? deliveryOptions : returnOptions)
-                  .length === 0 && (
-                  <li className="px-4 py-3 text-gray-500">
-                    {(
-                      activeField === "delivery"
-                        ? isLoadingDelivery
-                        : isLoadingReturn
-                    )
-                      ? "Loading..."
-                      : "No locations found"}
-                  </li>
-                )}
-              </ul>
-            </div>
+          />
+        </DialogContent>
+        <DialogActions>
+          <div className="flex flex-grow gap-1">
+            <span className="text-[10px] text-gray-400">
+              Powered by Google Maps
+            </span>
+            <Image
+              src="/assets/img/google-maps-pin.png"
+              width={10}
+              height={10}
+              alt="Maps Pin"
+            />
           </div>
-        </>
-      )}
+          <Button onClick={handleCloseModal} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+        <DialogContent dividers>
+          <ul>
+            {(activeField === "delivery"
+              ? modalDeliveryOptions
+              : modalReturnOptions
+            ).map((option) => (
+              <li
+                key={option.place_id}
+                className="cursor-pointer border-b border-gray-100 px-4 py-3 text-black hover:bg-gray-100"
+                onClick={() => handleSelectOption(option)}
+              >
+                {option.description}
+              </li>
+            ))}
+            {(activeField === "delivery"
+              ? modalDeliveryOptions
+              : modalReturnOptions
+            ).length === 0 && (
+              <li className="px-4 py-3 text-gray-500">
+                {activeField === "delivery"
+                  ? isLoadingDelivery
+                    ? "Loading..."
+                    : "No locations found"
+                  : isLoadingReturn
+                    ? "Loading..."
+                    : "No locations found"}
+              </li>
+            )}
+          </ul>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

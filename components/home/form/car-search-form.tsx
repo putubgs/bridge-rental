@@ -128,8 +128,11 @@ export default function CarSearchForm() {
   });
 
   return (
-    <form onSubmit={formik.handleSubmit} className="mt-5 space-y-3">
-      <div className="flex h-max flex-col gap-3 bg-neutral-100 bg-opacity-20 p-[6px] md:flex-row md:justify-between md:gap-2">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="mt-5 space-y-4 md:space-y-3"
+    >
+      <div className="flex h-max flex-col gap-4 bg-neutral-100 bg-opacity-20 p-[6px] md:flex-row md:justify-between md:gap-2">
         <LocationInput formik={formik} />
         <div className="flex items-center gap-2 font-bold md:hidden">
           <Toggle
@@ -142,7 +145,7 @@ export default function CarSearchForm() {
               formik.setFieldValue("same_return_location", isChecked)
             }
           />
-          <span className="whitespace-nowrap pt-1 text-sm text-[#868686]">
+          <span className="whitespace-nowrap pt-1 text-[10px] text-[#868686] md:text-sm">
             PICK-UP TO SAME LOCATION
           </span>
         </div>
@@ -150,11 +153,13 @@ export default function CarSearchForm() {
         <Button
           type="submit"
           variant="contained"
-          className="basis-[12%] py-2 md:py-0"
+          className="basis-[12%] rounded-md bg-[#8BD6D6] py-2 md:rounded-none md:bg-[#BAF0E2] md:py-0"
         >
-          <div className="flex items-center gap-1 font-overpass font-bold hover:bg-primary/90">
-            <SearchIcon className="size-[18px] shrink-0" />
-            <span className="translate-y-[1px]">Search</span>
+          <div className="flex items-center gap-1 font-overpass font-bold md:hover:bg-primary/90 h-[39px]">
+            <SearchIcon className="hidden size-[18px] shrink-0 md:block" />
+            <span className="translate-y-[1px] text-[12px] text-white md:text-[14px] md:text-black">
+              Search
+            </span>
           </div>
         </Button>
       </div>
@@ -175,7 +180,7 @@ export default function CarSearchForm() {
             PICK-UP TO SAME LOCATION
           </span>
         </div>
-        <div className="text-start text-black md:text-end md:text-white">
+        <div className="text-start text-[8px] text-black md:text-end md:text-[11px] md:text-white">
           <p>
             *KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO
             THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE

@@ -324,12 +324,16 @@ export default function LocationInput({ formik }: { formik: any }) {
 
   return (
     <>
-      <div className="h-13 flex basis-[40%] items-center gap-1 border border-neutral-400 bg-white text-black">
+      <div className="h-13 flex basis-[40%] items-center gap-1 rounded-md bg-[#F3F3F3] bg-white text-black md:rounded-none md:border md:border-neutral-400 md:bg-white">
         <div className="flex h-full items-end p-2 pb-2.5 pr-1">
-          <MapPinIcon className="size-[14px]" strokeWidth={1.5} />
+          <MapPinIcon
+            className="size-[14px]"
+            strokeWidth={1.5}
+            stroke={isMobile ? "#868686" : "#000000"}
+          />
         </div>
-        <div className="flex w-full flex-col pb-0 pr-2 pt-2">
-          <span className="text-[10px] text-neutral-400">
+        <div className="flex h-[60px] w-full flex-col justify-center pb-0 pr-2 pt-2 md:h-[52.5px]">
+          <span className="text-[8px] text-neutral-400 md:text-[10px]">
             CAR DELIVERY LOCATION
           </span>
           <Autocomplete
@@ -390,7 +394,9 @@ export default function LocationInput({ formik }: { formik: any }) {
                     fontSize: "14px",
                     cursor: isMobile ? "pointer" : "text",
                     opacity: "1 !important",
-                    WebkitTextFillColor: "black !important",
+                    WebkitTextFillColor: isMobile
+                      ? "#868686 !important"
+                      : "black !important",
                   },
                   "& .MuiInput-underline:before": {
                     borderBottom: "none",
@@ -416,7 +422,7 @@ export default function LocationInput({ formik }: { formik: any }) {
 
         {!formik?.values["same_return_location"] && (
           <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
-            <span className="text-[10px] text-neutral-400">
+          <span className="text-[8px] text-neutral-400 md:text-[10px]">
               CAR PICK-UP LOCATION
             </span>
             <Autocomplete
@@ -481,7 +487,9 @@ export default function LocationInput({ formik }: { formik: any }) {
                       fontSize: "14px",
                       cursor: isMobile ? "pointer" : "text",
                       opacity: "1 !important",
-                      WebkitTextFillColor: "black !important",
+                      WebkitTextFillColor: isMobile
+                        ? "#868686 !important"
+                        : "black !important",
                     },
                     "& .MuiInput-underline:before": {
                       borderBottom: "none",
@@ -552,7 +560,8 @@ export default function LocationInput({ formik }: { formik: any }) {
             variant="text"
             sx={{
               color: "#166534", // Custom dark blue color
-              "&:hover": { // Slightly lighter shade on hover
+              "&:hover": {
+                // Slightly lighter shade on hover
                 backgroundColor: "transparent", // Ensures no background on hover
               },
             }}

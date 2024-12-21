@@ -64,7 +64,7 @@ export default function HeroSection() {
             />
           )}
         </div>
-        <h2 className="flex md:hidden text-[20px] text-black my-[15px] px-4">Car rentals at your doorstep</h2>
+        <h2 className="flex md:hidden text-[20px] text-[#494949] my-[15px] px-4 font-semibold">Car rentals at your doorstep</h2>
         <div className="block md:hidden w-full">
           {heroImageUrl && (
             <Image

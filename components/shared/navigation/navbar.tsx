@@ -15,7 +15,12 @@ export default function Navbar() {
 
   const textColor =
     isHomePage || isScrolled ? "text-white" : "text-neutral-400";
-  const logoColor = isHomePage || isScrolled ? "white" : "black";
+  const logoColor =
+    mobileMenuOpen || window.innerWidth < 1024
+      ? "black"
+      : isHomePage || isScrolled
+        ? "white"
+        : "black";
 
   return (
     <div className="sticky top-0 z-30 w-full bg-transparent">
@@ -66,12 +71,12 @@ export default function Navbar() {
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? (
-              <span className="block text-2xl">&times;</span>
+              <span className="block text-2xl text-black">&times;</span>
             ) : (
               <>
-                <span className="block h-[2px] w-6 bg-current"></span>
-                <span className="block h-[2px] w-6 bg-current"></span>
-                <span className="block h-[2px] w-6 bg-current"></span>
+                <span className="block h-[2px] w-6 bg-black"></span>
+                <span className="block h-[2px] w-6 bg-black"></span>
+                <span className="block h-[2px] w-6 bg-black"></span>
               </>
             )}
           </button>
@@ -80,18 +85,22 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div
-            className={`mt-8 flex flex-col gap-4 font-medium uppercase ${textColor} md:hidden`}
+            className={`mt-8 flex flex-col gap-4 font-medium uppercase text-black md:hidden`}
           >
             <Link
               href="/contact"
-              className={`block ${pathName === "/contact" ? "text-primary-variant-2" : ""}`}
+              className={`block ${
+                pathName === "/contact" ? "text-primary-variant-2" : ""
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
             </Link>
             <Link
               href="/help"
-              className={`block ${pathName === "/help" ? "text-primary-variant-2" : ""}`}
+              className={`block ${
+                pathName === "/help" ? "text-primary-variant-2" : ""
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               Help

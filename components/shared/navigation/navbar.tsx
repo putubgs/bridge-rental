@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useScrolledNavbar from "@/hooks/useScrolledNavbar";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,16 +11,43 @@ export default function Navbar() {
   const isScrolled = useScrolledNavbar();
   const isHomePage = pathName === "/";
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Correctly destructured useState with explicit type
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  
+  // useState for windowWidth with proper typing
+  const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
 
+  // Effect to handle window resizing and set windowWidth
+  useEffect(() => {
+    // Function to update windowWidth state
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    // Set initial window width
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Determine logo color based on state and windowWidth
+  const logoColor = (() => {
+    if (mobileMenuOpen || (windowWidth !== undefined && windowWidth < 1024)) {
+      return "black";
+    } else if (isHomePage || isScrolled) {
+      return "white";
+    } else {
+      return "black";
+    }
+  })();
+
+  // Determine text color based on page state
   const textColor =
     isHomePage || isScrolled ? "text-white" : "text-neutral-400";
-  const logoColor =
-    mobileMenuOpen || window.innerWidth < 1024
-      ? "black"
-      : isHomePage || isScrolled
-        ? "white"
-        : "black";
 
   return (
     <div className="sticky top-0 z-30 w-full bg-transparent">

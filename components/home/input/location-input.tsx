@@ -324,7 +324,7 @@ export default function LocationInput({ formik }: { formik: any }) {
 
   return (
     <>
-      <div className="h-13 flex basis-[40%] items-center gap-1 rounded-md bg-[#F3F3F3] bg-white text-black md:rounded-none md:border md:border-neutral-400 md:bg-white">
+      <div className="h-13 flex basis-[40%] items-center gap-1 rounded-md bg-[#F3F3F3] text-black md:rounded-none md:border md:border-neutral-400 md:bg-white">
         <div className="flex h-full items-end p-2 pb-2.5 pr-1">
           <MapPinIcon
             className="size-[14px]"

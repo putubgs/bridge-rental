@@ -154,8 +154,11 @@ export default function CarSearchForm() {
           type="submit"
           variant="contained"
           className="basis-[12%] rounded-md bg-[#8BD6D6] py-2 md:rounded-none md:bg-[#BAF0E2] md:py-0"
+          sx={{
+            borderRadius: { xs: "0.375rem", md: "0" },
+          }}
         >
-          <div className="flex items-center gap-1 font-overpass font-bold md:hover:bg-primary/90 h-[39px]">
+          <div className="flex h-[39px] items-center gap-1 font-overpass font-bold md:hover:bg-primary/90">
             <SearchIcon className="hidden size-[18px] shrink-0 md:block" />
             <span className="translate-y-[1px] text-[12px] text-white md:text-[14px] md:text-black">
               Search

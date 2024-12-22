@@ -28,7 +28,7 @@ export default function ReservationPage() {
   }, [selectedType, showMoreThanFiveSeats, carModels]);
 
   return (
-    <main className="space-y-12 md:p-20 p-2">
+    <main className="space-y-6 py-2 md:space-y-12 md:p-20">
       <HeroSection />
       <FilterSection
         vehiclesData={carModels}
@@ -38,7 +38,9 @@ export default function ReservationPage() {
         setShowMoreThanFiveSeats={setShowMoreThanFiveSeats}
       />
       <CarCardsSection filteredCars={filteredCars} />
-      <InfoSection />
+      <div className="md:px-0 px-2">
+        <InfoSection />
+      </div>
     </main>
   );
 }

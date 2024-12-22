@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function HeroSection() {
   return (
     <section className="flex flex-col md:gap-12 gap-3 pt-1 md:pt-0">
-      <h1 className="text-[20px] text-black md:hidden block">Choose your vehicle</h1>
+      <h1 className="text-[20px] text-black md:hidden block md:px-0 px-2">Choose your vehicle</h1>
       <div className="relative h-[40vw] max-h-[600px] min-h-[100px] w-full">
         <Image
           src="/assets/img/reservation-page-banner.png"

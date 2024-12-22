@@ -19,7 +19,7 @@ export default function FilterSection({
 }: FilterSectionProps) {
   return (
     <>
-      <div className="flex items-center md:border md:border-[#D9D9D9] md:bg-white">
+      <div className="flex items-center md:border md:border-[#D9D9D9] md:bg-white md:px-0 px-2">
         <div
           className="bg-white md:basis-1/4 basis-2/4 border md:border md:border-transparent border border-[#D9D9D9] md:rounded-none rounded-lg"
         >

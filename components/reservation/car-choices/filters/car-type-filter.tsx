@@ -18,7 +18,7 @@ export default function CarTypeFilter({
   );
 
   return (
-    <div className="flex items-center gap-5 px-5 py-5 md:border-r md:border-[#D9D9D9]">
+    <div className="flex items-center gap-5 px-5 md:py-5 py-2 md:border-r md:border-[#D9D9D9]">
       <div className="flex-shrink-0">
         <SteeringWheelIcon className="h-6 w-6 md:h-10 md:w-10" />
       </div>
@@ -39,7 +39,7 @@ export default function CarTypeFilter({
               "& .MuiInputBase-input": {
                 padding: "1px 0",
                 fontWeight: 500,
-                fontSize: { xs: "14px", md: "14px" },
+                fontSize: { xs: "10px", md: "14px" },
               },
               "& .MuiInput-underline:before": { borderBottom: "none" },
               "& .MuiInput-underline:hover:not(.Mui-disabled):before": {

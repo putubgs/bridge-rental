@@ -77,7 +77,7 @@ export default function HeroSection() {
               src={heroImageUrl}
               alt="Banner Image"
               fill
-              className="-z-10 md:object-cover"
+              className={`-z-10 md:object-cover ${language === "ar" ? "scale-x-[-1]" : ""}`}
               sizes="(max-width: 768px) 90vw, 100vw"
               priority
             />

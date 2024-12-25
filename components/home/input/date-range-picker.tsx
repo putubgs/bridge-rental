@@ -3,6 +3,7 @@ import DateTimePicker from "./date-time-picker";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import useLanguageStore  from "@/store/useLanguageStore";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -10,6 +11,7 @@ dayjs.extend(timezone);
 const JORDAN_TIMEZONE = "Asia/Amman";
 
 export default function DateRangePicker({ formik }: { formik: any }) {
+  const { language } = useLanguageStore();
   const {
     deliveryDate,
     setDeliveryDate,
@@ -23,21 +25,21 @@ export default function DateRangePicker({ formik }: { formik: any }) {
 
   const isSameReturnDay = formik?.values["return_date"]?.isSame(
     formik?.values["delivery_date"],
-    "day"
-  );
-  
-  const isSameDay = formik?.values["delivery_date"]?.isSame(
-    dayjs().tz(JORDAN_TIMEZONE),
-    "day"
+    "day",
   );
 
-  const initialDeliveryTime = formik?.values["delivery_time"] || 
-    deliveryTime || 
+  const isSameDay = formik?.values["delivery_date"]?.isSame(
+    dayjs().tz(JORDAN_TIMEZONE),
+    "day",
+  );
+
+  const initialDeliveryTime =
+    formik?.values["delivery_time"] ||
+    deliveryTime ||
     dayjs().tz(JORDAN_TIMEZONE);
-    
-  const initialReturnTime = formik?.values["return_time"] || 
-    returnTime || 
-    dayjs().tz(JORDAN_TIMEZONE);
+
+  const initialReturnTime =
+    formik?.values["return_time"] || returnTime || dayjs().tz(JORDAN_TIMEZONE);
 
   const handleDeliveryDateTimeChange = (date: any, time: any) => {
     // Create a complete delivery datetime
@@ -71,8 +73,8 @@ export default function DateRangePicker({ formik }: { formik: any }) {
 
     // Ensure return time is at least 1 hour after delivery
     const minReturnTime = formik.values["delivery_date"].add(1, "hour");
-    const finalReturnDateTime = returnDateTime.isBefore(minReturnTime) 
-      ? minReturnTime 
+    const finalReturnDateTime = returnDateTime.isBefore(minReturnTime)
+      ? minReturnTime
       : returnDateTime;
 
     // Update return date and time in store and formik
@@ -85,7 +87,7 @@ export default function DateRangePicker({ formik }: { formik: any }) {
   return (
     <>
       <DateTimePicker
-        dateLabel="DELIVERY DATE"
+        dateLabel={language === "ar" ? "تاريخ التوصيل" : "DELIVERY DATE"}
         value={formik?.values["delivery_date"] || deliveryDate}
         onDateChange={(date) => {
           const time = formik.values["delivery_time"] || initialDeliveryTime;
@@ -94,14 +96,15 @@ export default function DateRangePicker({ formik }: { formik: any }) {
         minTime={isSameDay ? dayjs().tz(JORDAN_TIMEZONE) : undefined}
         onTimeChange={(time) => {
           if (time) {
-            const date = formik.values["delivery_date"] || dayjs().tz(JORDAN_TIMEZONE);
+            const date =
+              formik.values["delivery_date"] || dayjs().tz(JORDAN_TIMEZONE);
             handleDeliveryDateTimeChange(date, time);
           }
         }}
         timeValue={initialDeliveryTime}
       />
       <DateTimePicker
-        dateLabel="PICK-UP DATE"
+        dateLabel={language === "ar" ? "تاريخ الاستلام" : "PICK-UP DATE"}
         minDate={formik?.values["delivery_date"] ?? dayjs().tz(JORDAN_TIMEZONE)}
         minTime={
           isSameReturnDay
@@ -115,7 +118,9 @@ export default function DateRangePicker({ formik }: { formik: any }) {
         }}
         onTimeChange={(time) => {
           if (time) {
-            const date = formik.values["return_date"] || formik.values["delivery_date"].add(24, "hour");
+            const date =
+              formik.values["return_date"] ||
+              formik.values["delivery_date"].add(24, "hour");
             handleReturnDateTimeChange(date, time);
           }
         }}

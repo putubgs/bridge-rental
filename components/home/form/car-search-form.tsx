@@ -20,6 +20,7 @@ import {
   useRentDetailsStore,
 } from "@/store/reservation-store";
 import Toggle from "@/components/shared/toggle/toggle";
+import useLanguageStore from "@/store/useLanguageStore";
 
 const carSearchSchema = yup.object({
   delivery_location: yup.string().required("Delivery location is required"),
@@ -31,6 +32,8 @@ const carSearchSchema = yup.object({
 
 export default function CarSearchForm() {
   const router = useRouter();
+  const { language } = useLanguageStore();
+  const isArabic = language === "ar";
   const { setSearchCompleted } = useCarSearchStore();
   const {
     deliveryLocation,
@@ -131,6 +134,7 @@ export default function CarSearchForm() {
     <form
       onSubmit={formik.handleSubmit}
       className="mt-5 space-y-4 md:space-y-3"
+      dir={isArabic ? "rtl" : "ltr"}
     >
       <div className="flex h-max flex-col gap-4 bg-neutral-100 bg-opacity-20 p-[6px] md:flex-row md:justify-between md:gap-2">
         <LocationInput formik={formik} />
@@ -146,7 +150,7 @@ export default function CarSearchForm() {
             }
           />
           <span className="whitespace-nowrap pt-1 text-[10px] text-[#868686] md:text-sm">
-            PICK-UP TO SAME LOCATION
+            {isArabic ? "نفس موقع الاستلام" : "PICK-UP TO SAME LOCATION"}
           </span>
         </div>
         <DateRangePicker formik={formik} />
@@ -161,7 +165,7 @@ export default function CarSearchForm() {
           <div className="flex h-[39px] items-center gap-1 font-overpass font-bold md:hover:bg-primary/90">
             <SearchIcon className="hidden size-[18px] shrink-0 md:block" />
             <span className="translate-y-[1px] text-[12px] text-white md:text-[14px] md:text-black">
-              Search
+              {isArabic ? "بحث" : "Search"}
             </span>
           </div>
         </Button>
@@ -180,18 +184,23 @@ export default function CarSearchForm() {
             }
           />
           <span className="whitespace-nowrap pt-1 text-sm">
-            PICK-UP TO SAME LOCATION
+            {isArabic ? "نفس موقع الاستلام" : "PICK-UP TO SAME LOCATION"}
           </span>
         </div>
         <div className="text-start text-[8px] text-black md:text-end md:text-[11px] md:text-white">
           <p>
-            *KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO
-            THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE
-            CONTACT OUR <span className="text-primary">CUSTOMER SERVICE</span>{" "}
-            TEAM
+            {isArabic
+              ? "*يرجى التأكد من إجراء الحجز قبل موعد تسليم السيارة بساعتين على الأقل. للحجوزات الفورية، يرجى الاتصال بفريق "
+              : "*KINDLY ENSURE THAT YOUR BOOKING IS MADE AT LEAST 2 HOURS PRIOR TO THE SCHEDULED VEHICLE DELIVERY. FOR IMMEDIATE BOOKINGS, PLEASE CONTACT OUR "}
+            <span className="text-primary">
+              {isArabic ? "خدمة العملاء" : "CUSTOMER SERVICE"}
+            </span>
+            {!isArabic && " TEAM"}
           </p>
           <p className="pt-2 md:pt-0">
-            *BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)
+            {isArabic
+              ? "*يتم احتساب الحجوزات على أساس يومي (24 ساعة)"
+              : "*BOOKINGS ARE COUNTED ON A PER-DAY BASIS (24 HOURS)"}
           </p>
         </div>
       </div>

@@ -94,13 +94,12 @@ export default function ReservationLayout({
 
   return (
     <div className="-top-25 relative flex flex-col bg-[#F9F9F9] md:-top-20 md:max-w-[1920px] md:pt-32">
-      
       {pathname !== "/reservation/car-choices" && (
         <div className="w-full p-6 md:px-20">
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-12">
             {/* Rental Details Section */}
             <div
-              className="flex w-full flex-col gap-4 bg-white p-3"
+              className="flex w-full flex-col gap-4 bg-white p-3 md:col-span-4"
               // On mobile this takes the full row as the first card
               style={{ flexBasis: "40%" }}
             >
@@ -139,7 +138,7 @@ export default function ReservationLayout({
             </div>
 
             {/* Second row on mobile: Vehicle & Protection & Extras */}
-            <div className="grid grid-cols-2 gap-2 md:col-span-2">
+            <div className="grid grid-cols-2 gap-2 md:col-span-6">
               {/* Vehicle Section */}
               {pathname !== "/reservation/car-bundle" || totalBundlePrice ? (
                 <div
@@ -250,7 +249,7 @@ export default function ReservationLayout({
             {/* Review & Reserve Section (hidden on mobile) */}
             {pathname === "/reservation/review" ? (
               <div
-                className="flex hidden w-full flex-col justify-between gap-4 border-2 border-[#BAF0E2] bg-white p-3 md:block"
+                className="flex hidden w-full flex-col justify-between gap-4 border-2 border-[#BAF0E2] bg-white p-3 md:col-span-2 md:flex"
                 style={{ flexBasis: "25%" }}
               >
                 <div className="flex items-center gap-2">
@@ -273,7 +272,7 @@ export default function ReservationLayout({
               </div>
             ) : (
               <div
-                className="flex hidden w-full flex-col justify-between gap-4 bg-white p-3 md:block"
+                className="flex hidden w-full flex-col justify-between gap-4 bg-white p-3 md:col-span-2 md:flex"
                 style={{ flexBasis: "17.5%" }}
               >
                 <div className="flex items-center gap-2">

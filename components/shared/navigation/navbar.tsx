@@ -13,7 +13,7 @@ export default function Navbar() {
 
   // Correctly destructured useState with explicit type
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  
+
   // useState for windowWidth with proper typing
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
 
@@ -97,23 +97,37 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? (
-              <span className="block text-2xl text-black">&times;</span>
-            ) : (
-              <>
-                <span className="block h-[2px] w-6 bg-black"></span>
-                <span className="block h-[2px] w-6 bg-black"></span>
-                <span className="block h-[2px] w-6 bg-black"></span>
-              </>
-            )}
+            <div className="relative h-5 w-6">
+              <span
+                className={`absolute left-0 h-[2px] w-6 bg-black transition-all duration-300 ${
+                  mobileMenuOpen
+                    ? "top-1/2 -translate-y-1/2 rotate-45"
+                    : "top-[2px]"
+                }`}
+              ></span>
+              <span
+                className={`absolute left-0 top-1/2 h-[2px] w-6 -translate-y-1/2 bg-black transition-all duration-300 ${
+                  mobileMenuOpen ? "opacity-0" : "opacity-100"
+                }`}
+              ></span>
+              <span
+                className={`absolute left-0 h-[2px] w-6 bg-black transition-all duration-300 ${
+                  mobileMenuOpen
+                    ? "top-1/2 -translate-y-1/2 -rotate-45"
+                    : "bottom-[2px]"
+                }`}
+              ></span>
+            </div>
           </button>
         </nav>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div
-            className={`mt-8 flex flex-col gap-4 font-medium uppercase text-black md:hidden`}
-          >
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            mobileMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="mt-8 flex flex-col gap-4 font-medium uppercase text-black md:hidden">
             <Link
               href="/contact"
               className={`block ${
@@ -133,7 +147,7 @@ export default function Navbar() {
               Help
             </Link>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

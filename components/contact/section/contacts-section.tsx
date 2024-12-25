@@ -7,7 +7,7 @@ export default function ContactsSection() {
     <section>
       <h2 className="text-2xl font-semibold">Get in touch with us</h2>
 
-      <div className="mt-2 grid grid-cols-3 gap-3 border-y-2 border-neutral-200/80 py-12">
+      <div className="mt-2 grid grid-cols-1 gap-3 border-y-2 border-neutral-200/80 py-12 md:grid-cols-3">
         <ContactCard
           title="Telephone Bookings"
           description="Prefer to make a booking over the phone? No problem! Call us, and we'll get everything arranged for you."

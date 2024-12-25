@@ -58,35 +58,46 @@ export default function ProtectionsSection({
   const sortedProtections = [...protections].sort((a, b) => a.price - b.price);
 
   return (
-    <section>
-      <h2 className="mb-2 text-2xl font-semibold">Choose your protection</h2>
+    <section className="px-4 sm:px-0">
+      <h2 className="mb-4 text-xl font-semibold sm:text-2xl">
+        Choose your protection
+      </h2>
       <hr />
-      <div className="my-5 grid grid-cols-3 gap-4">
+      <div className="my-6 flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
         {sortedProtections.map(
           ({ id, image_url, offer_name, description, price }) => (
             <div
               key={id}
-              className="flex flex-col justify-between gap-5 border-2 bg-[#F9F9F9] p-5"
+              className="flex flex-col justify-between rounded-2xl border bg-white p-5 shadow-sm sm:rounded-none"
             >
               {/* Protection Information */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="relative aspect-square w-16">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative aspect-square w-14">
                     <Image
                       src={image_url || "/default-protection.png"}
                       alt="Protection Icon"
                       fill
                       sizes="(max-width: 768px) 100vw, 90vw"
+                      className="object-contain"
                     />
                   </div>
-                  <h3 className="text-2xl font-semibold">{offer_name}</h3>
+                  <h3 className="text-lg font-semibold sm:text-xl">
+                    {offer_name}
+                  </h3>
                 </div>
 
                 {/* Display Description as Bullet Points with Check Icons */}
-                <ul className="space-y-1 pl-5">
+                <ul className="space-y-3">
                   {parseDescription(description).map((line, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm">
-                      <CheckIcon className="shrink-0 text-primary" size={16} />
+                    <li
+                      key={index}
+                      className="flex items-start gap-3 text-sm text-neutral-800"
+                    >
+                      <CheckIcon
+                        className="mt-0.5 shrink-0 text-[#A5E5D9]"
+                        size={16}
+                      />
                       <span>{line}</span>
                     </li>
                   ))}
@@ -94,13 +105,13 @@ export default function ProtectionsSection({
               </div>
 
               {/* Action Buttons */}
-              <div className="mt-5 flex w-full items-end justify-between gap-5">
+              <div className="mt-6 flex w-full items-center justify-between">
                 <button
                   onClick={() => handleSelectProtection(offer_name, price)}
-                  className={`rounded px-4 py-2 font-medium transition-all duration-150 ${
+                  className={`rounded-lg md:rounded-none px-4 py-2 text-sm font-medium transition-all duration-150 ${
                     selected_protection === offer_name
-                      ? "bg-primary-variant-2 text-white hover:bg-primary-variant-3"
-                      : "bg-[#DCDCDC] text-[#7F7F7F] hover:bg-neutral-300"
+                      ? "bg-[#A5E5D9] text-black"
+                      : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
                   }`}
                 >
                   {selected_protection === offer_name ? "SELECTED" : "SELECT"}
@@ -113,7 +124,7 @@ export default function ProtectionsSection({
           ),
         )}
       </div>
-      <div className="mb-5 bg-[#F9F9F9] px-5 py-3 text-sm">
+      <div className="mb-6 rounded-lg bg-neutral-100 p-4 text-sm text-neutral-600">
         Take advantage and take out Supremely Relax Cover to be 100% protected.
         Without it you will have to leave a deposit as a vehicle guarantee.
       </div>

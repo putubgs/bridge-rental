@@ -30,28 +30,31 @@ export default function ProtectionAndExtras() {
   useEffect(() => {
     const fetchAdditionalOffers = async () => {
       try {
-        const { data, error } = await supabase.from("AdditionalOffers").select("*");
-  
+        const { data, error } = await supabase
+          .from("AdditionalOffers")
+          .select("*");
+
         if (error) throw error;
-  
+
         // Filter data based on the available status
         const protectionsData = data.filter(
-          (item: AdditionalOffer) => item.type === "Protection" && item.availability
+          (item: AdditionalOffer) =>
+            item.type === "Protection" && item.availability,
         );
         const extrasData = data.filter(
           (item: AdditionalOffer) =>
             item.type === "Extras" &&
             item.availability &&
             item.image_url !== null &&
-            item.description !== null
+            item.description !== null,
         );
         const childrenExtrasData = data.filter(
           (item: AdditionalOffer) =>
             item.type === "Extras" &&
             item.availability &&
-            (item.image_url === null || item.description === null)
+            (item.image_url === null || item.description === null),
         );
-  
+
         setProtections(protectionsData);
         useRentDetailsStore.getState().setExtras(extrasData);
         useRentDetailsStore.getState().setChildrenExtras(childrenExtrasData);
@@ -61,10 +64,10 @@ export default function ProtectionAndExtras() {
         setLoading(false);
       }
     };
-  
+
     fetchAdditionalOffers();
   }, []);
-  
+
   const handleBack = () => router.push("/reservation/car-bundle");
   const handleContinue = () => router.push("/reservation/review");
 
@@ -74,21 +77,21 @@ export default function ProtectionAndExtras() {
 
   return (
     <main>
-      <div className="mt-10 space-y-10 bg-white px-20 py-7">
+      <div className="mt-10 space-y-10 bg-white px-4 py-7 md:px-20">
         <ProtectionsSection protections={protections} />
         <ExtrasSection />
       </div>
-      <section className="flex justify-center gap-6 bg-primary-variant-1 py-11">
+      <section className="flex flex-col justify-center gap-4 md:bg-primary-variant-1 bg-white p-6 sm:flex-row sm:gap-6 sm:py-11">
         <button
           onClick={handleBack}
-          className="flex items-center gap-1 text-neutral-400"
+          className="md:flex hidden w-full items-center justify-center gap-1 text-neutral-400 sm:w-auto"
         >
           <ChevronLeftIcon className="-translate-y-[2px] fill-neutral-300 stroke-none" />
           <span>Back to car bundle</span>
         </button>
         <button
           onClick={handleContinue}
-          className="rounded bg-primary-variant-2 px-7 py-2 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3"
+          className="w-full rounded bg-primary-variant-2 px-7 py-2 font-medium !text-white transition-all duration-150 hover:bg-primary-variant-3 sm:w-auto"
         >
           Continue
         </button>

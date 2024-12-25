@@ -136,7 +136,7 @@ export default function PaymentForm({
               </Stack>
             </div>
           </div>
-          <div className="mt-5 flex md:flex-col justify-between gap-4 sm:flex-row sm:gap-7">
+          <div className="mt-5 flex justify-between gap-4 sm:flex-row sm:gap-7">
             <Stack spacing={1} className="flex-1">
               <div className="flex gap-2 items-center">
                 <Checkbox

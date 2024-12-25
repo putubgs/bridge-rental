@@ -1,13 +1,15 @@
 import CarTypeFilter from "../filters/car-type-filter";
 import FiveSeatsFilter from "../filters/five-seats-filter";
 import { ICarModel } from "@/lib/types";
+import useLanguageStore from "@/store/useLanguageStore";
 
 interface FilterSectionProps {
   vehiclesData: ICarModel[];
   selectedType: string | null;
   setSelectedType: (type: string | null) => void;
   showMoreThanFiveSeats: boolean;
-  setShowMoreThanFiveSeats: (state: boolean) => void;
+  setShowMoreThanFiveSeats: (value: boolean) => void;
+  translations: Record<string, string>;
 }
 
 export default function FilterSection({
@@ -16,22 +18,28 @@ export default function FilterSection({
   setSelectedType,
   showMoreThanFiveSeats,
   setShowMoreThanFiveSeats,
+  translations,
 }: FilterSectionProps) {
+  const { language } = useLanguageStore();
+  const isRTL = language === "ar";
+
   return (
     <>
-      <div className="flex items-center md:border md:border-[#D9D9D9] md:bg-white md:px-0 px-2">
-        <div
-          className="bg-white md:basis-1/4 basis-2/4 border md:border md:border-transparent border border-[#D9D9D9] md:rounded-none rounded-lg"
-        >
+      <div
+        className="flex items-center px-2 md:border md:border-[#D9D9D9] md:bg-white md:px-0"
+        style={{ direction: isRTL ? "rtl" : "ltr" }}
+      >
+            <div
+              className={`basis-2/4 bg-white md:basis-1/4 rounded-lg border-[#D9D9D9] md:rounded-none`}
+            >
           <CarTypeFilter
             vehiclesData={vehiclesData}
             selectedType={selectedType}
             setSelectedType={setSelectedType}
+            translations={translations}
           />
         </div>
-        <div
-          className="bg-transparent md:bg-white md:basis-3/4 basis-2/4"
-        >
+        <div className="basis-2/4 bg-transparent md:basis-3/4 md:bg-white">
           <FiveSeatsFilter
             showMoreThanFiveSeats={showMoreThanFiveSeats}
             setShowMoreThanFiveSeats={setShowMoreThanFiveSeats}

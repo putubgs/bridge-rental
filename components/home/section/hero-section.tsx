@@ -69,7 +69,9 @@ export default function HeroSection() {
         </Head>
       )}
       <section
-        className={`relative z-0 w-full px-0 pb-5 pt-10 text-white md:h-screen md:max-h-[850px] md:px-20 md:pb-16 ${language === "ar" ? "rtl" : "ltr"}`}
+        className={`relative z-0 w-full px-0 pb-5 pt-10 text-white transition-all duration-500 md:h-screen md:max-h-[850px] md:px-20 md:pb-16 ${
+          language === "ar" ? "rtl" : "ltr"
+        }`}
       >
         <div className="hidden md:block">
           {heroImageUrl && (
@@ -77,14 +79,20 @@ export default function HeroSection() {
               src={heroImageUrl}
               alt="Banner Image"
               fill
-              className={`-z-10 md:object-cover ${language === "ar" ? "scale-x-[-1]" : ""}`}
+              className={`-z-10 md:object-cover ${
+                language === "ar" ? "scale-x-[-1]" : ""
+              }`}
               sizes="(max-width: 768px) 90vw, 100vw"
               priority
             />
           )}
         </div>
         <h2
-          className={`my-[15px] flex px-4 text-[20px] font-semibold text-[#494949] md:hidden w-full ${language === "ar" ? "text-end justify-end" : "text-start justify-start"}`}
+          className={`my-[15px] flex w-full px-4 text-[20px] font-semibold text-[#494949] transition-all duration-500 md:hidden ${
+            language === "ar"
+              ? "justify-end text-end"
+              : "justify-start text-start"
+          }`}
         >
           {content.mobileTitle}
         </h2>
@@ -96,12 +104,17 @@ export default function HeroSection() {
               width={100}
               height={100}
               sizes="(max-width: 768px) 90vw, 100vw"
-              className="w-full"
+              className="w-full transition-transform duration-500"
+              style={{
+                transform: language === "ar" ? "scaleX(-1)" : "scaleX(1)",
+              }}
             />
           )}
         </div>
         <div
-          className={`mx-auto flex h-full w-full max-w-screen-2xl flex-col justify-end gap-6 ${language === "ar" ? "items-end text-right" : "items-start text-left"}`}
+          className={`mx-auto flex h-full w-full max-w-screen-2xl flex-col justify-end gap-6 transition-all duration-500 ${
+            language === "ar" ? "items-end text-right" : "items-start text-left"
+          }`}
         >
           <h2 className="hidden whitespace-pre-line px-4 font-poppins text-[64px] font-semibold leading-none md:flex md:px-0">
             {content.title}

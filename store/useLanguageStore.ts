@@ -1,11 +1,9 @@
 import { create } from "zustand";
 
-type Language = "en" | "ar";
-
-interface LanguageStore {
-  language: Language;
-  setLanguage: (language: Language) => void;
-}
+type LanguageStore = {
+  language: "en" | "ar";
+  setLanguage: (language: "en" | "ar") => void;
+};
 
 const useLanguageStore = create<LanguageStore>((set) => ({
   language: "en",

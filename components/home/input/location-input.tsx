@@ -252,7 +252,14 @@ export default function LocationInput({ formik }: { formik: any }) {
   const handleOpenModal = (field: "delivery" | "return") => {
     setActiveField(field);
     setModalOpen(true);
-    setModalInputValue("");
+    // Initialize modal input value with current selection
+    const currentValue =
+      field === "delivery" ? deliveryInputValue : returnInputValue;
+    setModalInputValue(currentValue);
+    // Fetch options for current value if it exists
+    if (currentValue) {
+      fetchOptions(currentValue, field);
+    }
     console.log(
       `${field.charAt(0).toUpperCase() + field.slice(1)} Autocomplete clicked on mobile`,
     );
@@ -263,6 +270,9 @@ export default function LocationInput({ formik }: { formik: any }) {
     setModalOpen(false);
     setActiveField(null);
     setModalInputValue("");
+    // Clear modal options when closing
+    setModalDeliveryOptions([]);
+    setModalReturnOptions([]);
     console.log("Shared Dropdown closed");
   };
 
@@ -270,18 +280,14 @@ export default function LocationInput({ formik }: { formik: any }) {
   const handleSelectOption = (option: PlaceOption) => {
     if (activeField === "delivery") {
       handleDeliveryLocationChange(null, option);
-      console.log(
-        "Selected delivery location from shared dropdown:",
-        option.description,
-      );
     } else {
       handleReturnLocationChange(null, option);
-      console.log(
-        "Selected return location from shared dropdown:",
-        option.description,
-      );
     }
-    // Removed the handleCloseModal() to keep the modal open after selection
+    // Don't clear options after selection to maintain the list
+    console.log(
+      `Selected ${activeField} location from shared dropdown:`,
+      option.description,
+    );
   };
 
   // Optional: Retain getSortedOptions() if you have another view that requires sorted options
@@ -422,7 +428,7 @@ export default function LocationInput({ formik }: { formik: any }) {
 
         {!formik?.values["same_return_location"] && (
           <div className="flex w-full flex-col border-l border-neutral-300 p-2 pb-0 pl-2">
-          <span className="text-[8px] text-neutral-400 md:text-[10px]">
+            <span className="text-[8px] text-neutral-400 md:text-[10px]">
               CAR PICK-UP LOCATION
             </span>
             <Autocomplete
@@ -533,6 +539,16 @@ export default function LocationInput({ formik }: { formik: any }) {
               const value = e.target.value;
               setModalInputValue(value);
               console.log("Shared Dropdown input changed to:", value);
+
+              if (value.trim() === "") {
+                // Clear options if input is empty
+                if (activeField === "delivery") {
+                  setModalDeliveryOptions([]);
+                } else {
+                  setModalReturnOptions([]);
+                }
+                return;
+              }
 
               // Fetch options based on active field
               if (activeField === "delivery") {

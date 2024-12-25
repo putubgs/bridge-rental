@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
 import Image from "next/image";
+import useLanguageStore from "@/store/useLanguageStore";
 
 interface IContactCard {
   title: string;
@@ -12,8 +13,15 @@ export default function ContactCard({
   description,
   onButtonClick,
 }: IContactCard) {
+  const { language } = useLanguageStore();
+  const isArabic = language === "ar";
+
   return (
-    <div className="flex flex-col justify-between gap-3 rounded border-2 border-neutral-200/80 p-5">
+    <div
+      className={`flex flex-col justify-between gap-3 rounded border-2 border-neutral-200/80 p-5 ${
+        isArabic ? "items-end text-right" : ""
+      }`}
+    >
       <div className="w-fit rounded-sm bg-primary-variant-1 p-2">
         <div className="relative size-7">
           <Image
@@ -32,7 +40,7 @@ export default function ContactCard({
         size="small"
         className="w-fit rounded border !bg-neutral-300 px-4 capitalize text-neutral-500"
       >
-        Call us
+        {isArabic ? "اتصل بنا" : "Call us"}
       </Button>
     </div>
   );

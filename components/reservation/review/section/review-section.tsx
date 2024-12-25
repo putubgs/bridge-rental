@@ -81,13 +81,23 @@ export default function ReviewSection() {
       <h2 className="mb-2 text-2xl font-semibold">
         Review and proceed to booking
       </h2>
-      {/* Added the total rental days display here */}
       <hr />
-      <div className="mt-5 flex gap-3">
-        <div className="flex basis-3/4 divide-x-2 border-2">
-          <div className="basis-2/3 p-5">
-            <h3 className="text-xl font-medium">Vehicle</h3>
-            <div className="relative aspect-video w-1/2">
+      <div className="mt-5 flex flex-col md:gap-3 lg:flex-row">
+        <div className="flex basis-3/4 flex-col gap-3 rounded-lg md:gap-0 md:divide-y-2 md:border-2 md:shadow-sm lg:flex-row lg:divide-x-2 lg:divide-y-0">
+          <div className="flex flex-col order-2 basis-2/3 rounded-t-lg border p-5 md:order-1 md:border-none items-center md:items-start">
+            <h3 className="mb-4 text-center md:text-2xl text-[20px] font-semibold lg:text-left lg:text-xl lg:font-medium">
+              Vehicle
+            </h3>
+            <div className="flex items-center gap-2 md:hidden">
+              <div className="z-10 flex w-fit items-center rounded-md bg-[#BAF0E233] px-2 py-1">
+                <p className="text-[#535353] text-[10px]">{car.car_type}</p>
+              </div>
+              <p className="text-[13px]">
+                {car.car_model}
+                <span className="text-neutral-400"> or similar</span>
+              </p>
+            </div>
+            <div className="relative aspect-video w-full sm:w-full lg:w-1/2">
               <Image
                 src={car.car_image}
                 alt={car.car_model}
@@ -97,50 +107,54 @@ export default function ReviewSection() {
               />
             </div>
             <div className="z-10 space-y-5 px-3">
-              <div className="flex flex-col gap-2">
-                <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
-                  <p className="pt-1 text-[#535353]">{car.car_type}</p>
+              <div className="hidden flex-col gap-2 md:flex">
+                <div className="z-10 flex w-fit items-center rounded-md bg-[#BAF0E233] px-2 py-1">
+                  <p className="text-[#535353]">{car.car_type}</p>
                 </div>
                 <p className="text-[18px]">
                   {car.car_model}
                   <span className="text-neutral-400"> or similar</span>
                 </p>
               </div>
-              <div className="flex w-3/4 gap-7 pb-2 pt-3">
+              <div className="flex w-full justify-center md:gap-8 gap-6 pb-2 pt-3 md:justify-start items-center">
                 <div className="relative flex h-fit w-fit items-end text-[12px]">
-                  <CarDoorIcon size={23} />
+                  <CarDoorIcon desktopSize={23} mobileSize={16} />
                   <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
                     x{car.doors}
                   </div>
                 </div>
                 <div className="relative flex h-fit w-fit items-end text-[12px]">
-                  <CarSeatIcon size={23} />
+                  <CarSeatIcon desktopSize={23} mobileSize={16} />
                   <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
                     x{car.passengers}
                   </div>
                 </div>
                 <div className="relative flex h-fit w-fit items-end text-[12px]">
-                  <CarLuggageIcon size={23} />
+                  <CarLuggageIcon desktopSize={23} mobileSize={16} />
                   <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
                     x{car.luggage}
                   </div>
                 </div>
-                <AirConditionerIcon size={23} />
-                <div className="ml-1 flex items-center gap-2 pr-[30px]">
-                  <div className="flex h-[23px] w-[23px] items-center justify-center border border-black pt-1 text-center font-bold">
+                <AirConditionerIcon desktopSize={23} mobileSize={16} />
+                <div className="md:ml-1 flex items-center gap-2 md:pr-[30px]">
+                  <div className="flex md:h-[23px] md:w-[23px] h-[16px] w-[16px] items-center justify-center border border-black pt-1 text-center font-bold md:text-[16px] text-[10px]">
                     A
                   </div>
-                  <p className="pt-1">Automatic</p>
+                  <p className="pt-1 md:text-[16px] text-[10px]">Automatic</p>
                 </div>
               </div>
-              <p className="text-xs text-neutral-400">VAT included</p>
+              <p className="text-center text-xs text-neutral-400 lg:text-left md:block hidden">
+                VAT included
+              </p>
             </div>
           </div>
-          <div className="basis-1/3 space-y-5 p-5">
-            <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
+          <div className="order-1 basis-1/3 space-y-5 rounded-lg border p-5 md:order-2 md:rounded-none">
+            <h3 className="mb-4 text-center md:text-2xl text-[20px] font-semibold lg:text-left lg:text-xl lg:font-medium">
+              Delivery & Pick-up
+            </h3>
             <div>
-              <p className="mb-1 text-xs text-neutral-400">DELIVERY :</p>
-              <ul className="ml-4 list-disc text-sm marker:text-primary">
+              <p className="mb-1 text-[11px] md:text-[12px] text-neutral-400">DELIVERY :</p>
+              <ul className="ml-4 list-disc text-[12px] md:text-[14px] marker:text-primary">
                 <li>
                   {deliveryDate?.format("dddd, MMM DD, YYYY") || "Date not set"}
                 </li>
@@ -149,8 +163,8 @@ export default function ReviewSection() {
               </ul>
             </div>
             <div>
-              <p className="mb-1 text-xs text-neutral-400">PICK-UP :</p>
-              <ul className="ml-4 list-disc text-sm marker:text-primary">
+              <p className="mb-1 text-[11px] md:text-[12px] text-neutral-400">PICK-UP :</p>
+              <ul className="ml-4 list-disc text-[12px] md:text-[14px] marker:text-primary">
                 <li>
                   {returnDate?.format("dddd, MMM DD, YYYY") || "Date not set"}
                 </li>
@@ -159,36 +173,42 @@ export default function ReviewSection() {
               </ul>
             </div>
             <div>
-              <p className="mb-1 text-xs text-neutral-400">
+              <p className="mb-1 text-[11px] md:text-[12px] text-neutral-400">
                 TOTAL DAYS OF RENTAL :
               </p>
-              <ul className="ml-4 list-disc text-sm marker:text-primary">
+              <ul className="ml-4 list-disc text-[12px] md:text-[14px] marker:text-primary">
                 <li>{totalDays} Days</li>
               </ul>
             </div>
           </div>
         </div>
-        <div className="basis-1/4 border-2 p-5 text-end text-sm">
-          <h4 className="text-xl font-medium">
+        <div className="flex basis-full flex-row items-center justify-between border px-6 py-5 shadow-sm md:flex-col md:items-end md:justify-normal md:rounded-lg md:border-2 md:p-5 lg:basis-1/4">
+          <h4 className="order-2 text-center text-[12px] font-semibold md:order-1 md:text-2xl lg:text-end lg:text-xl">
             {formatPrice(totalBundlePrice)} JOD
           </h4>
-          <div className="pb-4 pt-7">
-            <p>
+          <div className="order-1 text-center md:order-2 md:pb-4 md:pt-7 lg:text-end">
+            <p className="text-[12px] font-medium md:text-[16px]">
               {selected_bundle?.split("_").join(" ") || "No bundle selected"}
             </p>
-            <p>{car.car_model}</p>
+            <p className="hidden md:block">{car.car_model}</p>
           </div>
-          <p>*VAT included</p>
+          <p className="hidden text-center text-sm md:order-3 md:block lg:text-end">
+            *VAT included
+          </p>
         </div>
       </div>
 
-      <div className="my-4 border-2 p-5">
-        <div className="flex items-center justify-between gap-5 text-xl font-medium">
-          <h3>Protection & Extras</h3>
-          <p>{formatPrice(totalProtectionPrice + totalExtrasPrice)} JOD</p>
+      <div className="border-b-0 border-l border-r border-t p-5 shadow-sm md:my-4 md:rounded-lg md:border-2">
+        <div className="flex items-center justify-between gap-2 text-[12px] sm:flex-row sm:items-center sm:gap-5 md:text-xl">
+          <h3 className="text-[12px] font-semibold md:text-2xl lg:text-xl">
+            Protection & Extras
+          </h3>
+          <p className="font-semibold">
+            {formatPrice(totalProtectionPrice + totalExtrasPrice)} JOD
+          </p>
         </div>
 
-        <div className="mt-5 space-y-3">
+        <div className="mt-5 space-y-3 text-[12px] md:text-[16px]">
           <div className="flex items-center justify-between gap-5">
             <p>
               {selected_protection || "No protection selected"} ({totalDays} Day
@@ -228,9 +248,13 @@ export default function ReviewSection() {
         </div>
       </div>
 
-      <div className="my-4 flex items-center justify-between gap-5 bg-primary-variant-1 p-5 text-xl font-medium">
-        <h3>Total</h3>
-        <p>{formatPrice(calculateTotalPrice())} JOD</p>
+      <div className="mb-2 rounded-b-lg border-b border-l border-r border-t-0 md:border-0 bg-primary-variant-1 p-5 md:my-4 md:rounded-lg">
+        <div className="flex flex-row items-center justify-between gap-2 sm:items-center sm:gap-5">
+          <h3 className="text-[12px] font-semibold md:text-2xl">Total</h3>
+          <p className="text-[12px] font-semibold md:text-2xl">
+            {formatPrice(calculateTotalPrice())} JOD
+          </p>
+        </div>
       </div>
       <hr />
     </section>

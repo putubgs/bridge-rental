@@ -49,15 +49,17 @@ export default function PaymentForm({
   };
 
   return (
-    <div className="bg-primary-variant-1 p-5">
+    <div className="rounded-lg bg-primary-variant-1 p-3 sm:p-5 md:rounded-none">
       <div>
-        <h2 className="text-xl font-semibold">Complete your booking</h2>
-        <p className="text-neutral-400">
+        <h2 className="text-[16px] font-semibold md:text-xl">
+          Complete your booking
+        </h2>
+        <p className="text-[12px] text-neutral-400 md:text-[14px]">
           You can pay your booking now or pay later upon collection of the
           vehicle
         </p>
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-10">
+      <div className="mt-5 flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-10">
         <div>
           <div className="space-y-2">
             <Stack spacing={1}>
@@ -65,6 +67,11 @@ export default function PaymentForm({
                 size="medium"
                 placeholder="Card number"
                 className="w-full bg-white"
+                sx={{
+                  "& .MuiInputBase-input": {
+                    fontSize: { xs: "12px", md: "16px" },
+                  },
+                }}
                 required
                 value={formik.values ? formik.values["cardNumber"] : ""}
                 onChange={handleCardNumberChange}
@@ -90,6 +97,9 @@ export default function PaymentForm({
                       InputProps: {
                         sx: {
                           backgroundColor: "white",
+                          "& .MuiInputBase-input": {
+                            fontSize: { xs: "12px", md: "16px" },
+                          },
                         },
                         endAdornment: null,
                       },
@@ -108,6 +118,11 @@ export default function PaymentForm({
                   size="medium"
                   placeholder="CVV"
                   className="w-full bg-white"
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      fontSize: { xs: "12px", md: "16px" },
+                    },
+                  }}
                   required
                   value={formik.values ? formik.values["cvv"] : ""}
                   onChange={handleCVVChange}
@@ -121,9 +136,9 @@ export default function PaymentForm({
               </Stack>
             </div>
           </div>
-          <div className="mt-5 flex justify-between gap-7">
-            <Stack spacing={1}>
-              <div className="flex gap-2">
+          <div className="mt-5 flex md:flex-col justify-between gap-4 sm:flex-row sm:gap-7">
+            <Stack spacing={1} className="flex-1">
+              <div className="flex gap-2 items-center">
                 <Checkbox
                   checked={formik.values ? formik.values["agreement"] : false}
                   onChange={(e) =>
@@ -132,19 +147,24 @@ export default function PaymentForm({
                   id="agreement"
                   className="!h-fit !border-2 !bg-white !p-0"
                 />
-                <label htmlFor="agreement" className="text-xs text-neutral-400">
+                <label htmlFor="agreement" className="md:text-xs text-[8px] text-neutral-400">
                   I acknowledge that I have read, understood and agree to Bridge
                   Rent-A-Car Terms and Conditions and Privacy Policy
                 </label>
               </div>
               {formik.errors["agreement"] && (
-                <Typography className="text-red-700" fontSize={"12px"}>
+                <Typography 
+                  className="text-red-700" 
+                  sx={{
+                    fontSize: { xs: "8px", md: "12px" }
+                  }}
+                >
                   {formik.errors["agreement"]}
                 </Typography>
               )}
             </Stack>
-            <div className="flex gap-1">
-              <div className="relative h-[38px] w-[59px]">
+            <div className="flex justify-center gap-1 sm:justify-end">
+              <div className="relative h-[28.5px] w-[44.25px]">
                 <Image
                   src={"/assets/img/visa-logo.png"}
                   alt="Visa Logo"
@@ -152,7 +172,7 @@ export default function PaymentForm({
                   sizes="(max-width: 768px) 100vw, 90vw"
                 />
               </div>
-              <div className="relative h-[38px] w-[59px]">
+              <div className="relative h-[28.5px] w-[44.25px]">
                 <Image
                   src={"/assets/img/mastercard-logo.png"}
                   alt="Visa Logo"
@@ -163,8 +183,8 @@ export default function PaymentForm({
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
-          <div className="relative flex w-1/2 flex-col justify-between h-full border-2 border-primary bg-white px-6 pb-5 pt-14">
+        <div className="flex flex-col gap-3 sm:flex-row lg:flex-row md:pt-0 pt-5">
+          <div className="relative flex w-full flex-col justify-between border-2 border-primary bg-white px-4 pb-5 pt-14 sm:w-1/2 sm:px-6">
             <div>
               <div className="absolute right-0 top-0 bg-[#FF8181] px-4 py-[1px] text-sm text-white">
                 -5%
@@ -186,7 +206,7 @@ export default function PaymentForm({
               </button>
             </div>
           </div>
-          <div className="relative w-1/2 border-2 bg-white px-6 pb-5 pt-14">
+          <div className="relative w-full border-2 bg-white px-4 pb-5 pt-14 sm:w-1/2 sm:px-6">
             <h3 className="font-semibold">Pay on Delivery</h3>
             <p className="pt-1 text-justify text-sm">
               Book now and pay by card upon vehicle collection. Cash payments

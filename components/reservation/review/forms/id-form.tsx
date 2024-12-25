@@ -10,18 +10,25 @@ export default function IdForm({ formik }: { formik: any }) {
   return (
     <div className="space-y-5 bg-[#F9F9F9] p-5">
       <div>
-        <h2 className="text-xl font-semibold">Main driver details</h2>
-        <p className="text-neutral-400">
+        <h2 className="text-[16px] text-base font-semibold md:text-xl">
+          Main driver details
+        </h2>
+        <p className="text-[12px] text-neutral-400 sm:text-base md:text-[14px]">
           Fill in the same name and surname that appears on your ID or Passport
         </p>
       </div>
-      <form className="grid grid-cols-3 gap-2">
-        <div className="col-span-2 grid grid-cols-2 gap-2">
+      <form className="grid grid-cols-1 gap-2 md:grid-cols-3">
+        <div className="col-span-1 grid grid-cols-1 gap-2 sm:grid-cols-2 md:col-span-2">
           <Stack spacing={1}>
             <TextField
               size="medium"
               placeholder="First name*"
               className="w-full bg-white"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: { xs: "12px", md: "16px" },
+                },
+              }}
               required
               value={formik.values["firstName"] ?? ""}
               onChange={(event) =>
@@ -40,6 +47,11 @@ export default function IdForm({ formik }: { formik: any }) {
               size="medium"
               placeholder="Last name*"
               className="w-full bg-white"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: { xs: "12px", md: "16px" },
+                },
+              }}
               required
               value={formik.values["lastName"] ?? ""}
               onChange={(event) =>
@@ -58,6 +70,11 @@ export default function IdForm({ formik }: { formik: any }) {
               size="medium"
               placeholder="Email address*"
               className="w-full bg-white"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: { xs: "12px", md: "16px" },
+                },
+              }}
               required
               value={formik.values["email"] ?? ""}
               onChange={(event) =>
@@ -76,6 +93,11 @@ export default function IdForm({ formik }: { formik: any }) {
               size="medium"
               placeholder="Confirm email address*"
               className="w-full bg-white"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: { xs: "12px", md: "16px" },
+                },
+              }}
               required
               value={formik.values["confirmEmail"] ?? ""}
               onChange={(event) =>
@@ -102,6 +124,9 @@ export default function IdForm({ formik }: { formik: any }) {
                     readOnly: true,
                     sx: {
                       backgroundColor: "white",
+                      "& .MuiInputBase-input": {
+                        fontSize: { xs: "12px", md: "16px" },
+                      },
                     },
                   },
                   error: Boolean(formik.errors["dateOfBirth"]),
@@ -120,6 +145,11 @@ export default function IdForm({ formik }: { formik: any }) {
               size="medium"
               placeholder="Phone number*"
               className="w-full bg-white"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: { xs: "12px", md: "16px" },
+                },
+              }}
               required
               value={formik.values["phoneNumber"] ?? ""}
               onChange={(event) =>
@@ -135,7 +165,7 @@ export default function IdForm({ formik }: { formik: any }) {
           </Stack>
         </div>
 
-        <Stack spacing={1}>
+        <Stack spacing={1} className="mt-4 h-[200px] md:mt-0 md:h-auto">
           <FileUpload
             onFileSelect={(base64) =>
               formik.setFieldValue("idDocument", base64)
@@ -143,15 +173,20 @@ export default function IdForm({ formik }: { formik: any }) {
             isFieldError={Boolean(formik.errors["idDocument"])}
           />
           {displayMainIdDocError && formik.errors["idDocument"] && (
-            <div className="">
-              <Typography className="text-red-700" fontSize={"12px"}>
+            <div>
+              <Typography
+                className="text-red-700"
+                sx={{
+                  fontSize: { xs: "12px", md: "16px" },
+                }}
+              >
                 {formik.errors["idDocument"]}
               </Typography>
             </div>
           )}
         </Stack>
         {!displayMainIdDocError && formik.errors["idDocument"] && (
-          <div className="col-start-3">
+          <div className="col-span-1 md:col-start-3">
             <Typography className="text-red-700" fontSize={"12px"}>
               {formik.errors["idDocument"]}
             </Typography>

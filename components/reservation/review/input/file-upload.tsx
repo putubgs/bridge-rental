@@ -111,8 +111,10 @@ export default function FileUpload({
           height={64}
           className="mb-4"
         />
-        <p className="mb-2 text-[#ACACAC]">Passport/ID Card</p>
-        <div className="text-sm text-[#BBBBBB]">
+        <p className="mb-2 text-xs text-[#ACACAC] sm:text-base">
+          Passport/ID Card
+        </p>
+        <div className="text-xs text-[#BBBBBB] sm:text-sm">
           {file ? (
             file.name
           ) : (
@@ -122,7 +124,9 @@ export default function FileUpload({
             </p>
           )}
         </div>
-        {error && <p className="mt-2 text-red-500">{error}</p>}
+        {error && (
+          <p className="mt-2 text-xs text-red-500 sm:text-base">{error}</p>
+        )}
       </div>
     </div>
   );

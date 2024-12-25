@@ -5,7 +5,7 @@ import ReviewSection from "@/components/reservation/review/section/review-sectio
 
 export default function Review() {
   return (
-    <main className="mt-10 bg-white px-20 py-10">
+    <main className="mt-10 bg-white px-4 py-6 sm:px-8 sm:py-10 md:px-20">
       <ReviewSection />
       <PaySection />
     </main>

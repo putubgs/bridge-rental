@@ -5,8 +5,15 @@ import { countDays } from "@/utils/utils";
 import { MenuItem, Select } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
+import { AdditionalOffer } from "@/app/(client)/reservation/protection-and-extras/page";
+import useLanguageStore from "@/store/useLanguageStore";
 
-export default function ExtrasSection() {
+interface ExtrasSectionProps {
+  extras: AdditionalOffer[];
+}
+
+export default function ExtrasSection({ extras }: ExtrasSectionProps) {
+  const { language } = useLanguageStore();
   const {
     selected_extras,
     selected_children_extras,
@@ -20,7 +27,6 @@ export default function ExtrasSection() {
     returnTime,
     childrenSeatsQuantity,
     setChildrenSeatsQuantity,
-    extras,
     childrenExtras,
   } = useRentDetailsStore();
 
@@ -38,17 +44,30 @@ export default function ExtrasSection() {
   const handleSelectExtra = (extra: string, price: number) => {
     if (typeof price !== "number" || isNaN(price)) return;
 
-    const isExtraSelected = selected_extras.includes(extra as any);
+    // Find the original English name if we're in Arabic mode
+    let originalName = extra;
+    if (language === "ar") {
+      const originalExtra = extras.find(
+        (e) => e.offer_name === extra || e.id === extra,
+      );
+      if (originalExtra) {
+        originalName = originalExtra.offer_name;
+      }
+    }
+
+    const isExtraSelected = selected_extras.includes(originalName as any);
     const calculatedPrice = calculatePrice(price);
 
     if (isExtraSelected) {
-      const updatedExtras = selected_extras.filter((item) => item !== extra);
+      const updatedExtras = selected_extras.filter(
+        (item) => item !== originalName,
+      );
       setSelectedExtras(updatedExtras);
       setTotalExtrasPrice(
         Math.max(0, (totalExtrasPrice || 0) - calculatedPrice),
       );
     } else {
-      const updatedExtras = [...selected_extras, extra];
+      const updatedExtras = [...selected_extras, originalName];
       setSelectedExtras(updatedExtras as any);
       setTotalExtrasPrice((totalExtrasPrice || 0) + calculatedPrice);
     }
@@ -61,30 +80,43 @@ export default function ExtrasSection() {
   const handleSelectChildrenExtra = (extra: string, price: number) => {
     if (typeof price !== "number" || isNaN(price)) return;
 
-    const quantity = tempQuantities[extra] || 1;
-    const isExtraSelected = selected_children_extras.includes(extra as any);
+    // Find the original English name if we're in Arabic mode
+    let originalName = extra;
+    if (language === "ar") {
+      const originalExtra = childrenExtras.find(
+        (e) => e.offer_name === extra || e.id === extra,
+      );
+      if (originalExtra) {
+        originalName = originalExtra.offer_name;
+      }
+    }
+
+    const quantity = tempQuantities[originalName] || 1;
+    const isExtraSelected = selected_children_extras.includes(
+      originalName as any,
+    );
     const calculatedPrice = calculatePrice(price, quantity);
 
     if (isExtraSelected) {
       const updatedChildrenExtras = selected_children_extras.filter(
-        (item) => item !== extra,
+        (item) => item !== originalName,
       );
       setSelectedChildrenExtras(updatedChildrenExtras);
       setTotalExtrasPrice(
         Math.max(0, (totalExtrasPrice || 0) - calculatedPrice),
       );
-      setTempQuantities((prev) => ({ ...prev, [extra]: 1 }));
+      setTempQuantities((prev) => ({ ...prev, [originalName]: 1 }));
       setChildrenSeatsQuantity({
         ...childrenSeatsQuantity,
-        [extra]: 1,
+        [originalName]: 1,
       });
     } else {
-      const updatedChildrenExtras = [...selected_children_extras, extra];
+      const updatedChildrenExtras = [...selected_children_extras, originalName];
       setSelectedChildrenExtras(updatedChildrenExtras as any);
       setTotalExtrasPrice((totalExtrasPrice || 0) + calculatedPrice);
       setChildrenSeatsQuantity({
         ...childrenSeatsQuantity,
-        [extra]: quantity,
+        [originalName]: quantity,
       });
     }
   };
@@ -120,7 +152,7 @@ export default function ExtrasSection() {
   return (
     <section>
       <h2 className="mb-2 text-xl font-semibold sm:text-2xl">
-        Available Extras
+        {language === "ar" ? "الإضافات المتاحة" : "Available Extras"}
       </h2>
 
       <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -158,7 +190,13 @@ export default function ExtrasSection() {
                       : "bg-[#DCDCDC] text-[#7F7F7F] hover:bg-neutral-300"
                   }`}
                 >
-                  {isAdded ? "ADDED" : "ADD"}
+                  {isAdded
+                    ? language === "ar"
+                      ? "تمت الإضافة"
+                      : "ADDED"
+                    : language === "ar"
+                      ? "إضافة"
+                      : "ADD"}
                 </button>
                 <p className="text-end text-xs font-medium sm:text-sm">
                   {price === 0
@@ -183,11 +221,12 @@ export default function ExtrasSection() {
           </div>
           <div className="space-y-1 sm:space-y-2">
             <h3 className="text-base font-semibold sm:text-xl">
-              Travel Safety
+              {language === "ar" ? "سلامة السفر" : "Travel Safety"}
             </h3>
             <p className="text-xs text-neutral-400 sm:text-sm">
-              Select up to 3 baby seats. Baby seats are fitted with a hygienic
-              disposable cover.
+              {language === "ar"
+                ? "اختر حتى 3 مقاعد للأطفال. مقاعد الأطفال مزودة بغطاء صحي يمكن التخلص منه."
+                : "Select up to 3 baby seats. Baby seats are fitted with a hygienic disposable cover."}
             </p>
           </div>
         </div>
@@ -250,7 +289,13 @@ export default function ExtrasSection() {
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200 sm:bg-[#DCDCDC] sm:text-[#7F7F7F] sm:hover:bg-neutral-300"
                     }`}
                   >
-                    {isAdded ? "ADDED" : "ADD"}
+                    {isAdded
+                      ? language === "ar"
+                        ? "تمت الإضافة"
+                        : "ADDED"
+                      : language === "ar"
+                        ? "إضافة"
+                        : "ADD"}
                   </button>
                 </div>
               </div>

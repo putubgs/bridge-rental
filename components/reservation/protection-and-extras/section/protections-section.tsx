@@ -4,6 +4,8 @@ import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import { CheckIcon } from "lucide-react";
 import Image from "next/image";
+import useLanguageStore from "@/store/useLanguageStore";
+import { useMemo, useEffect } from "react";
 
 interface ProtectionsSectionProps {
   protections: AdditionalOffer[];
@@ -32,7 +34,32 @@ export default function ProtectionsSection({
     returnTime,
   } = useRentDetailsStore();
 
+  const { language } = useLanguageStore();
+
+  useEffect(() => {
+    const freeProtection = protections.find((p) => p.price === 0);
+    const defaultProtection = freeProtection || protections[0];
+
+    if (defaultProtection && !selected_protection) {
+      handleSelectProtection(
+        defaultProtection.offer_name,
+        defaultProtection.price,
+      );
+    }
+  }, [protections]);
+
   const handleSelectProtection = (protectionName: string, price: number) => {
+    // Find the original English name if we're in Arabic mode
+    let originalName = protectionName;
+    if (language === "ar") {
+      const originalProtection = protections.find(
+        (p) => p.offer_name === protectionName || p.id === protectionName,
+      );
+      if (originalProtection) {
+        originalName = originalProtection.offer_name;
+      }
+    }
+
     const totalDays = countDays(
       deliveryDate,
       deliveryTime,
@@ -42,7 +69,7 @@ export default function ProtectionsSection({
 
     const totalPrice = totalDays * price;
 
-    setSelectedProtection(protectionName as any);
+    setSelectedProtection(originalName as any);
     setTotalProtectionPrice(totalPrice);
   };
 
@@ -54,13 +81,20 @@ export default function ProtectionsSection({
       .filter((line) => line !== "");
   };
 
-  // Sort protections by price in ascending order
-  const sortedProtections = [...protections].sort((a, b) => a.price - b.price);
+  // Sort protections based on language
+  const isArabic = language.toLowerCase().startsWith("ar");
+
+  const sortedProtections = useMemo(() => {
+    const protectionsCopy = [...protections].sort((a, b) => a.price - b.price);
+    return protectionsCopy;
+  }, [protections, isArabic]);
 
   return (
     <section className="px-4 sm:px-0">
       <h2 className="mb-4 text-xl font-semibold sm:text-2xl">
-        Choose your protection
+        {language === "ar"
+          ? "اختر الحماية الخاصة بك"
+          : "Choose your protection"}
       </h2>
       <hr />
       <div className="my-6 flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
@@ -108,16 +142,29 @@ export default function ProtectionsSection({
               <div className="mt-6 flex w-full items-center justify-between">
                 <button
                   onClick={() => handleSelectProtection(offer_name, price)}
-                  className={`rounded-lg md:rounded-none px-4 py-2 text-sm font-medium transition-all duration-150 ${
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 md:rounded-md ${
                     selected_protection === offer_name
-                      ? "bg-[#A5E5D9] text-black"
-                      : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
+                      ? "bg-[#A5E5D9] text-white"
+                      : price === 0
+                        ? "cursor-not-allowed bg-[#A5E5D9] text-white"
+                        : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
                   }`}
+                  disabled={price === 0}
                 >
-                  {selected_protection === offer_name ? "SELECTED" : "SELECT"}
+                  {selected_protection === offer_name || price === 0
+                    ? language === "ar"
+                      ? "تم الاختيار"
+                      : "SELECTED"
+                    : language === "ar"
+                      ? "اختيار"
+                      : "SELECT"}
                 </button>
                 <p className="text-end text-sm font-medium">
-                  {price === 0 ? "FREE" : `${price.toFixed(2)} JOD/DAY`}
+                  {price === 0
+                    ? language === "ar"
+                      ? "مجاناً"
+                      : "FREE"
+                    : `${price.toFixed(2)} JOD/DAY`}
                 </p>
               </div>
             </div>
@@ -125,8 +172,9 @@ export default function ProtectionsSection({
         )}
       </div>
       <div className="mb-6 rounded-lg bg-neutral-100 p-4 text-sm text-neutral-600">
-        Take advantage and take out Supremely Relax Cover to be 100% protected.
-        Without it you will have to leave a deposit as a vehicle guarantee.
+        {language === "ar"
+          ? "استفد من الأمر واحصل على تغطية الحماية القصوى لتكون محمياً بنسبة 100%. بدونها سيتعين عليك ترك وديعة كضمان للمركبة."
+          : "Take advantage and take out Supremely Relax Cover to be 100% protected. Without it you will have to leave a deposit as a vehicle guarantee."}
       </div>
       <hr />
     </section>

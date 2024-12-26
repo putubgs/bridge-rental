@@ -10,6 +10,7 @@ import { useRentDetailsStore } from "@/store/reservation-store";
 import { useCarStore } from "@/store/car-store";
 import { PaymentMethod, usePayStore } from "@/store/pay-store";
 import { useEffect } from "react";
+import useLanguageStore from "@/store/useLanguageStore";
 
 const InvoiceDownloadComponent = () => {
   const {
@@ -42,6 +43,17 @@ const InvoiceDownloadComponent = () => {
     returnDate,
     returnTime,
   );
+
+  const { language } = useLanguageStore();
+  const isRTL = language === "ar";
+  const containerStyle = {
+    direction: isRTL ? "rtl" : "ltr",
+    textAlign: isRTL ? "right" : "left",
+  };
+
+  // Calculate total price
+  const totalPrice = totalBundlePrice + totalProtectionPrice + totalExtrasPrice;
+  const discountedPrice = totalPrice * 0.95; // 5% discount for pay now
 
   if (!car) {
     return <p>Car not found</p>;
@@ -182,59 +194,73 @@ const InvoiceDownloadComponent = () => {
   return (
     <div>
       <button onClick={generatePDF} className="text-primary-variant-3">
-        click here
+        {isRTL ? "اضغط هنا" : "click here"}
       </button>
 
-      {/* Hidden invoice content */}
       <div style={{ display: "none" }}>
-        <section className="p-5" id="invoice">
+        <section className="p-5" id="invoice" style={containerStyle}>
           <div className="flex flex-col gap-5">
-            <header className="flex w-full items-center justify-between gap-5">
-              <div>
+            <header
+              className={`flex w-full items-center justify-between gap-5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+            >
+              <div className="relative w-[200px]">
                 <img
                   src="/assets/img/brand-logo-black.png"
                   alt="logo"
-                  width={200}
-                  height={120}
+                  className="h-auto w-full object-contain"
                 />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">Invoice</h1>
-                {/* TODO: change invoice number and date */}
-                <p>Invoice Number: INV-123456</p>
-                <p>Invoice Date: 2024-12-07</p>
+              <div className={isRTL ? "text-right" : "text-left"}>
+                <h1 className="text-2xl font-bold">
+                  {isRTL ? "فاتورة" : "Invoice"}
+                </h1>
+                <p>{isRTL ? "رقم الفاتورة" : "Invoice Number"}: INV-123456</p>
+                <p>
+                  {isRTL ? "تاريخ الفاتورة" : "Invoice Date"}:{" "}
+                  {deliveryDate?.format("DD-MM-YYYY")}
+                </p>
               </div>
             </header>
 
             <hr />
             {/* Customer Details */}
             <div className="mt-28 pt-3">
-              <h2 className="mb-2 text-2xl font-semibold">CUSTOMER DESIGN</h2>
+              <h2 className="mb-2 text-2xl font-semibold">
+                {isRTL ? "تفاصيل العميل" : "CUSTOMER DETAILS"}
+              </h2>
               <p className="text-xl">
-                Customer Name:{" "}
+                {isRTL ? "اسم العميل" : "Customer Name"}:{" "}
                 {`${paymentData.firstName} ${paymentData.lastName}`}
               </p>
-              <p className="text-xl">Email: {paymentData.email}</p>
-              <p className="text-xl">Phone: {paymentData.phoneNumber}</p>
+              <p className="text-xl">
+                {isRTL ? "البريد الإلكتروني" : "Email"}: {paymentData.email}
+              </p>
+              <p className="text-xl">
+                {isRTL ? "الهاتف" : "Phone"}: {paymentData.phoneNumber}
+              </p>
             </div>
 
             {/* Rental Details */}
-            <h2 className="mb-2 mt-5 text-2xl font-semibold">RENTAL DESIGN</h2>
-            <div className="flex w-full gap-3">
-              <div className="flex w-3/4 divide-x-2 border-2">
+            <h2 className="mb-2 mt-5 text-2xl font-semibold">
+              {isRTL ? "تفاصيل التأجير" : "RENTAL DETAILS"}
+            </h2>
+            <div className="flex w-full gap-3 bg-white">
+              <div className="flex w-3/4 divide-x-2 border-2 bg-white">
                 <div className="basis-2/3 p-5">
-                  <h3 className="text-xl font-medium">Vehicle</h3>
-                  <div className="relative aspect-video w-1/2">
+                  <h3 className="text-xl font-medium">
+                    {isRTL ? "المركبة" : "Vehicle"}
+                  </h3>
+                  <div
+                    className={`relative aspect-[272/98] w-[70%] scale-50`}
+                  >
                     <img
                       src={car.car_image}
-                      alt={"car_image"}
-                      className="absolute object-contain"
+                      alt="car_image"
+                      className="absolute h-full w-full object-contain"
                       style={{
-                        transform: "scaleX(-1)",
+                        transform: isRTL ? "scaleX(1)" : "scaleX(-1)",
                         objectFit: "contain",
                         objectPosition: "center",
-                        width: "100%",
-                        height: "100%",
                       }}
                     />
                   </div>
@@ -245,10 +271,12 @@ const InvoiceDownloadComponent = () => {
                       </div>
                       <p className="text-[18px]">
                         {car.car_model}
-                        <span className="text-neutral-400"> or similar</span>
+                        <span className="text-neutral-400">
+                          {isRTL ? " أو ما شابه" : " or similar"}
+                        </span>
                       </p>
                     </div>
-                    <div className="flex w-fit gap-5 pb-2 pt-3">
+                    <div className={`flow-row flex w-fit gap-5 pb-2 pt-3`}>
                       <div className="relative flex h-fit w-fit items-end text-[12px]">
                         <CarDoorIcon size={23} />
                         <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
@@ -268,7 +296,9 @@ const InvoiceDownloadComponent = () => {
                         </div>
                       </div>
                       <AirConditionerIcon size={23} />
-                      <div className="ml-1 flex items-center gap-2 pr-[30px]">
+                      <div
+                        className={`ml-1 flex items-center gap-2 ${isRTL ? "pl-[30px]" : "pr-[30px]"}`}
+                      >
                         <div className="flex h-[23px] w-[23px] items-center justify-center border border-black pt-1 text-center font-bold">
                           A
                         </div>
@@ -278,26 +308,72 @@ const InvoiceDownloadComponent = () => {
                   </div>
                 </div>
                 <div className="basis-1/3 space-y-5 p-5">
-                  <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
+                  <h3 className="text-xl font-medium">
+                    {isRTL ? "التوصيل والاستلام" : "Delivery & Pick-up"}
+                  </h3>
                   <div>
-                    <p className="mb-1 text-xs text-neutral-400">DELIVERY :</p>
-                    <ul className="ml-4 list-disc text-sm marker:text-primary">
-                      <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
-                      <li>{deliveryTime?.format("hh:mm A")}</li>
-                      <li>{deliveryLocation}</li>
-                    </ul>
+                    <p className="mb-1 text-xs text-neutral-400">
+                      {isRTL ? "التوصيل" : "DELIVERY"}:
+                    </p>
+                    <div style={{ direction: isRTL ? "rtl" : "ltr" }}>
+                      <ul
+                        className="text-sm"
+                        style={{
+                          listStyle: "disc",
+                          marginRight: isRTL ? "20px" : "0",
+                          marginLeft: isRTL ? "0" : "20px",
+                        }}
+                      >
+                        <li style={{ display: "flex", gap: "8px" }}>
+                          <span style={{ color: "#6B7280" }}>•</span>
+                          <span>
+                            {deliveryDate?.format("dddd, MMM DD, YYYY")}
+                          </span>
+                        </li>
+                        <li style={{ display: "flex", gap: "8px" }}>
+                          <span style={{ color: "#6B7280" }}>•</span>
+                          <span>{deliveryTime?.format("hh:mm A")}</span>
+                        </li>
+                        <li style={{ display: "flex", gap: "8px" }}>
+                          <span style={{ color: "#6B7280" }}>•</span>
+                          <span>{deliveryLocation}</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                   <div>
-                    <p className="mb-1 text-xs text-neutral-400">PICK-UP :</p>
-                    <ul className="ml-4 list-disc text-sm marker:text-primary">
-                      <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
-                      <li>{returnTime?.format("hh:mm A")}</li>
-                      <li>{returnLocation}</li>
-                    </ul>
+                    <p className="mb-1 text-xs text-neutral-400">
+                      {isRTL ? "الاستلام" : "PICK-UP"}:
+                    </p>
+                    <div style={{ direction: isRTL ? "rtl" : "ltr" }}>
+                      <ul
+                        className="text-sm"
+                        style={{
+                          listStyle: "disc",
+                          marginRight: isRTL ? "20px" : "0",
+                          marginLeft: isRTL ? "0" : "20px",
+                        }}
+                      >
+                        <li style={{ display: "flex", gap: "8px" }}>
+                          <span style={{ color: "#6B7280" }}>•</span>
+                          <span>
+                            {returnDate?.format("dddd, MMM DD, YYYY")}
+                          </span>
+                        </li>
+                        <li style={{ display: "flex", gap: "8px" }}>
+                          <span style={{ color: "#6B7280" }}>•</span>
+                          <span>{returnTime?.format("hh:mm A")}</span>
+                        </li>
+                        <li style={{ display: "flex", gap: "8px" }}>
+                          <span style={{ color: "#6B7280" }}>•</span>
+                          <span>{returnLocation}</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-shrink-0 flex-col w-1/4 border-2 p-5 text-end text-sm">
+              <div className="flex w-1/4 flex-shrink-0 flex-col border-2 bg-white p-5 text-end text-sm">
                 <h4 className="text-xl font-medium">
                   {totalBundlePrice.toFixed(2)} JOD
                 </h4>
@@ -305,14 +381,16 @@ const InvoiceDownloadComponent = () => {
                   <p>{selected_bundle?.split("_").join(" ")}</p>
                   <p>{car.car_model}</p>
                 </div>
-                <p>*VAT included</p>
+                <p>{isRTL ? "* شامل الضريبة" : "*VAT included"}</p>
               </div>
             </div>
 
             {/* Protection & Extras */}
             <div className="my-4 border-2 p-5">
-              <div className="flex items-center justify-between gap-5 text-xl font-medium">
-                <h3>Protection & Extras</h3>
+              <div
+                className={`flex items-center justify-between gap-5 text-xl font-medium`}
+              >
+                <h3>{isRTL ? "الحماية والإضافات" : "Protection & Extras"}</h3>
                 <p>
                   {(totalProtectionPrice + totalExtrasPrice).toFixed(2)} JOD
                 </p>
@@ -369,30 +447,21 @@ const InvoiceDownloadComponent = () => {
             </div>
 
             {/* Total */}
-            <div className="my-2 flex flex-col gap-2 bg-primary-variant-1 p-5 text-xl font-medium">
-              <div className="flex w-full items-center justify-between gap-5">
-                <h3>Total</h3>
-                <p>
-                  {(
-                    totalBundlePrice +
-                    totalProtectionPrice +
-                    totalExtrasPrice
-                  ).toFixed(2)}{" "}
-                  JOD
-                </p>
+            <div className="my-2 flex flex-col gap-2 bg-primary-variant-1 p-5">
+              <div
+                className={`flex w-full items-center justify-between gap-5`}
+              >
+                <h3>{isRTL ? "المجموع" : "Total"}</h3>
+                <p>{totalPrice.toFixed(2)} JOD</p>
               </div>
               {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
-                <div className="flex w-full items-center justify-between gap-5">
-                  <h3>{"5% Discount (Pay Now)"}</h3>
-                  <p>
-                    {(
-                      (totalBundlePrice +
-                        totalProtectionPrice +
-                        totalExtrasPrice) *
-                      0.95
-                    ).toFixed(2)}{" "}
-                    JOD
-                  </p>
+                <div
+                  className={`flex w-full items-center justify-between gap-5`}
+                >
+                  <h3>
+                    {isRTL ? "خصم (الدفع الآن) ٥٪" : "5% Discount (Pay Now)"}
+                  </h3>
+                  <p>{discountedPrice.toFixed(2)} JOD</p>
                 </div>
               )}
             </div>
@@ -400,18 +469,28 @@ const InvoiceDownloadComponent = () => {
             <hr />
 
             {/* Payment Details */}
-            <h2 className="mb-2 mt-5 text-2xl font-semibold">PAYMENT DETAIL</h2>
+            <h2 className="mb-2 mt-5 text-2xl font-semibold">
+              {isRTL ? "تفاصيل الدفع" : "PAYMENT DETAIL"}
+            </h2>
             <div className="flex gap-3">
               <div className="flex w-full divide-x-2 border-2">
                 <div className="flex w-full gap-14 p-4 text-xl">
                   <div className="flex flex-col">
-                    <h3 className="text-xl font-medium">Payment Method</h3>
+                    <h3 className="text-xl font-medium">
+                      {isRTL ? "طريقة الدفع" : "Payment Method"}
+                    </h3>
                     <h3 className="mt-2 text-xl">
-                      {paymentData.paymentMethod}
+                      {isRTL
+                        ? paymentData.paymentMethod === PaymentMethod.PAYNOW
+                          ? "الدفع الآن"
+                          : "الدفع لاحقاً"
+                        : paymentData.paymentMethod}
                     </h3>
                   </div>
                   <div className="flex flex-col">
-                    <h3 className="text-xl font-medium">Total Amount</h3>
+                    <h3 className="text-xl font-medium">
+                      {isRTL ? "المبلغ الإجمالي" : "Total Amount"}
+                    </h3>
                     <h3 className="mt-2 text-xl">
                       {(
                         (totalBundlePrice +
@@ -424,29 +503,41 @@ const InvoiceDownloadComponent = () => {
                     </h3>
                   </div>
                   <div className="flex flex-col">
-                    <h3 className="text-xl font-medium">Payment Status</h3>
+                    <h3 className="text-xl font-medium">
+                      {isRTL ? "حالة الدفع" : "Payment Status"}
+                    </h3>
                     <h3 className="mt-2 text-xl">
                       {paymentData.paymentMethod == PaymentMethod.PAYNOW
-                        ? "PAID"
-                        : "UNPAID"}
+                        ? isRTL
+                          ? "مدفوع"
+                          : "PAID"
+                        : isRTL
+                          ? "غير مدفوع"
+                          : "UNPAID"}
                     </h3>
                   </div>
                   {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
                     <>
                       <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">Credit Card</h3>
+                        <h3 className="text-xl font-medium">
+                          {isRTL ? "بطاقة الائتمان" : "Credit Card"}
+                        </h3>
                         <h3 className="mt-2 text-xl">
                           {"******" + paymentData.cardNumber.slice(-6)}
                         </h3>
                       </div>
                       <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">Expiry Code</h3>
+                        <h3 className="text-xl font-medium">
+                          {isRTL ? "تاريخ الانتهاء" : "Expiry Code"}
+                        </h3>
                         <h3 className="mt-2 text-xl">
                           {paymentData.expiryDate.format("MM/YY")}
                         </h3>
                       </div>
                       <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">Prepayment</h3>
+                        <h3 className="text-xl font-medium">
+                          {isRTL ? "الدفع المسبق" : "Prepayment"}
+                        </h3>
                         <h3 className="mt-2 text-xl">
                           {(
                             (totalBundlePrice +
@@ -463,7 +554,9 @@ const InvoiceDownloadComponent = () => {
                     <>
                       <div className="flex flex-col">
                         <h3 className="text-xl font-medium">
-                          Ammount Paid Locally
+                          {isRTL
+                            ? "المبلغ المدفوع محليًا"
+                            : "Amount Paid Locally"}
                         </h3>
                         <h3 className="mt-2 text-xl">
                           {(
@@ -480,9 +573,10 @@ const InvoiceDownloadComponent = () => {
               </div>
             </div>
 
-            <p className="mt-6 text-xl">
-              For any inquiries, contact us at +962 7XXX XXXX or
-              info@bridgerentacar.com
+            <p className={`mt-6 text-xl ${isRTL ? "text-right" : "text-left"}`}>
+              {isRTL
+                ? "للاستفسارات، اتصل بنا على +962 7XXX XXXX أو info@bridgerentacar.com"
+                : "For any inquiries, contact us at +962 7XXX XXXX or info@bridgerentacar.com"}
             </p>
           </div>
         </section>

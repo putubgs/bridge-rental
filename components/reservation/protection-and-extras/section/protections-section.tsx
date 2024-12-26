@@ -5,7 +5,7 @@ import { countDays } from "@/utils/utils";
 import { CheckIcon } from "lucide-react";
 import Image from "next/image";
 import useLanguageStore from "@/store/useLanguageStore";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 interface ProtectionsSectionProps {
   protections: AdditionalOffer[];
@@ -35,6 +35,18 @@ export default function ProtectionsSection({
   } = useRentDetailsStore();
 
   const { language } = useLanguageStore();
+
+  useEffect(() => {
+    const freeProtection = protections.find((p) => p.price === 0);
+    const defaultProtection = freeProtection || protections[0];
+
+    if (defaultProtection && !selected_protection) {
+      handleSelectProtection(
+        defaultProtection.offer_name,
+        defaultProtection.price,
+      );
+    }
+  }, [protections]);
 
   const handleSelectProtection = (protectionName: string, price: number) => {
     // Find the original English name if we're in Arabic mode
@@ -74,9 +86,6 @@ export default function ProtectionsSection({
 
   const sortedProtections = useMemo(() => {
     const protectionsCopy = [...protections].sort((a, b) => a.price - b.price);
-    if (isArabic) {
-      return protectionsCopy.reverse();
-    }
     return protectionsCopy;
   }, [protections, isArabic]);
 
@@ -136,10 +145,13 @@ export default function ProtectionsSection({
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 md:rounded-md ${
                     selected_protection === offer_name
                       ? "bg-[#A5E5D9] text-white"
-                      : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
+                      : price === 0
+                        ? "cursor-not-allowed bg-[#A5E5D9] text-white"
+                        : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
                   }`}
+                  disabled={price === 0}
                 >
-                  {selected_protection === offer_name
+                  {selected_protection === offer_name || price === 0
                     ? language === "ar"
                       ? "تم الاختيار"
                       : "SELECTED"

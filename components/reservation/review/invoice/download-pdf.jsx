@@ -153,9 +153,9 @@ const InvoiceDownloadComponent = () => {
                 }
 
                 if (img.alt.includes("car_image")) {
-                  img.style.transform = "scaleX(-1) translateX(400px)";
+                  img.style.transform = "scaleX(-1) translateX(350px)";
                   container.style.aspectRatio = "272 / 98";
-                  container.style.width = "80%";
+                  container.style.width = "70%";
                   container.style.scale = "0.5";
                   img.style.width = "100%";
                   img.style.height = "100%";
@@ -220,8 +220,8 @@ const InvoiceDownloadComponent = () => {
 
             {/* Rental Details */}
             <h2 className="mb-2 mt-5 text-2xl font-semibold">RENTAL DESIGN</h2>
-            <div className="flex gap-3">
-              <div className="flex basis-3/4 divide-x-2 border-2">
+            <div className="flex w-full bg-primary-variant-1  gap-3">
+              <div className="flex w-3/4 divide-x-2 bg-[#EFEFEF] border-2">
                 <div className="basis-2/3 p-5">
                   <h3 className="text-xl font-medium">Vehicle</h3>
                   <div className="relative aspect-video w-1/2">
@@ -248,7 +248,7 @@ const InvoiceDownloadComponent = () => {
                         <span className="text-neutral-400"> or similar</span>
                       </p>
                     </div>
-                    <div className="flex w-3/4 gap-7 pb-2 pt-3">
+                    <div className="flex w-fit gap-5 pb-2 pt-3">
                       <div className="relative flex h-fit w-fit items-end text-[12px]">
                         <CarDoorIcon size={23} />
                         <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
@@ -297,7 +297,7 @@ const InvoiceDownloadComponent = () => {
                   </div>
                 </div>
               </div>
-              <div className="basis-1/4 border-2 p-5 text-end text-sm">
+              <div className="flex flex-shrink-0 flex-col w-1/4 bg-[#EFEFEF] border-2 p-5 text-end text-sm">
                 <h4 className="text-xl font-medium">
                   {totalBundlePrice.toFixed(2)} JOD
                 </h4>

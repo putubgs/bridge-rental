@@ -39,7 +39,7 @@ const rentDetailsInitialState = {
   selected_bundle: null as BundleType | null,
   totalBundlePrice: 0,
   rent_status: "",
-  selected_protection: ProtectionType.protection1,
+  selected_protection: null as ProtectionType | null,
   totalProtectionPrice: 0,
   selected_extras: [] as ExtrasType[],
   selected_children_extras: [] as ChildrenExtrasType[],

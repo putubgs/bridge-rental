@@ -220,8 +220,8 @@ const InvoiceDownloadComponent = () => {
 
             {/* Rental Details */}
             <h2 className="mb-2 mt-5 text-2xl font-semibold">RENTAL DESIGN</h2>
-            <div className="flex w-full bg-primary-variant-1  gap-3">
-              <div className="flex w-3/4 divide-x-2 bg-[#EFEFEF] border-2">
+            <div className="flex w-full gap-3">
+              <div className="flex w-3/4 divide-x-2 border-2">
                 <div className="basis-2/3 p-5">
                   <h3 className="text-xl font-medium">Vehicle</h3>
                   <div className="relative aspect-video w-1/2">
@@ -297,7 +297,7 @@ const InvoiceDownloadComponent = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-shrink-0 flex-col w-1/4 bg-[#EFEFEF] border-2 p-5 text-end text-sm">
+              <div className="flex flex-shrink-0 flex-col w-1/4 border-2 p-5 text-end text-sm">
                 <h4 className="text-xl font-medium">
                   {totalBundlePrice.toFixed(2)} JOD
                 </h4>

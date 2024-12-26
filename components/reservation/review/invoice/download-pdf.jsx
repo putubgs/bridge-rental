@@ -153,9 +153,9 @@ const InvoiceDownloadComponent = () => {
                 }
 
                 if (img.alt.includes("car_image")) {
-                  img.style.transform = "scaleX(-1) translateX(470px)";
+                  img.style.transform = "scaleX(-1) translateX(400px)";
                   container.style.aspectRatio = "272 / 98";
-                  container.style.width = "100%";
+                  container.style.width = "80%";
                   container.style.scale = "0.5";
                   img.style.width = "100%";
                   img.style.height = "100%";

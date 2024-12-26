@@ -388,7 +388,7 @@ const InvoiceDownloadComponent = () => {
             {/* Protection & Extras */}
             <div className="my-4 border-2 p-5">
               <div
-                className={`flex items-center justify-between gap-5 text-xl font-medium ${isRTL ? "flex-row-reverse" : ""}`}
+                className={`flex items-center justify-between gap-5 text-xl font-medium`}
               >
                 <h3>{isRTL ? "الحماية والإضافات" : "Protection & Extras"}</h3>
                 <p>
@@ -449,14 +449,14 @@ const InvoiceDownloadComponent = () => {
             {/* Total */}
             <div className="my-2 flex flex-col gap-2 bg-primary-variant-1 p-5">
               <div
-                className={`flex w-full items-center justify-between gap-5 ${isRTL ? "flex-row-reverse" : ""}`}
+                className={`flex w-full items-center justify-between gap-5`}
               >
                 <h3>{isRTL ? "المجموع" : "Total"}</h3>
                 <p>{totalPrice.toFixed(2)} JOD</p>
               </div>
               {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
                 <div
-                  className={`flex w-full items-center justify-between gap-5 ${isRTL ? "flex-row-reverse" : ""}`}
+                  className={`flex w-full items-center justify-between gap-5`}
                 >
                   <h3>
                     {isRTL ? "خصم (الدفع الآن) ٥٪" : "5% Discount (Pay Now)"}

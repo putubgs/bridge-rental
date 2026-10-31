@@ -180,14 +180,14 @@ export default function Navbar() {
               <div
                 className={`hidden items-center gap-10 font-medium uppercase md:flex ${textColor}`}
               >
-                <button
+                {/* <button
                   onClick={() =>
                     setLanguage(language === ("en" as Language) ? "ar" : "en")
                   }
                   className={`${textColor} hover:text-primary-variant-2`}
                 >
                   {translations[language].switchLanguage}
-                </button>
+                </button> */}
                 <Link
                   href="/contact"
                   className={`${pathName === "/contact" ? "text-primary-variant-2" : ""}`}
@@ -242,7 +242,7 @@ export default function Navbar() {
         >
           <div className="mt-8 flex flex-col gap-4 font-medium uppercase text-black md:hidden">
             {/* Language Switch Button for Mobile */}
-            <button
+            {/* <button
               onClick={() => {
                 setLanguage(language === "en" ? "ar" : "en");
                 setMobileMenuOpen(false);
@@ -250,7 +250,7 @@ export default function Navbar() {
               className={`block ${isRTL ? "text-right" : "text-left"}`}
             >
               {translations[language].switchLanguage}
-            </button>
+            </button> */}
 
             <Link
               href="/contact"

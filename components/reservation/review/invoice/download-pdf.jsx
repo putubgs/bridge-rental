@@ -53,6 +53,7 @@ const InvoiceDownloadComponent = () => {
       const imageContainers = element.querySelectorAll(".relative");
 
       imageContainers.forEach((container) => {
+        if (!container.querySelector("img")) return;
         container.dataset.originalStyle = container.style.cssText;
         container.style.position = "relative";
         container.style.overflow = "visible";
@@ -90,6 +91,7 @@ const InvoiceDownloadComponent = () => {
       const imageContainers = element.querySelectorAll(".relative");
 
       imageContainers.forEach((container) => {
+        if (!container.querySelector("img")) return;
         if (container.dataset.originalStyle) {
           container.style.cssText = container.dataset.originalStyle;
         }
@@ -125,6 +127,44 @@ const InvoiceDownloadComponent = () => {
           windowWidth: 1440,
           windowHeight: 2052,
           onclone: (clonedDoc) => {
+            const invoice = clonedDoc.getElementById("invoice");
+            const rental = clonedDoc.getElementById("invoice-rental");
+            if (invoice && rental) {
+              const declared = parseFloat(invoice.style.width) || 1440;
+              const total = declared - 40;
+              const gap = 12;
+              const right = Math.round(total * 0.25);
+              const left = total - gap - right;
+              rental.style.display = "table";
+              rental.style.width = `${total}px`;
+              rental.style.tableLayout = "fixed";
+              const [main, price] = rental.children;
+              main.style.display = "table-cell";
+              main.style.width = `${left + gap}px`;
+              main.style.paddingRight = `${gap}px`;
+              main.style.boxSizing = "border-box";
+              main.style.verticalAlign = "top";
+              price.style.display = "table-cell";
+              price.style.width = `${right}px`;
+              price.style.boxSizing = "border-box";
+              price.style.verticalAlign = "top";
+
+              const split = main.firstElementChild;
+              const cardWidth = left;
+              const vehicleWidth = Math.round(cardWidth * (2 / 3));
+              const [vehicle, delivery] = split.children;
+              split.style.display = "table";
+              split.style.width = `${cardWidth}px`;
+              split.style.tableLayout = "fixed";
+              split.style.height = "100%";
+              vehicle.style.display = "table-cell";
+              vehicle.style.width = `${vehicleWidth}px`;
+              vehicle.style.verticalAlign = "top";
+              delivery.style.display = "table-cell";
+              delivery.style.width = `${cardWidth - vehicleWidth}px`;
+              delivery.style.verticalAlign = "top";
+            }
+
             const clonedImages = clonedDoc.getElementsByTagName("img");
             Array.from(clonedImages).forEach((img) => {
               const container = img.closest(".relative");
@@ -157,6 +197,8 @@ const InvoiceDownloadComponent = () => {
                   container.style.aspectRatio = "272 / 98";
                   container.style.width = "80%";
                   container.style.scale = "0.5";
+                  container.style.minHeight = "203px";
+                  container.style.height = "203px";
                   img.style.width = "100%";
                   img.style.height = "100%";
                   img.style.objectFit = "contain";
@@ -209,7 +251,7 @@ const InvoiceDownloadComponent = () => {
             <hr />
             {/* Customer Details */}
             <div className="mt-28 pt-3">
-              <h2 className="mb-2 text-2xl font-semibold">CUSTOMER DESIGN</h2>
+              <h2 className="mb-2 text-2xl font-semibold">CUSTOMER DETAIL</h2>
               <p className="text-xl">
                 Customer Name:{" "}
                 {`${paymentData.firstName} ${paymentData.lastName}`}
@@ -219,10 +261,41 @@ const InvoiceDownloadComponent = () => {
             </div>
 
             {/* Rental Details */}
-            <h2 className="mb-2 mt-5 text-2xl font-semibold">RENTAL DESIGN</h2>
-            <div className="flex gap-3">
-              <div className="flex basis-3/4 divide-x-2 border-2">
-                <div className="basis-2/3 p-5">
+            <h2 className="mb-2 mt-5 text-2xl font-semibold">RENTAL DETAIL</h2>
+            <div
+              id="invoice-rental"
+              style={{
+                display: "table",
+                width: "100%",
+                tableLayout: "fixed",
+              }}
+            >
+              <div
+                style={{
+                  display: "table-cell",
+                  width: "75%",
+                  paddingRight: 12,
+                  verticalAlign: "top",
+                  boxSizing: "border-box",
+                }}
+              >
+                <div
+                  className="border-2"
+                  style={{
+                    display: "table",
+                    width: "100%",
+                    height: "100%",
+                    tableLayout: "fixed",
+                  }}
+                >
+                <div
+                  className="p-5"
+                  style={{
+                    display: "table-cell",
+                    width: "66.666%",
+                    verticalAlign: "top",
+                  }}
+                >
                   <h3 className="text-xl font-medium">Vehicle</h3>
                   <div className="relative aspect-video w-1/2">
                     <img
@@ -248,36 +321,45 @@ const InvoiceDownloadComponent = () => {
                         <span className="text-neutral-400"> or similar</span>
                       </p>
                     </div>
-                    <div className="flex w-3/4 gap-7 pb-2 pt-3">
-                      <div className="relative flex h-fit w-fit items-end text-[12px]">
+                    <div className="flex w-3/4 items-end pb-2 pt-3">
+                      <div className="relative mr-7 flex h-fit w-fit items-end text-[12px]">
                         <CarDoorIcon size={23} />
                         <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
                           x{car.doors}
                         </div>
                       </div>
-                      <div className="relative flex h-fit w-fit items-end text-[12px]">
+                      <div className="relative mr-7 flex h-fit w-fit items-end text-[12px]">
                         <CarSeatIcon size={23} />
                         <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
                           x{car.passengers}
                         </div>
                       </div>
-                      <div className="relative flex h-fit w-fit items-end text-[12px]">
+                      <div className="relative mr-7 flex h-fit w-fit items-end text-[12px]">
                         <CarLuggageIcon size={23} />
                         <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
                           x{car.luggage}
                         </div>
                       </div>
-                      <AirConditionerIcon size={23} />
-                      <div className="ml-1 flex items-center gap-2 pr-[30px]">
+                      <div className="mr-7">
+                        <AirConditionerIcon size={23} />
+                      </div>
+                      <div className="ml-1 flex items-center pr-[30px]">
                         <div className="flex h-[23px] w-[23px] items-center justify-center border border-black pt-1 text-center font-bold">
                           A
                         </div>
-                        <p className="pt-1">Automatic</p>
+                        <p className="ml-2 pt-1">Automatic</p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="basis-1/3 space-y-5 p-5">
+                <div
+                  className="space-y-5 border-l-2 p-5"
+                  style={{
+                    display: "table-cell",
+                    width: "33.333%",
+                    verticalAlign: "top",
+                  }}
+                >
                   <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
                   <div>
                     <p className="mb-1 text-xs text-neutral-400">DELIVERY :</p>
@@ -296,8 +378,16 @@ const InvoiceDownloadComponent = () => {
                     </ul>
                   </div>
                 </div>
+                </div>
               </div>
-              <div className="basis-1/4 border-2 p-5 text-end text-sm">
+              <div
+                style={{
+                  display: "table-cell",
+                  width: "25%",
+                  verticalAlign: "top",
+                }}
+              >
+              <div className="h-full border-2 p-5 text-end text-sm">
                 <h4 className="text-xl font-medium">
                   {totalBundlePrice.toFixed(2)} JOD
                 </h4>
@@ -306,6 +396,7 @@ const InvoiceDownloadComponent = () => {
                   <p>{car.car_model}</p>
                 </div>
                 <p>*VAT included</p>
+              </div>
               </div>
             </div>
 

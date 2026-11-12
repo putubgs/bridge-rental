@@ -5,6 +5,7 @@ import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
 import { getDeliveryFee } from "@/lib/delivery-fee";
+import { BundleType } from "@/lib/enums";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import Image from "next/image";
@@ -196,6 +197,11 @@ export default function ReviewSection() {
             {deliveryFee > 0 && (
               <p className="mt-3 inline-block bg-primary px-2 py-1 text-[12px] font-semibold md:text-[14px]">
                 Delivery fee +{formatPrice(deliveryFee)} JOD
+              </p>
+            )}
+            {selected_bundle === BundleType.bundle1 && (
+              <p className="mt-3 inline-block bg-primary px-2 py-1 text-[12px] font-semibold md:text-[14px]">
+                Zero Excess & Unlimited Mileage
               </p>
             )}
           </div>

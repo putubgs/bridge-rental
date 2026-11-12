@@ -8,6 +8,7 @@ import { getDeliveryFee } from "@/lib/delivery-fee";
 import { BundleType } from "@/lib/enums";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
+import { CheckIcon } from "lucide-react";
 import Image from "next/image";
 import { useCarStore } from "@/store/car-store";
 
@@ -23,6 +24,16 @@ interface AdditionalOffer {
 
 const formatPrice = (price: number): string => {
   return typeof price === "number" && !isNaN(price) ? price.toFixed(2) : "0.00";
+};
+
+const BUNDLE_BENEFITS: Record<BundleType, string[]> = {
+  [BundleType.bundle1]: [
+    "Zero Excess",
+    "Unlimited Mileage",
+    "Free vehicle delivery",
+  ],
+  [BundleType.bundle2]: ["With Excess", "150 KM Mileage/day"],
+  [BundleType.bundle3]: ["With Excess", "100 KM Mileage/day"],
 };
 
 export default function ReviewSection() {
@@ -52,6 +63,12 @@ export default function ReviewSection() {
   const totalDays =
     countDays(deliveryDate, deliveryTime, returnDate, returnTime) || 0;
   const deliveryFee = getDeliveryFee(selected_bundle);
+  const benefits = selected_bundle
+    ? [...(BUNDLE_BENEFITS[selected_bundle] ?? [])]
+    : [];
+  if (deliveryFee > 0) {
+    benefits.splice(1, 0, `+ ${deliveryFee} JOD Delivery`);
+  }
 
   if (!car) {
     return <p>Car not found</p>;
@@ -194,18 +211,28 @@ export default function ReviewSection() {
               {selected_bundle?.split("_").join(" ") || "No bundle selected"}
             </p>
             <p className="hidden md:block">{car.car_model}</p>
-            {deliveryFee > 0 && (
-              <p className="mt-3 inline-block bg-primary px-2 py-1 text-[12px] font-semibold md:text-[14px]">
-                Delivery fee +{formatPrice(deliveryFee)} JOD
-              </p>
-            )}
-            {selected_bundle === BundleType.bundle1 && (
-              <p className="mt-3 inline-block bg-primary px-2 py-1 text-[12px] font-semibold md:text-[14px]">
-                Zero Excess & Unlimited Mileage
-              </p>
+            {benefits.length > 0 && (
+              <div className="mt-6 inline-block text-end">
+                <p className="text-[11px] font-medium text-neutral-400 md:text-[12px]">
+                  Includes
+                </p>
+                <ul className="mt-1.5 space-y-1.5 border-primary text-[12px] font-semibold md:text-[14px]">
+                  {benefits.map((benefit) => (
+                    <li
+                      key={benefit}
+                      className="flex items-center justify-end gap-1.5"
+                    >
+                      <span>{benefit}</span>
+                      <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary">
+                        <CheckIcon className="h-3 w-3" strokeWidth={2.5} />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
-          <p className="hidden text-center text-sm md:order-3 md:block lg:text-end">
+          <p className="hidden mt-3 text-center text-sm md:order-3 md:block lg:text-end">
             *VAT included
           </p>
         </div>

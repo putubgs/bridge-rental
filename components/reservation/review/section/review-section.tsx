@@ -4,6 +4,7 @@ import AirConditionerIcon from "@/components/shared/icons/air-conditioner";
 import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
+import { getDeliveryFee } from "@/lib/delivery-fee";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { countDays } from "@/utils/utils";
 import Image from "next/image";
@@ -49,6 +50,7 @@ export default function ReviewSection() {
 
   const totalDays =
     countDays(deliveryDate, deliveryTime, returnDate, returnTime) || 0;
+  const deliveryFee = getDeliveryFee(selected_bundle);
 
   if (!car) {
     return <p>Car not found</p>;
@@ -73,7 +75,7 @@ export default function ReviewSection() {
     const bundlePrice = totalBundlePrice || 0;
     const protectionPrice = totalProtectionPrice || 0;
     const extrasPrice = totalExtrasPrice || 0;
-    return bundlePrice + protectionPrice + extrasPrice;
+    return bundlePrice + protectionPrice + extrasPrice + deliveryFee;
   };
 
   return (
@@ -191,6 +193,11 @@ export default function ReviewSection() {
               {selected_bundle?.split("_").join(" ") || "No bundle selected"}
             </p>
             <p className="hidden md:block">{car.car_model}</p>
+            {deliveryFee > 0 && (
+              <p className="mt-3 inline-block bg-primary px-2 py-1 text-[12px] font-semibold md:text-[14px]">
+                Delivery fee +{formatPrice(deliveryFee)} JOD
+              </p>
+            )}
           </div>
           <p className="hidden text-center text-sm md:order-3 md:block lg:text-end">
             *VAT included

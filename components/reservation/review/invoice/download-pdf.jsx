@@ -5,6 +5,7 @@ import AirConditionerIcon from "@/components/shared/icons/air-conditioner";
 import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
 import CarSeatIcon from "@/components/shared/icons/car-seat";
+import { getDeliveryFee } from "@/lib/delivery-fee";
 import { countDays } from "@/utils/utils";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { useCarStore } from "@/store/car-store";
@@ -42,6 +43,9 @@ const InvoiceDownloadComponent = () => {
     returnDate,
     returnTime,
   );
+  const deliveryFee = getDeliveryFee(selected_bundle);
+  const bookingTotal =
+    totalBundlePrice + totalProtectionPrice + totalExtrasPrice + deliveryFee;
 
   if (!car) {
     return <p>Car not found</p>;
@@ -165,6 +169,18 @@ const InvoiceDownloadComponent = () => {
               delivery.style.verticalAlign = "top";
             }
 
+            const specs = clonedDoc.getElementById("invoice-specs");
+            if (specs) {
+              specs.style.display = "table";
+              specs.style.width = "auto";
+              Array.from(specs.children).forEach((cell, index) => {
+                cell.style.display = "table-cell";
+                cell.style.verticalAlign = "bottom";
+                cell.style.paddingRight =
+                  index < specs.children.length - 1 ? "36px" : "0px";
+              });
+            }
+
             const clonedImages = clonedDoc.getElementsByTagName("img");
             Array.from(clonedImages).forEach((img) => {
               const container = img.closest(".relative");
@@ -205,6 +221,32 @@ const InvoiceDownloadComponent = () => {
                 }
               }
             });
+
+            const rentalRow = clonedDoc.getElementById("invoice-rental");
+            if (invoice && rentalRow) {
+              let node = invoice.parentElement;
+              while (node) {
+                if (
+                  clonedDoc.defaultView.getComputedStyle(node).display ===
+                  "none"
+                ) {
+                  node.style.display = "block";
+                }
+                node = node.parentElement;
+              }
+
+              const [mainCell, priceCell] = rentalRow.children;
+              const leftCard = mainCell && mainCell.firstElementChild;
+              if (leftCard && priceCell) {
+                const cardHeight = Math.ceil(
+                  leftCard.getBoundingClientRect().height,
+                );
+                if (cardHeight > 0) {
+                  priceCell.style.height = `${cardHeight}px`;
+                  priceCell.style.boxSizing = "border-box";
+                }
+              }
+            }
           },
         },
         jsPDF: {
@@ -288,115 +330,188 @@ const InvoiceDownloadComponent = () => {
                     tableLayout: "fixed",
                   }}
                 >
-                <div
-                  className="p-5"
-                  style={{
-                    display: "table-cell",
-                    width: "66.666%",
-                    verticalAlign: "top",
-                  }}
-                >
-                  <h3 className="text-xl font-medium">Vehicle</h3>
-                  <div className="relative aspect-video w-1/2">
-                    <img
-                      src={car.car_image}
-                      alt={"car_image"}
-                      className="absolute object-contain"
-                      style={{
-                        transform: "scaleX(-1)",
-                        objectFit: "contain",
-                        objectPosition: "center",
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    />
-                  </div>
-                  <div className="z-10 space-y-5 px-3">
-                    <div className="flex flex-col gap-2">
-                      <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
-                        <p className="pt-1 text-[#535353]">{car.car_type}</p>
+                  <div
+                    className="p-5"
+                    style={{
+                      display: "table-cell",
+                      width: "66.666%",
+                      verticalAlign: "top",
+                    }}
+                  >
+                    <h3 className="text-xl font-medium">Vehicle</h3>
+                    <div className="relative aspect-video w-1/2">
+                      <img
+                        src={car.car_image}
+                        alt={"car_image"}
+                        className="absolute object-contain"
+                        style={{
+                          transform: "scaleX(-1)",
+                          objectFit: "contain",
+                          objectPosition: "center",
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      />
+                    </div>
+                    <div className="z-10 space-y-5 px-3">
+                      <div className="flex flex-col gap-2">
+                        <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
+                          <p className="pt-1 text-[#535353]">{car.car_type}</p>
+                        </div>
+                        <p className="text-[18px]">
+                          {car.car_model}
+                          <span className="text-neutral-400"> or similar</span>
+                        </p>
                       </div>
-                      <p className="text-[18px]">
-                        {car.car_model}
-                        <span className="text-neutral-400"> or similar</span>
+                      <div
+                        id="invoice-specs"
+                        className="pb-2 pt-4 text-[12px]"
+                        style={{ display: "table" }}
+                      >
+                        <div
+                          style={{
+                            display: "table-cell",
+                            paddingRight: 36,
+                            verticalAlign: "bottom",
+                          }}
+                        >
+                          <div className="relative h-[23px] w-[23px]">
+                            <CarDoorIcon size={23} />
+                            <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
+                              x{car.doors}
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: "table-cell",
+                            paddingRight: 36,
+                            verticalAlign: "bottom",
+                          }}
+                        >
+                          <div className="relative h-[23px] w-[23px]">
+                            <CarSeatIcon size={23} />
+                            <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
+                              x{car.passengers}
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: "table-cell",
+                            paddingRight: 36,
+                            verticalAlign: "bottom",
+                          }}
+                        >
+                          <div className="relative h-[23px] w-[23px]">
+                            <CarLuggageIcon size={23} />
+                            <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
+                              x{car.luggage}
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: "table-cell",
+                            paddingRight: 36,
+                            verticalAlign: "bottom",
+                          }}
+                        >
+                          <AirConditionerIcon size={23} />
+                        </div>
+                        <div
+                          style={{
+                            display: "table-cell",
+                            verticalAlign: "bottom",
+                          }}
+                        >
+                          <div style={{ display: "table" }}>
+                            <div
+                              className="border border-black text-center font-bold"
+                              style={{
+                                display: "table-cell",
+                                width: 23,
+                                height: 23,
+                                verticalAlign: "middle",
+                              }}
+                            >
+                              A
+                            </div>
+                            <div
+                              style={{
+                                display: "table-cell",
+                                verticalAlign: "middle",
+                                paddingLeft: 8,
+                              }}
+                            >
+                              Automatic
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="space-y-5 border-l-2 p-5"
+                    style={{
+                      display: "table-cell",
+                      width: "33.333%",
+                      verticalAlign: "top",
+                    }}
+                  >
+                    <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
+                    <div>
+                      <p className="mb-1 text-xs text-neutral-400">
+                        DELIVERY :
                       </p>
+                      <ul className="ml-4 list-disc text-sm marker:text-primary">
+                        <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
+                        <li>{deliveryTime?.format("hh:mm A")}</li>
+                        <li>{deliveryLocation}</li>
+                      </ul>
                     </div>
-                    <div className="flex w-3/4 items-end pb-2 pt-3">
-                      <div className="relative mr-7 flex h-fit w-fit items-end text-[12px]">
-                        <CarDoorIcon size={23} />
-                        <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                          x{car.doors}
-                        </div>
-                      </div>
-                      <div className="relative mr-7 flex h-fit w-fit items-end text-[12px]">
-                        <CarSeatIcon size={23} />
-                        <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                          x{car.passengers}
-                        </div>
-                      </div>
-                      <div className="relative mr-7 flex h-fit w-fit items-end text-[12px]">
-                        <CarLuggageIcon size={23} />
-                        <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                          x{car.luggage}
-                        </div>
-                      </div>
-                      <div className="mr-7">
-                        <AirConditionerIcon size={23} />
-                      </div>
-                      <div className="ml-1 flex items-center pr-[30px]">
-                        <div className="flex h-[23px] w-[23px] items-center justify-center border border-black pt-1 text-center font-bold">
-                          A
-                        </div>
-                        <p className="ml-2 pt-1">Automatic</p>
-                      </div>
+                    <div>
+                      <p className="mb-1 text-xs text-neutral-400">PICK-UP :</p>
+                      <ul className="ml-4 list-disc text-sm marker:text-primary">
+                        <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
+                        <li>{returnTime?.format("hh:mm A")}</li>
+                        <li>{returnLocation}</li>
+                      </ul>
                     </div>
                   </div>
-                </div>
-                <div
-                  className="space-y-5 border-l-2 p-5"
-                  style={{
-                    display: "table-cell",
-                    width: "33.333%",
-                    verticalAlign: "top",
-                  }}
-                >
-                  <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
-                  <div>
-                    <p className="mb-1 text-xs text-neutral-400">DELIVERY :</p>
-                    <ul className="ml-4 list-disc text-sm marker:text-primary">
-                      <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
-                      <li>{deliveryTime?.format("hh:mm A")}</li>
-                      <li>{deliveryLocation}</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="mb-1 text-xs text-neutral-400">PICK-UP :</p>
-                    <ul className="ml-4 list-disc text-sm marker:text-primary">
-                      <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
-                      <li>{returnTime?.format("hh:mm A")}</li>
-                      <li>{returnLocation}</li>
-                    </ul>
-                  </div>
-                </div>
                 </div>
               </div>
               <div
+                className="border-2 p-5 text-end text-sm"
                 style={{
                   display: "table-cell",
                   width: "25%",
                   verticalAlign: "top",
+                  boxSizing: "border-box",
                 }}
               >
-              <div className="h-full border-2 p-5 text-end text-sm">
                 <h4 className="text-xl font-medium">
                   {totalBundlePrice.toFixed(2)} JOD
                 </h4>
                 <div className="pb-4 pt-7">
                   <p>{selected_bundle?.split("_").join(" ")}</p>
                   <p>{car.car_model}</p>
+                  {deliveryFee > 0 && (
+                    <p
+                      className="bg-primary font-semibold"
+                      style={{
+                        display: "inline-block",
+                        width: "fit-content",
+                        marginLeft: "auto",
+                        marginTop: 4,
+                        padding: "4px 8px",
+                      }}
+                    >
+                      Delivery fee +{deliveryFee.toFixed(2)} JOD
+                    </p>
+                  )}
                 </div>
                 <p>*VAT included</p>
-              </div>
               </div>
             </div>
 
@@ -463,27 +578,12 @@ const InvoiceDownloadComponent = () => {
             <div className="my-2 flex flex-col gap-2 bg-primary-variant-1 p-5 text-xl font-medium">
               <div className="flex w-full items-center justify-between gap-5">
                 <h3>Total</h3>
-                <p>
-                  {(
-                    totalBundlePrice +
-                    totalProtectionPrice +
-                    totalExtrasPrice
-                  ).toFixed(2)}{" "}
-                  JOD
-                </p>
+                <p>{bookingTotal.toFixed(2)} JOD</p>
               </div>
               {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
                 <div className="flex w-full items-center justify-between gap-5">
                   <h3>{"5% Discount (Pay Now)"}</h3>
-                  <p>
-                    {(
-                      (totalBundlePrice +
-                        totalProtectionPrice +
-                        totalExtrasPrice) *
-                      0.95
-                    ).toFixed(2)}{" "}
-                    JOD
-                  </p>
+                  <p>{(bookingTotal * 0.95).toFixed(2)} JOD</p>
                 </div>
               )}
             </div>
@@ -505,9 +605,7 @@ const InvoiceDownloadComponent = () => {
                     <h3 className="text-xl font-medium">Total Amount</h3>
                     <h3 className="mt-2 text-xl">
                       {(
-                        (totalBundlePrice +
-                          totalProtectionPrice +
-                          totalExtrasPrice) *
+                        bookingTotal *
                         (paymentData.paymentMethod == PaymentMethod.PAYNOW
                           ? 0.95
                           : 1)
@@ -539,13 +637,7 @@ const InvoiceDownloadComponent = () => {
                       <div className="flex flex-col">
                         <h3 className="text-xl font-medium">Prepayment</h3>
                         <h3 className="mt-2 text-xl">
-                          {(
-                            (totalBundlePrice +
-                              totalProtectionPrice +
-                              totalExtrasPrice) *
-                            0.95
-                          ).toFixed(2)}{" "}
-                          JOD
+                          {(bookingTotal * 0.95).toFixed(2)} JOD
                         </h3>
                       </div>
                     </>
@@ -557,12 +649,7 @@ const InvoiceDownloadComponent = () => {
                           Ammount Paid Locally
                         </h3>
                         <h3 className="mt-2 text-xl">
-                          {(
-                            totalBundlePrice +
-                            totalProtectionPrice +
-                            totalExtrasPrice
-                          ).toFixed(2)}{" "}
-                          JOD
+                          {bookingTotal.toFixed(2)} JOD
                         </h3>
                       </div>
                     </>

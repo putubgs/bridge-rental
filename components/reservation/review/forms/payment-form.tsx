@@ -1,3 +1,4 @@
+import { getDeliveryFee } from "@/lib/delivery-fee";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { Checkbox, Stack, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -16,10 +17,18 @@ export default function PaymentForm({
   handlePayNow: () => void;
   handlePayLater: () => void;
 }) {
-  const { totalBundlePrice, totalExtrasPrice, totalProtectionPrice } =
-    useRentDetailsStore();
+  const {
+    totalBundlePrice,
+    totalExtrasPrice,
+    totalProtectionPrice,
+    selected_bundle,
+  } = useRentDetailsStore();
 
-  const totalPrice = totalBundlePrice + totalExtrasPrice + totalProtectionPrice;
+  const totalPrice =
+    totalBundlePrice +
+    totalExtrasPrice +
+    totalProtectionPrice +
+    getDeliveryFee(selected_bundle);
   const discountedPrice = totalPrice - totalPrice * 0.05;
 
   const formatCardNumber = (value: string): string => {

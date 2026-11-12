@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { getDeliveryFee } from "@/lib/delivery-fee";
 import {
   useRentDetailsStore,
   useCarSearchStore,
@@ -28,7 +29,10 @@ export default function ReservationLayout({
     totalBundlePrice,
     totalExtrasPrice,
     totalProtectionPrice,
+    selected_bundle,
   } = useRentDetailsStore();
+  const deliveryFee =
+    pathname === "/reservation/review" ? getDeliveryFee(selected_bundle) : 0;
 
   const { searchCompleted } = useCarSearchStore();
 
@@ -311,8 +315,9 @@ export default function ReservationLayout({
                     {(
                       totalBundlePrice +
                       totalExtrasPrice +
-                      totalProtectionPrice
-                    ).toFixed(2)}
+                      totalProtectionPrice +
+                      deliveryFee
+                    ).toFixed(2)}{" "}
                     JOD
                   </p>
                 </div>

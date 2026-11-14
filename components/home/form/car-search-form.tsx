@@ -22,13 +22,20 @@ import {
 import Toggle from "@/components/shared/toggle/toggle";
 import useLanguageStore from "@/store/useLanguageStore";
 
-const carSearchSchema = yup.object({
-  delivery_location: yup.string().required("Delivery location is required"),
-  return_location: yup.string(),
-  delivery_date: yup.date().required("Delivery date is required"),
-  return_date: yup.date().nullable(),
-  same_return_location: yup.boolean(),
-});
+const getCarSearchSchema = (isArabic: boolean) =>
+  yup.object({
+    delivery_location: yup.string().required("Delivery location is required"),
+    return_location: yup.string().when("same_return_location", {
+      is: false,
+      then: (schema) =>
+        schema.trim().required(
+          isArabic ? "موقع الاستلام مطلوب" : "Pick-up location is required",
+        ),
+    }),
+    delivery_date: yup.date().required("Delivery date is required"),
+    return_date: yup.date().nullable(),
+    same_return_location: yup.boolean(),
+  });
 
 export default function CarSearchForm() {
   const router = useRouter();
@@ -84,7 +91,7 @@ export default function CarSearchForm() {
           .minute(dayjs().minute()),
       same_return_location: true,
     },
-    validationSchema: carSearchSchema,
+    validationSchema: getCarSearchSchema(isArabic),
     onSubmit: (values) => {
       // Format the dates with proper timezone handling
       const deliveryDateTime = values.delivery_date
@@ -132,7 +139,27 @@ export default function CarSearchForm() {
 
   return (
     <form
-      onSubmit={formik.handleSubmit}
+      onSubmit={(event) => {
+        event.preventDefault();
+        const delivery = formik.values.delivery_location?.trim();
+        const pickup = formik.values.return_location?.trim();
+
+        if (!delivery) {
+          alert(
+            isArabic ? "موقع التسليم مطلوب" : "Delivery location is required",
+          );
+          return;
+        }
+
+        if (!formik.values.same_return_location && !pickup) {
+          alert(
+            isArabic ? "موقع الاستلام مطلوب" : "Pick-up location is required",
+          );
+          return;
+        }
+
+        formik.handleSubmit();
+      }}
       className="mt-5 space-y-4 md:space-y-3"
       dir={isArabic ? "rtl" : "ltr"}
     >

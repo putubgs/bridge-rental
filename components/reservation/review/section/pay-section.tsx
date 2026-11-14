@@ -26,6 +26,7 @@ const validationSchema = yup.object().shape({
   dateOfBirth: yup.date().required("Date of birth is required"),
   phoneNumber: yup.string().required("Phone number is required"),
   idDocument: yup.string().required("ID document is required"),
+  drivingLicense: yup.string().required("Driving license is required"),
   agreement: yup.boolean().oneOf([true], "You must agree to the terms"),
   cardNumber: yup.string().min(19, "Card number must contain 16 digits"),
   expiryDate: yup
@@ -65,6 +66,7 @@ export default function PaySection() {
       dateOfBirth: null as Dayjs | null,
       phoneNumber: "",
       idDocument: "",
+      drivingLicense: "",
       agreement: false,
       cardNumber: "",
       expiryDate: null as Dayjs | null,

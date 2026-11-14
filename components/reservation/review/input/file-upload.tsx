@@ -2,11 +2,13 @@ import { useState, useRef, DragEvent, ChangeEvent } from "react";
 import Image from "next/image";
 
 interface FileUploadProps {
+  label: string;
   onFileSelect: (base64: string) => void;
   isFieldError?: boolean;
 }
 
 export default function FileUpload({
+  label,
   onFileSelect,
   isFieldError = false,
 }: FileUploadProps) {
@@ -111,9 +113,7 @@ export default function FileUpload({
           height={64}
           className="mb-4"
         />
-        <p className="mb-2 text-xs text-[#ACACAC] sm:text-base">
-          Passport/ID Card
-        </p>
+        <p className="mb-2 text-xs text-[#ACACAC] sm:text-base">{label}</p>
         <div className="text-xs text-[#BBBBBB] sm:text-sm">
           {file ? (
             file.name

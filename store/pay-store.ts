@@ -9,6 +9,7 @@ interface PaymentData {
   dateOfBirth: Dayjs | null;
   phoneNumber: string;
   idDocument: string;
+  drivingLicense: string;
   agreement: boolean;
   cardNumber: string;
   expiryDate: Dayjs | null;

@@ -4,9 +4,6 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
 export default function IdForm({ formik }: { formik: any }) {
-  const displayMainIdDocError =
-    formik.errors["dateOfBirth"] || formik.errors["phoneNumber"];
-
   return (
     <div className="space-y-5 bg-[#F9F9F9] p-5">
       <div>
@@ -165,33 +162,36 @@ export default function IdForm({ formik }: { formik: any }) {
           </Stack>
         </div>
 
-        <Stack spacing={1} className="mt-4 h-[200px] md:mt-0 md:h-auto">
-          <FileUpload
-            onFileSelect={(base64) =>
-              formik.setFieldValue("idDocument", base64)
-            }
-            isFieldError={Boolean(formik.errors["idDocument"])}
-          />
-          {displayMainIdDocError && formik.errors["idDocument"] && (
-            <div>
-              <Typography
-                className="text-red-700"
-                sx={{
-                  fontSize: { xs: "12px", md: "16px" },
-                }}
-              >
+        <div className="col-span-1 mt-4 grid grid-cols-2 gap-2 md:mt-0">
+          <Stack spacing={1} className="h-[200px] md:h-auto">
+            <FileUpload
+              label="Passport/ID Card"
+              onFileSelect={(base64) =>
+                formik.setFieldValue("idDocument", base64)
+              }
+              isFieldError={Boolean(formik.errors["idDocument"])}
+            />
+            {formik.errors["idDocument"] && (
+              <Typography className="text-red-700" fontSize={"12px"}>
                 {formik.errors["idDocument"]}
               </Typography>
-            </div>
-          )}
-        </Stack>
-        {!displayMainIdDocError && formik.errors["idDocument"] && (
-          <div className="col-span-1 md:col-start-3">
-            <Typography className="text-red-700" fontSize={"12px"}>
-              {formik.errors["idDocument"]}
-            </Typography>
-          </div>
-        )}
+            )}
+          </Stack>
+          <Stack spacing={1} className="h-[200px] md:h-auto">
+            <FileUpload
+              label="Driving License"
+              onFileSelect={(base64) =>
+                formik.setFieldValue("drivingLicense", base64)
+              }
+              isFieldError={Boolean(formik.errors["drivingLicense"])}
+            />
+            {formik.errors["drivingLicense"] && (
+              <Typography className="text-red-700" fontSize={"12px"}>
+                {formik.errors["drivingLicense"]}
+              </Typography>
+            )}
+          </Stack>
+        </div>
       </form>
     </div>
   );

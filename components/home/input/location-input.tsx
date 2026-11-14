@@ -215,15 +215,22 @@ export default function LocationInput({ formik }: { formik: any }) {
   };
 
   // Handle input change for return
-  const handleInputChangeReturn = (_: any, inputValue: string) => {
+  const handleInputChangeReturn = (
+    _: any,
+    inputValue: string,
+    reason?: string,
+  ) => {
     setReturnInputValue(inputValue);
-    setIsTypingReturn(true);
-    if (inputValue) {
-      fetchOptions(inputValue, "return");
-    } else {
-      setReturnOptions([]);
-      setModalReturnOptions([]);
+    if (reason !== "input" || !inputValue) {
+      setIsTypingReturn(false);
+      if (!inputValue) {
+        setReturnOptions([]);
+        setModalReturnOptions([]);
+      }
+      return;
     }
+    setIsTypingReturn(true);
+    fetchOptions(inputValue, "return");
   };
 
   const renderNoOptions = (isLoading: boolean, isTyping: boolean) => {
@@ -287,6 +294,26 @@ export default function LocationInput({ formik }: { formik: any }) {
     }
   }, [modalOpen, activeField, deliveryLocation, returnLocation]);
 
+  const sameReturnLocation = Boolean(formik.values.same_return_location);
+  const previousSameReturnLocation = useRef(sameReturnLocation);
+
+  useEffect(() => {
+    if (previousSameReturnLocation.current === sameReturnLocation) return;
+
+    if (sameReturnLocation) {
+      const delivery = formik.values.delivery_location || "";
+      setReturnInputValue(delivery);
+      setReturnLocation(delivery);
+      formik.setFieldValue("return_location", delivery);
+    } else {
+      setReturnInputValue("");
+      setReturnLocation("");
+      formik.setFieldValue("return_location", "");
+    }
+
+    previousSameReturnLocation.current = sameReturnLocation;
+  }, [sameReturnLocation, formik, setReturnLocation]);
+
   return (
     <>
       {/* DELIVERY SECTION */}
@@ -341,10 +368,6 @@ export default function LocationInput({ formik }: { formik: any }) {
             renderInput={(params) => (
               <TextField
                 {...params}
-                error={
-                  formik.touched["delivery_location"] &&
-                  Boolean(formik.errors["delivery_location"])
-                }
                 placeholder={
                   isMobile 
                     ? (isRTL ? "انقر للبحث عن الموقع" : "Tap to search location")
@@ -451,10 +474,6 @@ export default function LocationInput({ formik }: { formik: any }) {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  error={
-                    formik.touched["return_location"] &&
-                    Boolean(formik.errors["return_location"])
-                  }
                   placeholder={
                     isMobile
                       ? isRTL

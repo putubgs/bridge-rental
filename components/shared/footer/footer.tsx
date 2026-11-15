@@ -74,7 +74,7 @@ export default function Footer() {
               </p>
 
               <ul className="space-y-1 pt-2 text-[10px] md:text-[16px]">
-                <li className="text-black lg:text-white">+962-6-7790-890</li>
+                <li className="text-black lg:text-white">+962-7-7011-1100</li>
                 <li className="text-black lg:text-white">+962-7-9169-8125</li>
               </ul>
             </div>

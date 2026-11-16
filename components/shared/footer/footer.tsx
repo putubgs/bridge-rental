@@ -48,7 +48,7 @@ export default function Footer() {
         >
           {/* Logo Section */}
           <div className="flex flex-col items-start py-5 lg:items-center lg:justify-center">
-            <div className="relative h-[33px] w-[109px]">
+            <div className="relative h-[35px] w-[115px]">
               <Image
                 src={logoSrc}
                 alt="Brand Logo"

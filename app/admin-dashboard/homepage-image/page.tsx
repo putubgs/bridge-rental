@@ -20,11 +20,12 @@ export default function HomepageImage() {
       const { data, error: fetchError } = await supabase
         .from("HomepageImage")
         .select("image_url")
-        .single();
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 
-        console.log(data?.image_url)
       if (data?.image_url) {
         setCurrentImage(data?.image_url);
       } else {
@@ -45,25 +46,29 @@ export default function HomepageImage() {
     }
   
     try {
-      const newImageName = `${Date.now()}_${newImage.name}`;
-  
-      if (currentImage) {
-        const oldImagePath = currentImage.split("/homepage-image/")[1];
-        if (oldImagePath) {
-          const { error: deleteError } = await supabase.storage
-            .from("homepage-image")
-            .remove([oldImagePath]);
-          if (deleteError) {
-            console.error("Error deleting old image:", deleteError);
-            setError("Failed to delete the old image.");
-          }
+      const newImageName = `${Date.now()}_${newImage.name.replace(/\s+/g, "-")}`;
+
+      const { data: existingImages } = await supabase
+        .from("HomepageImage")
+        .select("image_url");
+
+      const oldPaths = (existingImages ?? [])
+        .map((row) => {
+          const encodedPath = row.image_url?.split("/homepage-image/")[1];
+          return encodedPath ? decodeURIComponent(encodedPath) : null;
+        })
+        .filter((path): path is string => Boolean(path));
+
+      if (oldPaths.length > 0) {
+        const { error: deleteError } = await supabase.storage
+          .from("homepage-image")
+          .remove(oldPaths);
+        if (deleteError) {
+          console.error("Error deleting old image:", deleteError);
         }
-  
-        await supabase
-          .from("HomepageImage")
-          .delete()
-          .eq("image_url", currentImage);
       }
+
+      await supabase.from("HomepageImage").delete().neq("image_url", "");
   
       const { error: uploadError } = await supabase.storage
         .from("homepage-image")

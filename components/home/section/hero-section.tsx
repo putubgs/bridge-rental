@@ -20,7 +20,9 @@ export default function HeroSection() {
         const { data, error: fetchError } = await supabase
           .from("HomepageImage")
           .select("image_url")
-          .single();
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
         if (fetchError) throw fetchError;
 

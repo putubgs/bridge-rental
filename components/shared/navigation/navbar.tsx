@@ -95,7 +95,7 @@ export default function Navbar() {
               {/* Logo */}
               <div>
                 <Link href="/">
-                  <div className="relative h-[35px] w-[115px]">
+                  <div className="relative h-[44px] w-[145px] md:h-[77px] md:w-[255px]">
                     <Image
                       src={`/assets/img/brand-logo-${logoColor}.png`}
                       alt="Brand Logo"
@@ -165,7 +165,7 @@ export default function Navbar() {
               {/* Logo */}
               <div>
                 <Link href="/">
-                  <div className="relative h-[35px] w-[115px]">
+                  <div className="relative h-[44px] w-[145px] md:h-[77px] md:w-[255px]">
                     <Image
                       src={`/assets/img/brand-logo-${logoColor}.png`}
                       alt="Brand Logo"

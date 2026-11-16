@@ -39,7 +39,7 @@ export default function HomePage() {
 
   return (
     <main
-      className={`relative -top-10 md:-top-20 ${language === "ar" ? "rtl" : "ltr"}`}
+      className={`relative -top-10 md:-top-[117px] ${language === "ar" ? "rtl" : "ltr"}`}
     >
       <HeroSection />
       <ExperienceSection />

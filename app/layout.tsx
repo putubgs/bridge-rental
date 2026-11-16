@@ -12,8 +12,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Bridge Rental",
-  description: "Car Rentals At Your Doorstep",
+  title: "Bridge Rent-A-Car",
+  description: "Rent a car at your doorstep",
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="mx-auto max-w-[1920px] border">
+      <body className="mx-auto max-w-[1920px]">
         <MuiLocalizationProvider>
           <MuiThemeProvider>
             {children}

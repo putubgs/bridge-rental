@@ -660,7 +660,7 @@ const InvoiceDownloadComponent = () => {
 
             <p className="mt-6 text-xl">
               For any inquiries, contact us at +962 7XXX XXXX or
-              info@bridgerentacar.com
+              info@bridgerentalcar.com
             </p>
           </div>
         </section>

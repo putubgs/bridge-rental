@@ -93,10 +93,10 @@ export default function Footer() {
                 {isRTL ? "للمساعدة والتعليقات" : "For help and feedbacks"}
               </p>
               <ul className="space-y-1 pt-2 text-[10px] md:text-[16px]">
-                <li className="text-black lg:text-white">
+                {/* <li className="text-black lg:text-white">
                   customer@bridge.co.com
-                </li>
-                <li className="text-black lg:text-white">info@bridge.co.com</li>
+                </li> */}
+                <li className="text-black lg:text-white">info@bridgerentalcar.com</li>
               </ul>
             </div>
           </div>

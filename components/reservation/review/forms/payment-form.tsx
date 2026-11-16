@@ -96,30 +96,26 @@ export default function PaymentForm({
           vehicle
         </p>
       </div>
-      <div className="mt-5 flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
-        <div>
-          {checkout ? (
-            <div>
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold md:text-base">
-                  Card details
-                </p>
-                <button
-                  type="button"
-                  onClick={onEditBilling}
-                  className="text-xs text-primary-variant-3 underline md:text-sm"
-                >
-                  Edit billing address
-                </button>
-              </div>
-              <HyperPayWidget
-                checkoutId={checkout.checkoutId}
-                amount={checkout.amount}
-                onError={onWidgetError}
-                onBeforeSubmit={onBeforeCardSubmit}
-              />
-            </div>
-          ) : (
+      <div
+        className={`mt-5 flex flex-col gap-5 lg:grid lg:grid-cols-2 ${
+          checkout
+            ? "lg:grid-rows-[auto_auto_auto] lg:gap-x-10 lg:gap-y-0"
+            : "lg:items-start lg:gap-10"
+        }`}
+      >
+        {checkout ? (
+          <div className="mb-3 flex items-center justify-between gap-3 lg:col-start-1 lg:row-start-1">
+            <p className="text-sm font-semibold md:text-base">Card details</p>
+            <button
+              type="button"
+              onClick={onEditBilling}
+              className="text-xs text-primary-variant-3 underline md:text-sm"
+            >
+              Edit billing address
+            </button>
+          </div>
+        ) : (
+          <div>
             <div className="space-y-2">
               <p className="text-sm font-semibold md:text-base">
                 Billing address
@@ -178,14 +174,30 @@ export default function PaymentForm({
                 />
               </div>
             </div>
-          )}
-          {paymentError && (
-            <p className="mt-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 md:text-sm">
-              {paymentError}
-            </p>
-          )}
-          {checkout && (
-            <div className="mt-5 flex justify-between gap-4 sm:flex-row sm:gap-7">
+            {paymentError && (
+              <p className="mt-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 md:text-sm">
+                {paymentError}
+              </p>
+            )}
+          </div>
+        )}
+        {checkout && (
+          <div className="lg:col-start-1 lg:row-start-2">
+            <HyperPayWidget
+              checkoutId={checkout.checkoutId}
+              amount={checkout.amount}
+              onError={onWidgetError}
+              onBeforeSubmit={onBeforeCardSubmit}
+            />
+            {paymentError && (
+              <p className="mt-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 md:text-sm">
+                {paymentError}
+              </p>
+            )}
+          </div>
+        )}
+        {checkout && (
+          <div className="mt-5 flex justify-between gap-4 sm:flex-row sm:gap-7 lg:col-start-1 lg:row-start-3">
               <Stack spacing={1} className="flex-1">
                 <div className="flex gap-2 items-center">
                   <Checkbox
@@ -231,19 +243,18 @@ export default function PaymentForm({
                 </div>
               </div>
             </div>
-          )}
-        </div>
+        )}
         <div
-          className={`grid grid-cols-1 pt-5 transition-[grid-template-columns,gap] duration-500 ease-out md:pt-0 lg:h-fit ${
+          className={`grid grid-cols-1 pt-5 transition-[grid-template-columns,gap] duration-500 ease-out md:pt-0 ${
             checkout
-              ? "gap-0 sm:grid-cols-[0fr_1fr] lg:self-center"
-              : "gap-3 sm:grid-cols-[1fr_1fr] lg:self-end"
+              ? "h-full gap-0 sm:grid-cols-[0fr_1fr] lg:col-start-2 lg:row-start-2 lg:h-full lg:pt-0"
+              : "gap-3 sm:grid-cols-[1fr_1fr] lg:h-fit lg:self-end"
           }`}
         >
           <div
             className={`min-h-0 min-w-0 overflow-hidden transition-all duration-500 ease-out ${
               checkout
-                ? "pointer-events-none max-h-0 opacity-0"
+                ? "pointer-events-none h-0 max-h-0 opacity-0"
                 : "max-h-[28rem] opacity-100"
             }`}
             aria-hidden={Boolean(checkout)}
@@ -276,7 +287,11 @@ export default function PaymentForm({
             </div>
           </div>
           <div className="h-full min-w-0">
-            <div className="relative flex h-full w-full flex-col justify-between border-2 bg-white px-4 pb-5 pt-14 sm:px-6">
+            <div
+              className={`relative flex h-full w-full flex-col justify-between border-2 bg-white px-4 pb-5 sm:px-6 ${
+                checkout ? "pt-5" : "pt-14"
+              }`}
+            >
               <div>
                 <h3 className="font-semibold">Pay on Delivery</h3>
                 <p className="pt-1 text-justify text-sm">

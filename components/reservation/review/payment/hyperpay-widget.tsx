@@ -74,9 +74,11 @@ function mountBrandMark(root: Element) {
   root.querySelector(".hyperpay-brand-picker")?.remove();
   if (!select || !wrapper) return;
 
-  let mark = wrapper.querySelector<HTMLImageElement>(".hyperpay-brand-mark");
-  if (!mark) {
-    mark = document.createElement("img");
+  const existing = wrapper.querySelector<HTMLImageElement>(
+    ".hyperpay-brand-mark",
+  );
+  const mark = existing ?? document.createElement("img");
+  if (!existing) {
     mark.className = "hyperpay-brand-mark";
     mark.alt = "";
     mark.hidden = true;
@@ -100,6 +102,27 @@ function mountBrandMark(root: Element) {
   };
 
   window.__applyHyperpayBrand = paint;
+}
+
+function releaseCardSubmit() {
+  const form = document.querySelector<HTMLFormElement>(
+    ".hyperpay-widget form.wpwl-form-card",
+  );
+  if (!form) return;
+  // HyperPay locks the form as soon as Pay is clicked and only unlocks it
+  // after a completed submit. Cancelling here has to undo that lock.
+  form.setAttribute("submitStatus", "none");
+  form
+    .querySelectorAll<HTMLButtonElement>("button.wpwl-button-pay")
+    .forEach((button) => {
+      button.disabled = false;
+      button.removeAttribute("disabled");
+    });
+  form
+    .querySelectorAll<HTMLInputElement>('[data-action="blur-card-expiry"]')
+    .forEach((input) => {
+      input.disabled = false;
+    });
 }
 
 function onBrandMessage(event: MessageEvent) {
@@ -201,7 +224,11 @@ export default function HyperPayWidget({
         if (root) mountBrandMark(root);
         setIsReady(true);
       },
-      onBeforeSubmitCard: () => onBeforeSubmitRef.current?.() !== false,
+      onBeforeSubmitCard: () => {
+        const proceed = onBeforeSubmitRef.current?.() !== false;
+        if (!proceed) releaseCardSubmit();
+        return proceed;
+      },
       onError: (error: { name?: string; message?: string }) => {
         console.error("HyperPay widget error", error);
         if (error?.name === "InvalidCheckoutIdError") {

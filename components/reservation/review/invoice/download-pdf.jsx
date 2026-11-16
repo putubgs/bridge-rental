@@ -625,13 +625,13 @@ const InvoiceDownloadComponent = () => {
                       <div className="flex flex-col">
                         <h3 className="text-xl font-medium">Credit Card</h3>
                         <h3 className="mt-2 text-xl">
-                          {"******" + paymentData.cardNumber.slice(-6)}
+                          {"**** " + paymentData.cardLast4}
                         </h3>
                       </div>
                       <div className="flex flex-col">
                         <h3 className="text-xl font-medium">Expiry Code</h3>
                         <h3 className="mt-2 text-xl">
-                          {paymentData.expiryDate.format("MM/YY")}
+                          {paymentData.cardExpiry}
                         </h3>
                       </div>
                       <div className="flex flex-col">

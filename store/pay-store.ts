@@ -1,7 +1,7 @@
 import { Dayjs } from "dayjs";
 import { create } from "zustand";
 
-interface PaymentData {
+export interface PaymentFormValues {
   firstName: string;
   lastName: string;
   email: string;
@@ -11,35 +11,52 @@ interface PaymentData {
   idDocument: string;
   drivingLicense: string;
   agreement: boolean;
-  cardNumber: string;
-  expiryDate: Dayjs | null;
-  cvv: string;
+  billingStreet: string;
+  billingCity: string;
+  billingState: string;
+  billingCountry: string;
+  billingPostcode: string;
   paymentMethod: PaymentMethod;
 }
 
+export interface PaymentData extends PaymentFormValues {
+  cardLast4: string;
+  cardExpiry: string;
+  paymentReference: string;
+}
+
+export interface PendingCheckout {
+  checkoutId: string;
+  merchantTransactionId: string;
+  amount: string;
+}
+
+export interface PaymentReturn {
+  resourcePath: string;
+  checkout: PendingCheckout;
+  formValues: PaymentFormValues;
+}
+
 export enum PaymentMethod {
-    PAYNOW = "PAY NOW",
-    PAYLATER = "PAY LATER",
+  PAYNOW = "PAY NOW",
+  PAYLATER = "PAY LATER",
 }
 
 interface PayStore {
   paymentData: PaymentData | null;
+  paymentReturn: PaymentReturn | null;
   savePayment: (data: PaymentData) => void;
   resetPayment: () => void;
+  setPaymentReturn: (paymentReturn: PaymentReturn | null) => void;
 }
 
 export const usePayStore = create<PayStore>((set) => ({
   paymentData: null,
+  paymentReturn: null,
 
-  savePayment: (data: PaymentData) =>{
-    set({
-      paymentData: data,
-    })
-    console.log("cek", data, "cek")
-},
+  savePayment: (data) => set({ paymentData: data }),
 
-  resetPayment: () =>
-    set({
-      paymentData: null,
-    }),
+  resetPayment: () => set({ paymentData: null }),
+
+  setPaymentReturn: (paymentReturn) => set({ paymentReturn }),
 }));

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { restoreBookingAfterPayment } from "@/lib/booking-session";
 import { getDeliveryFee } from "@/lib/delivery-fee";
 import {
   useRentDetailsStore,
@@ -35,8 +36,16 @@ export default function ReservationLayout({
     pathname === "/reservation/review" ? getDeliveryFee(selected_bundle) : 0;
 
   const { searchCompleted } = useCarSearchStore();
+  const [isPaymentReturnChecked, setIsPaymentReturnChecked] = useState(false);
 
   const { carModels, fetchCars } = useCarStore();
+
+  useEffect(() => {
+    if (pathname === "/reservation/review") {
+      restoreBookingAfterPayment();
+    }
+    setIsPaymentReturnChecked(true);
+  }, [pathname]);
 
   const { language } = useLanguageStore();
   const isArabic = language === "ar";
@@ -80,6 +89,10 @@ export default function ReservationLayout({
     // Replace 'HH:mm A' with 'hh:mm A' for 12-hour format
     return time ? time.format("hh:mm A") : "No Time";
   };
+
+  if (!searchCompleted && !isPaymentReturnChecked) {
+    return <div className="h-screen" />;
+  }
 
   if (!searchCompleted) {
     return (

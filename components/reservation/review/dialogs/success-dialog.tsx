@@ -41,7 +41,8 @@ export default function SuccessDialog({
         </p>
         <div className="flex flex-col items-center space-y-[14px]">
           <div className="text-sm font-medium">
-            download your booking confirmation <InvoiceDownloadComponent />
+            download your booking confirmation{" "}
+            <InvoiceDownloadComponent variant="button" />
           </div>
           <button
             onClick={() => router.push("/")}

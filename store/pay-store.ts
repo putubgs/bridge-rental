@@ -35,6 +35,10 @@ export interface PaymentReturn {
   resourcePath: string;
   checkout: PendingCheckout;
   formValues: PaymentFormValues;
+  vehicle?: {
+    model: string;
+    type: string;
+  };
 }
 
 export enum PaymentMethod {

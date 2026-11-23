@@ -1,6 +1,6 @@
 "use client";
 
-import html2pdf from "html2pdf.js";
+// import html2pdf from "html2pdf.js";
 import AirConditionerIcon from "@/components/shared/icons/air-conditioner";
 import CarDoorIcon from "@/components/shared/icons/car-door";
 import CarLuggageIcon from "@/components/shared/icons/car-luggage";
@@ -10,9 +10,14 @@ import { countDays } from "@/utils/utils";
 import { useRentDetailsStore } from "@/store/reservation-store";
 import { useCarStore } from "@/store/car-store";
 import { PaymentMethod, usePayStore } from "@/store/pay-store";
-import { useEffect } from "react";
 
-const InvoiceDownloadComponent = () => {
+let invoicePdfRunner = async () => "";
+
+export function captureInvoicePdf(download = false) {
+  return invoicePdfRunner(download);
+}
+
+const InvoiceDownloadComponent = ({ variant = "full" }) => {
   const {
     car_id,
     selected_bundle,
@@ -47,13 +52,17 @@ const InvoiceDownloadComponent = () => {
   const bookingTotal =
     totalBundlePrice + totalProtectionPrice + totalExtrasPrice + deliveryFee;
 
-  if (!car) {
-    return <p>Car not found</p>;
-  }
+  const generatePDF = async (download = false) => {
+    if (typeof window === "undefined") return "";
 
-  const generatePDF = async () => {
+    const element = document.querySelector("#invoice");
+    if (!element) return "";
+
+    // Load html2pdf only in the browser when PDF generation is requested.
+    const html2pdfModule = await import("html2pdf.js");
+    const html2pdf = html2pdfModule.default;
+
     const preprocessImages = async () => {
-      const element = document.querySelector("#invoice");
       const imageContainers = element.querySelectorAll(".relative");
 
       imageContainers.forEach((container) => {
@@ -257,414 +266,446 @@ const InvoiceDownloadComponent = () => {
         },
       };
 
-      await html2pdf().set(opt).from(element).save();
+      const worker = html2pdf().set(opt).from(element);
+      if (download) {
+        await worker.save();
+        return "";
+      }
+      const dataUri = await worker.outputPdf("datauristring");
+      const encoded = String(dataUri);
+      return encoded.includes(",") ? encoded.split(",")[1] : encoded;
     } finally {
       restoreImages();
     }
   };
 
+  invoicePdfRunner = generatePDF;
+
+  if (!car || !paymentData) {
+    return variant === "document" ? null : <p>Car not found</p>;
+  }
+
   return (
     <div>
-      <button onClick={generatePDF} className="text-primary-variant-3">
-        click here
-      </button>
+      {variant !== "document" && (
+        <button
+          onClick={() => generatePDF(true)}
+          className="text-primary-variant-3"
+        >
+          click here
+        </button>
+      )}
 
-      {/* Hidden invoice content */}
-      <div style={{ display: "none" }}>
-        <section className="p-5" id="invoice">
-          <div className="flex flex-col gap-5">
-            <header className="flex w-full items-center justify-between gap-5">
-              <div>
-                <img
-                  src="/assets/img/brand-logo-black.png"
-                  alt="logo"
-                  width={200}
-                  height={120}
-                />
+      {variant !== "button" && (
+        <div style={{ display: "none" }}>
+          <section className="p-5" id="invoice">
+            <div className="flex flex-col gap-5">
+              <header className="flex w-full items-center justify-between gap-5">
+                <div>
+                  <img
+                    src="/assets/img/brand-logo-black.png"
+                    alt="logo"
+                    width={200}
+                    height={120}
+                  />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Invoice</h1>
+                  {/* TODO: change invoice number and date */}
+                  <p>Invoice Number: INV-123456</p>
+                  <p>Invoice Date: 2024-12-07</p>
+                </div>
+              </header>
+
+              <hr />
+              {/* Customer Details */}
+              <div className="mt-28 pt-3">
+                <h2 className="mb-2 text-2xl font-semibold">CUSTOMER DETAIL</h2>
+                <p className="text-xl">
+                  Customer Name:{" "}
+                  {`${paymentData.firstName} ${paymentData.lastName}`}
+                </p>
+                <p className="text-xl">Email: {paymentData.email}</p>
+                <p className="text-xl">Phone: {paymentData.phoneNumber}</p>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">Invoice</h1>
-                {/* TODO: change invoice number and date */}
-                <p>Invoice Number: INV-123456</p>
-                <p>Invoice Date: 2024-12-07</p>
-              </div>
-            </header>
 
-            <hr />
-            {/* Customer Details */}
-            <div className="mt-28 pt-3">
-              <h2 className="mb-2 text-2xl font-semibold">CUSTOMER DETAIL</h2>
-              <p className="text-xl">
-                Customer Name:{" "}
-                {`${paymentData.firstName} ${paymentData.lastName}`}
-              </p>
-              <p className="text-xl">Email: {paymentData.email}</p>
-              <p className="text-xl">Phone: {paymentData.phoneNumber}</p>
-            </div>
-
-            {/* Rental Details */}
-            <h2 className="mb-2 mt-5 text-2xl font-semibold">RENTAL DETAIL</h2>
-            <div
-              id="invoice-rental"
-              style={{
-                display: "table",
-                width: "100%",
-                tableLayout: "fixed",
-              }}
-            >
+              {/* Rental Details */}
+              <h2 className="mb-2 mt-5 text-2xl font-semibold">
+                RENTAL DETAIL
+              </h2>
               <div
+                id="invoice-rental"
                 style={{
-                  display: "table-cell",
-                  width: "75%",
-                  paddingRight: 12,
-                  verticalAlign: "top",
-                  boxSizing: "border-box",
+                  display: "table",
+                  width: "100%",
+                  tableLayout: "fixed",
                 }}
               >
                 <div
-                  className="border-2"
                   style={{
-                    display: "table",
-                    width: "100%",
-                    height: "100%",
-                    tableLayout: "fixed",
+                    display: "table-cell",
+                    width: "75%",
+                    paddingRight: 12,
+                    verticalAlign: "top",
+                    boxSizing: "border-box",
                   }}
                 >
                   <div
-                    className="p-5"
+                    className="border-2"
                     style={{
-                      display: "table-cell",
-                      width: "66.666%",
-                      verticalAlign: "top",
+                      display: "table",
+                      width: "100%",
+                      height: "100%",
+                      tableLayout: "fixed",
                     }}
                   >
-                    <h3 className="text-xl font-medium">Vehicle</h3>
-                    <div className="relative aspect-video w-1/2">
-                      <img
-                        src={car.car_image}
-                        alt={"car_image"}
-                        className="absolute object-contain"
-                        style={{
-                          transform: "scaleX(-1)",
-                          objectFit: "contain",
-                          objectPosition: "center",
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      />
-                    </div>
-                    <div className="z-10 space-y-5 px-3">
-                      <div className="flex flex-col gap-2">
-                        <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
-                          <p className="pt-1 text-[#535353]">{car.car_type}</p>
-                        </div>
-                        <p className="text-[18px]">
-                          {car.car_model}
-                          <span className="text-neutral-400"> or similar</span>
-                        </p>
-                      </div>
-                      <div
-                        id="invoice-specs"
-                        className="pb-2 pt-4 text-[12px]"
-                        style={{ display: "table" }}
-                      >
-                        <div
-                          style={{
-                            display: "table-cell",
-                            paddingRight: 36,
-                            verticalAlign: "bottom",
-                          }}
-                        >
-                          <div className="relative h-[23px] w-[23px]">
-                            <CarDoorIcon size={23} />
-                            <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                              x{car.doors}
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            display: "table-cell",
-                            paddingRight: 36,
-                            verticalAlign: "bottom",
-                          }}
-                        >
-                          <div className="relative h-[23px] w-[23px]">
-                            <CarSeatIcon size={23} />
-                            <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                              x{car.passengers}
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            display: "table-cell",
-                            paddingRight: 36,
-                            verticalAlign: "bottom",
-                          }}
-                        >
-                          <div className="relative h-[23px] w-[23px]">
-                            <CarLuggageIcon size={23} />
-                            <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
-                              x{car.luggage}
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            display: "table-cell",
-                            paddingRight: 36,
-                            verticalAlign: "bottom",
-                          }}
-                        >
-                          <AirConditionerIcon size={23} />
-                        </div>
-                        <div
-                          style={{
-                            display: "table-cell",
-                            verticalAlign: "bottom",
-                          }}
-                        >
-                          <div style={{ display: "table" }}>
-                            <div
-                              className="border border-black text-center font-bold"
-                              style={{
-                                display: "table-cell",
-                                width: 23,
-                                height: 23,
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              A
-                            </div>
-                            <div
-                              style={{
-                                display: "table-cell",
-                                verticalAlign: "middle",
-                                paddingLeft: 8,
-                              }}
-                            >
-                              Automatic
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className="space-y-5 border-l-2 p-5"
-                    style={{
-                      display: "table-cell",
-                      width: "33.333%",
-                      verticalAlign: "top",
-                    }}
-                  >
-                    <h3 className="text-xl font-medium">Delivery & Pick-up</h3>
-                    <div>
-                      <p className="mb-1 text-xs text-neutral-400">
-                        DELIVERY :
-                      </p>
-                      <ul className="ml-4 list-disc text-sm marker:text-primary">
-                        <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
-                        <li>{deliveryTime?.format("hh:mm A")}</li>
-                        <li>{deliveryLocation}</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="mb-1 text-xs text-neutral-400">PICK-UP :</p>
-                      <ul className="ml-4 list-disc text-sm marker:text-primary">
-                        <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
-                        <li>{returnTime?.format("hh:mm A")}</li>
-                        <li>{returnLocation}</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                className="border-2 p-5 text-end text-sm"
-                style={{
-                  display: "table-cell",
-                  width: "25%",
-                  verticalAlign: "top",
-                  boxSizing: "border-box",
-                }}
-              >
-                <h4 className="text-xl font-medium">
-                  {totalBundlePrice.toFixed(2)} JOD
-                </h4>
-                <div className="pb-4 pt-7">
-                  <p>{selected_bundle?.split("_").join(" ")}</p>
-                  <p>{car.car_model}</p>
-                  {deliveryFee > 0 && (
-                    <p
-                      className="bg-primary font-semibold"
+                    <div
+                      className="p-5"
                       style={{
-                        display: "inline-block",
-                        width: "fit-content",
-                        marginLeft: "auto",
-                        marginTop: 4,
-                        padding: "4px 8px",
+                        display: "table-cell",
+                        width: "66.666%",
+                        verticalAlign: "top",
                       }}
                     >
-                      Delivery fee +{deliveryFee.toFixed(2)} JOD
-                    </p>
-                  )}
-                </div>
-                <p>*VAT included</p>
-              </div>
-            </div>
-
-            {/* Protection & Extras */}
-            <div className="my-4 border-2 p-5">
-              <div className="flex items-center justify-between gap-5 text-xl font-medium">
-                <h3>Protection & Extras</h3>
-                <p>
-                  {(totalProtectionPrice + totalExtrasPrice).toFixed(2)} JOD
-                </p>
-              </div>
-
-              <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between gap-5">
-                  <p>
-                    {selected_protection} ({totalDays} Day{totalDays > 1 && "s"}
-                    )
-                  </p>
-                  <p>{totalProtectionPrice.toFixed(2)} JOD</p>
-                </div>
-                {selected_extras.map((extra) => (
-                  <div
-                    key={extra}
-                    className="flex items-center justify-between gap-5"
-                  >
-                    <p>{extra}</p>
-                    <p>
-                      {(
-                        (extras.find(({ offer_name }) => offer_name === extra)
-                          ?.price ?? 0) * totalDays
-                      ).toFixed(2)}{" "}
-                      JOD
-                    </p>
+                      <h3 className="text-xl font-medium">Vehicle</h3>
+                      <div className="relative aspect-video w-1/2">
+                        <img
+                          src={car.car_image}
+                          alt={"car_image"}
+                          className="absolute object-contain"
+                          style={{
+                            transform: "scaleX(-1)",
+                            objectFit: "contain",
+                            objectPosition: "center",
+                            width: "100%",
+                            height: "100%",
+                          }}
+                        />
+                      </div>
+                      <div className="z-10 space-y-5 px-3">
+                        <div className="flex flex-col gap-2">
+                          <div className="z-10 flex w-fit items-center bg-[#BAF0E233] px-1">
+                            <p className="pt-1 text-[#535353]">
+                              {car.car_type}
+                            </p>
+                          </div>
+                          <p className="text-[18px]">
+                            {car.car_model}
+                            <span className="text-neutral-400">
+                              {" "}
+                              or similar
+                            </span>
+                          </p>
+                        </div>
+                        <div
+                          id="invoice-specs"
+                          className="pb-2 pt-4 text-[12px]"
+                          style={{ display: "table" }}
+                        >
+                          <div
+                            style={{
+                              display: "table-cell",
+                              paddingRight: 36,
+                              verticalAlign: "bottom",
+                            }}
+                          >
+                            <div className="relative h-[23px] w-[23px]">
+                              <CarDoorIcon size={23} />
+                              <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
+                                x{car.doors}
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "table-cell",
+                              paddingRight: 36,
+                              verticalAlign: "bottom",
+                            }}
+                          >
+                            <div className="relative h-[23px] w-[23px]">
+                              <CarSeatIcon size={23} />
+                              <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
+                                x{car.passengers}
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "table-cell",
+                              paddingRight: 36,
+                              verticalAlign: "bottom",
+                            }}
+                          >
+                            <div className="relative h-[23px] w-[23px]">
+                              <CarLuggageIcon size={23} />
+                              <div className="absolute -right-4 -top-4 h-[23px] w-[23px] rounded-full bg-[#EFEFEF] p-1">
+                                x{car.luggage}
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "table-cell",
+                              paddingRight: 36,
+                              verticalAlign: "bottom",
+                            }}
+                          >
+                            <AirConditionerIcon size={23} />
+                          </div>
+                          <div
+                            style={{
+                              display: "table-cell",
+                              verticalAlign: "bottom",
+                            }}
+                          >
+                            <div style={{ display: "table" }}>
+                              <div
+                                className="border border-black text-center font-bold"
+                                style={{
+                                  display: "table-cell",
+                                  width: 23,
+                                  height: 23,
+                                  verticalAlign: "middle",
+                                }}
+                              >
+                                A
+                              </div>
+                              <div
+                                style={{
+                                  display: "table-cell",
+                                  verticalAlign: "middle",
+                                  paddingLeft: 8,
+                                }}
+                              >
+                                Automatic
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="space-y-5 border-l-2 p-5"
+                      style={{
+                        display: "table-cell",
+                        width: "33.333%",
+                        verticalAlign: "top",
+                      }}
+                    >
+                      <h3 className="text-xl font-medium">
+                        Delivery & Pick-up
+                      </h3>
+                      <div>
+                        <p className="mb-1 text-xs text-neutral-400">
+                          DELIVERY :
+                        </p>
+                        <ul className="ml-4 list-disc text-sm marker:text-primary">
+                          <li>{deliveryDate?.format("dddd, MMM DD, YYYY")}</li>
+                          <li>{deliveryTime?.format("hh:mm A")}</li>
+                          <li>{deliveryLocation}</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="mb-1 text-xs text-neutral-400">
+                          PICK-UP :
+                        </p>
+                        <ul className="ml-4 list-disc text-sm marker:text-primary">
+                          <li>{returnDate?.format("dddd, MMM DD, YYYY")}</li>
+                          <li>{returnTime?.format("hh:mm A")}</li>
+                          <li>{returnLocation}</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                ))}
+                </div>
+                <div
+                  className="border-2 p-5 text-end text-sm"
+                  style={{
+                    display: "table-cell",
+                    width: "25%",
+                    verticalAlign: "top",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <h4 className="text-xl font-medium">
+                    {totalBundlePrice.toFixed(2)} JOD
+                  </h4>
+                  <div className="pb-4 pt-7">
+                    <p>{selected_bundle?.split("_").join(" ")}</p>
+                    <p>{car.car_model}</p>
+                    {deliveryFee > 0 && (
+                      <p
+                        className="bg-primary font-semibold"
+                        style={{
+                          display: "inline-block",
+                          width: "fit-content",
+                          marginLeft: "auto",
+                          marginTop: 4,
+                          padding: "4px 8px",
+                        }}
+                      >
+                        Delivery fee +{deliveryFee.toFixed(2)} JOD
+                      </p>
+                    )}
+                  </div>
+                  <p>*VAT included</p>
+                </div>
+              </div>
 
-                {selected_children_extras.map((extra) => {
-                  const quantity = 1;
-                  return (
+              {/* Protection & Extras */}
+              <div className="my-4 border-2 p-5">
+                <div className="flex items-center justify-between gap-5 text-xl font-medium">
+                  <h3>Protection & Extras</h3>
+                  <p>
+                    {(totalProtectionPrice + totalExtrasPrice).toFixed(2)} JOD
+                  </p>
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  <div className="flex items-center justify-between gap-5">
+                    <p>
+                      {selected_protection} ({totalDays} Day
+                      {totalDays > 1 && "s"})
+                    </p>
+                    <p>{totalProtectionPrice.toFixed(2)} JOD</p>
+                  </div>
+                  {selected_extras.map((extra) => (
                     <div
                       key={extra}
                       className="flex items-center justify-between gap-5"
                     >
-                      <p className="capitalize">
-                        {extra.split("_").join(" ")} ({quantity}x)
-                      </p>
+                      <p>{extra}</p>
                       <p>
                         {(
-                          (childrenExtras.find(
-                            ({ offer_name }) => offer_name === extra,
-                          )?.price ?? 0) *
-                          quantity *
-                          totalDays
+                          (extras.find(({ offer_name }) => offer_name === extra)
+                            ?.price ?? 0) * totalDays
                         ).toFixed(2)}{" "}
                         JOD
                       </p>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                  ))}
 
-            {/* Total */}
-            <div className="my-2 flex flex-col gap-2 bg-primary-variant-1 p-5 text-xl font-medium">
-              <div className="flex w-full items-center justify-between gap-5">
-                <h3>Total</h3>
-                <p>{bookingTotal.toFixed(2)} JOD</p>
+                  {selected_children_extras.map((extra) => {
+                    const quantity = 1;
+                    return (
+                      <div
+                        key={extra}
+                        className="flex items-center justify-between gap-5"
+                      >
+                        <p className="capitalize">
+                          {extra.split("_").join(" ")} ({quantity}x)
+                        </p>
+                        <p>
+                          {(
+                            (childrenExtras.find(
+                              ({ offer_name }) => offer_name === extra,
+                            )?.price ?? 0) *
+                            quantity *
+                            totalDays
+                          ).toFixed(2)}{" "}
+                          JOD
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
+
+              {/* Total */}
+              <div className="my-2 flex flex-col gap-2 bg-primary-variant-1 p-5 text-xl font-medium">
                 <div className="flex w-full items-center justify-between gap-5">
-                  <h3>{"5% Discount (Pay Now)"}</h3>
-                  <p>{(bookingTotal * 0.95).toFixed(2)} JOD</p>
+                  <h3>Total</h3>
+                  <p>{bookingTotal.toFixed(2)} JOD</p>
                 </div>
-              )}
-            </div>
+                {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
+                  <div className="flex w-full items-center justify-between gap-5">
+                    <h3>{"5% Discount (Pay Now)"}</h3>
+                    <p>{(bookingTotal * 0.95).toFixed(2)} JOD</p>
+                  </div>
+                )}
+              </div>
 
-            <hr />
+              <hr />
 
-            {/* Payment Details */}
-            <h2 className="mb-2 mt-5 text-2xl font-semibold">PAYMENT DETAIL</h2>
-            <div className="flex gap-3">
-              <div className="flex w-full divide-x-2 border-2">
-                <div className="flex w-full gap-14 p-4 text-xl">
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-medium">Payment Method</h3>
-                    <h3 className="mt-2 text-xl">
-                      {paymentData.paymentMethod}
-                    </h3>
+              {/* Payment Details */}
+              <h2 className="mb-2 mt-5 text-2xl font-semibold">
+                PAYMENT DETAIL
+              </h2>
+              <div className="flex gap-3">
+                <div className="flex w-full divide-x-2 border-2">
+                  <div className="flex w-full gap-14 p-4 text-xl">
+                    <div className="flex flex-col">
+                      <h3 className="text-xl font-medium">Payment Method</h3>
+                      <h3 className="mt-2 text-xl">
+                        {paymentData.paymentMethod}
+                      </h3>
+                    </div>
+                    <div className="flex flex-col">
+                      <h3 className="text-xl font-medium">Total Amount</h3>
+                      <h3 className="mt-2 text-xl">
+                        {(
+                          bookingTotal *
+                          (paymentData.paymentMethod == PaymentMethod.PAYNOW
+                            ? 0.95
+                            : 1)
+                        ).toFixed(2)}
+                      </h3>
+                    </div>
+                    <div className="flex flex-col">
+                      <h3 className="text-xl font-medium">Payment Status</h3>
+                      <h3 className="mt-2 text-xl">
+                        {paymentData.paymentMethod == PaymentMethod.PAYNOW
+                          ? "PAID"
+                          : "UNPAID"}
+                      </h3>
+                    </div>
+                    {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
+                      <>
+                        <div className="flex flex-col">
+                          <h3 className="text-xl font-medium">Credit Card</h3>
+                          <h3 className="mt-2 text-xl">
+                            {"**** " + paymentData.cardLast4}
+                          </h3>
+                        </div>
+                        <div className="flex flex-col">
+                          <h3 className="text-xl font-medium">Expiry Code</h3>
+                          <h3 className="mt-2 text-xl">
+                            {paymentData.cardExpiry}
+                          </h3>
+                        </div>
+                        <div className="flex flex-col">
+                          <h3 className="text-xl font-medium">Prepayment</h3>
+                          <h3 className="mt-2 text-xl">
+                            {(bookingTotal * 0.95).toFixed(2)} JOD
+                          </h3>
+                        </div>
+                      </>
+                    )}
+                    {paymentData.paymentMethod === PaymentMethod.PAYLATER && (
+                      <>
+                        <div className="flex flex-col">
+                          <h3 className="text-xl font-medium">
+                            Ammount Paid Locally
+                          </h3>
+                          <h3 className="mt-2 text-xl">
+                            {bookingTotal.toFixed(2)} JOD
+                          </h3>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-medium">Total Amount</h3>
-                    <h3 className="mt-2 text-xl">
-                      {(
-                        bookingTotal *
-                        (paymentData.paymentMethod == PaymentMethod.PAYNOW
-                          ? 0.95
-                          : 1)
-                      ).toFixed(2)}
-                    </h3>
-                  </div>
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-medium">Payment Status</h3>
-                    <h3 className="mt-2 text-xl">
-                      {paymentData.paymentMethod == PaymentMethod.PAYNOW
-                        ? "PAID"
-                        : "UNPAID"}
-                    </h3>
-                  </div>
-                  {paymentData.paymentMethod === PaymentMethod.PAYNOW && (
-                    <>
-                      <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">Credit Card</h3>
-                        <h3 className="mt-2 text-xl">
-                          {"**** " + paymentData.cardLast4}
-                        </h3>
-                      </div>
-                      <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">Expiry Code</h3>
-                        <h3 className="mt-2 text-xl">
-                          {paymentData.cardExpiry}
-                        </h3>
-                      </div>
-                      <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">Prepayment</h3>
-                        <h3 className="mt-2 text-xl">
-                          {(bookingTotal * 0.95).toFixed(2)} JOD
-                        </h3>
-                      </div>
-                    </>
-                  )}
-                  {paymentData.paymentMethod === PaymentMethod.PAYLATER && (
-                    <>
-                      <div className="flex flex-col">
-                        <h3 className="text-xl font-medium">
-                          Ammount Paid Locally
-                        </h3>
-                        <h3 className="mt-2 text-xl">
-                          {bookingTotal.toFixed(2)} JOD
-                        </h3>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
-            </div>
 
-            <p className="mt-6 text-xl">
-              For any inquiries, contact us at +962 7XXX XXXX or
-              info@bridgerentalcar.com
-            </p>
-          </div>
-        </section>
-      </div>
+              <p className="mt-6 text-xl">
+                For any inquiries, contact us at +962 7XXX XXXX or
+                info@bridgerentalcar.com
+              </p>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };

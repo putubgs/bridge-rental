@@ -14,6 +14,11 @@ import {
   usePayStore,
 } from "@/store/pay-store";
 import { useRentDetailsStore } from "@/store/reservation-store";
+import InvoiceDownloadComponent, {
+  captureInvoicePdf,
+} from "@/components/reservation/review/invoice/download-pdf";
+import { noticeFromStores } from "@/lib/build-booking-notice";
+import { notifyBooking } from "@/lib/booking-notice";
 import { getDeliveryFee } from "@/lib/delivery-fee";
 import {
   clearBookingSnapshot,
@@ -74,6 +79,9 @@ export default function PaySection() {
   const [checkout, setCheckout] = useState<PendingCheckout | null>(null);
   const [isStartingPayment, setIsStartingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [emailRequest, setEmailRequest] = useState<Parameters<
+    typeof noticeFromStores
+  >[0] | null>(null);
 
   const totalPrice =
     totalBundlePrice +
@@ -108,6 +116,18 @@ export default function PaySection() {
         cardExpiry: "",
         paymentReference: "",
       });
+      if (values.paymentMethod === PaymentMethod.PAYLATER) {
+        setEmailRequest({
+          outcome: "pay_later",
+          paymentMethod: "PAY LATER",
+          customer: {
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            phone: values.phoneNumber,
+          },
+        });
+      }
       setIsProcessingDialogOpen(true);
 
       setTimeout(() => {
@@ -176,9 +196,9 @@ export default function PaySection() {
     }
   };
 
-  const handlePayLater = () => {
-    formik.setFieldValue("paymentMethod", PaymentMethod.PAYLATER);
-    formik.submitForm();
+  const handlePayLater = async () => {
+    await formik.setFieldValue("paymentMethod", PaymentMethod.PAYLATER);
+    await formik.submitForm();
   };
 
   const handleBeforeCardSubmit = useCallback(() => {
@@ -198,7 +218,8 @@ export default function PaySection() {
 
   useEffect(() => {
     if (!paymentReturn) return;
-    const { resourcePath, checkout: paidCheckout, formValues } = paymentReturn;
+    const { resourcePath, checkout: paidCheckout, formValues, vehicle } =
+      paymentReturn;
     if (handledResourcePaths.has(resourcePath)) return;
     handledResourcePaths.add(resourcePath);
 
@@ -211,28 +232,86 @@ export default function PaySection() {
         const response = await fetch(
           `/api/payment/status?resourcePath=${encodeURIComponent(resourcePath)}`,
         );
+
+        console.log("=== RESPONSE IN LOG ===");
+        console.log("response: ", response);
+
         const payment: HyperPayVerifiedPayment & { error?: string } =
           await response.json();
+
+        console.log("=== PAYMENT IN LOG ===");
+        console.log("payment: ", payment);
+
+        if (
+          payment.outcome !== "success" &&
+          payment.outcome !== "pending" &&
+          payment.outcome !== "failed"
+        ) {
+          setFailureMessage(
+            "We could not confirm your payment. Please contact us before trying again.",
+          );
+          return;
+        }
+
+        console.log("=== PAID CHECKOUT IN LOG ===");
+        console.log("paidCheckout: ", paidCheckout);
 
         const matchesCheckout =
           payment.merchantTransactionId === paidCheckout.merchantTransactionId &&
           Number(payment.amount) === Number(paidCheckout.amount) &&
           payment.currency === "JOD";
 
+        const customer = {
+          firstName: formValues.firstName,
+          lastName: formValues.lastName,
+          email: formValues.email,
+          phone: formValues.phoneNumber,
+        };
+        const expiryYear = payment.card?.expiryYear ?? "";
+        const cardExpiry = payment.card?.expiryMonth
+          ? `${payment.card.expiryMonth}/${expiryYear.slice(-2)}`
+          : "";
+
         if (payment.outcome === "success" && matchesCheckout) {
-          const expiryYear = payment.card?.expiryYear ?? "";
           savePayment({
             ...formValues,
             paymentMethod: PaymentMethod.PAYNOW,
             cardLast4: payment.card?.last4Digits ?? "",
-            cardExpiry: payment.card?.expiryMonth
-              ? `${payment.card.expiryMonth}/${expiryYear.slice(-2)}`
-              : "",
+            cardExpiry,
             paymentReference: payment.paymentId ?? "",
+          });
+          setEmailRequest({
+            outcome: "success",
+            paymentMethod: "PAY NOW",
+            resourcePath,
+            merchantTransactionId: paidCheckout.merchantTransactionId,
+            cardLast4: payment.card?.last4Digits ?? "",
+            cardExpiry,
+            paymentReference: payment.paymentId ?? "",
+            vehicle,
+            customer,
           });
           clearBookingSnapshot();
           setIsSuccessDialogOpen(true);
         } else if (payment.outcome === "pending") {
+          savePayment({
+            ...formValues,
+            paymentMethod: PaymentMethod.PAYNOW,
+            cardLast4: payment.card?.last4Digits ?? "",
+            cardExpiry,
+            paymentReference: payment.paymentId ?? "",
+          });
+          setEmailRequest({
+            outcome: "pending",
+            paymentMethod: "PAY NOW",
+            resourcePath,
+            merchantTransactionId: paidCheckout.merchantTransactionId,
+            cardLast4: payment.card?.last4Digits ?? "",
+            cardExpiry,
+            paymentReference: payment.paymentId ?? "",
+            vehicle,
+            customer,
+          });
           setIsPaymentPending(true);
           setFailureMessage(
             "Your bank is still processing this payment. Please do not pay again; contact us and quote reference " +
@@ -240,6 +319,24 @@ export default function PaySection() {
               ".",
           );
         } else {
+          savePayment({
+            ...formValues,
+            paymentMethod: PaymentMethod.PAYNOW,
+            cardLast4: payment.card?.last4Digits ?? "",
+            cardExpiry,
+            paymentReference: payment.paymentId ?? "",
+          });
+          setEmailRequest({
+            outcome: "failed",
+            paymentMethod: "PAY NOW",
+            resourcePath,
+            merchantTransactionId: paidCheckout.merchantTransactionId,
+            cardLast4: payment.card?.last4Digits ?? "",
+            cardExpiry,
+            paymentReference: payment.paymentId ?? "",
+            vehicle,
+            customer,
+          });
           clearBookingSnapshot();
           setFailureMessage(
             payment.outcome === "success"
@@ -261,6 +358,21 @@ export default function PaySection() {
 
     verify();
   }, [paymentReturn]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!emailRequest) return;
+    const request = emailRequest;
+    setEmailRequest(null);
+    void (async () => {
+      let invoicePdf = "";
+      try {
+        invoicePdf = await captureInvoicePdf(false);
+      } catch (error) {
+        console.error("Invoice PDF was not created", error);
+      }
+      await notifyBooking({ ...noticeFromStores(request), invoicePdf });
+    })();
+  }, [emailRequest]);
 
   return (
     <section className="mt-5 space-y-5">
@@ -285,6 +397,7 @@ export default function PaySection() {
         handleClose={() => {}}
         email={formik.values["email"]}
       />
+      <InvoiceDownloadComponent variant="document" />
       <PaymentFailedDialog
         open={Boolean(failureMessage)}
         message={failureMessage ?? ""}

@@ -84,11 +84,19 @@ export async function POST(request: Request) {
 
   const merchantTransactionId = `BR-${Date.now()}-${randomUUID().slice(0, 8)}`;
 
+  const isTestMode =
+  process.env.NEXT_PUBLIC_PAYMENT_BASE_URL?.includes("test.oppwa.com") ||
+  process.env.NEXT_PUBLIC_PAYMENT_BASE_URL?.includes("eu-test.oppwa.com");
+
   const params = new URLSearchParams({
     entityId,
-    amount: formattedAmount,
+    amount: isHyperPayTestMode(baseUrl)
+    ? `${Math.round(Number(amount))}.00`
+    : formattedAmount,
+    // amount: "0.01",
     currency: "JOD",
     paymentType: "DB",
+    ...(isTestMode && { testMode: "EXTERNAL" }),
     merchantTransactionId,
     "customer.email": customer.email,
     "customer.givenName": customer.givenName,
@@ -98,12 +106,16 @@ export async function POST(request: Request) {
     "billing.state": billing.state,
     "billing.country": billing.country,
     "billing.postcode": billing.postcode,
+    "customParameters[3DS2_enrolled]": "true",
   });
 
-  if (isHyperPayTestMode(baseUrl)) {
-    params.set("testMode", "EXTERNAL");
-    params.set("customParameters[3DS2_enrolled]", "true");
-  }
+  console.log("=== PARAMS IN LOG ===");
+  console.log("params: ", params.toString());
+
+  // if (isHyperPayTestMode(baseUrl)) {
+  //   params.set("testMode", "EXTERNAL");
+  //   params.set("customParameters[3DS2_enrolled]", "true");
+  // }
 
   try {
     const response = await fetch(`${baseUrl}/v1/checkouts`, {

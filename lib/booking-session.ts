@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { useCarStore } from "@/store/car-store";
 import {
   useCarSearchStore,
   useRentDetailsStore,
@@ -33,6 +34,7 @@ interface BookingSnapshot {
   checkout: PendingCheckout;
   language: "en" | "ar";
   rentDetails: Record<string, unknown>;
+  vehicle: { model: string; type: string };
   formValues: Omit<PaymentFormValues, "dateOfBirth"> & {
     dateOfBirth: string | null;
   };
@@ -60,11 +62,19 @@ export function saveBookingSnapshot(
       : value;
   }
 
+  const car = useCarStore
+    .getState()
+    .carModels.find((vehicle) => vehicle.car_id === rentDetails.car_id);
+
   const snapshot: BookingSnapshot = {
     savedAt: Date.now(),
     checkout,
     language: useLanguageStore.getState().language,
     rentDetails,
+    vehicle: {
+      model: car?.car_model ?? "",
+      type: car?.car_type ?? "",
+    },
     formValues: { ...formValues, dateOfBirth: toIso(formValues.dateOfBirth) },
   };
 
@@ -118,6 +128,7 @@ export function restoreBookingAfterPayment() {
   const paymentReturn: PaymentReturn = {
     resourcePath: returnParams.resourcePath,
     checkout: snapshot.checkout,
+    vehicle: snapshot.vehicle ?? { model: "", type: "" },
     formValues: {
       ...snapshot.formValues,
       dateOfBirth: fromIso(snapshot.formValues.dateOfBirth),

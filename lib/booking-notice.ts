@@ -28,6 +28,7 @@ export interface BookingNotice {
   cardLast4?: string;
   cardExpiry?: string;
   paymentReference?: string;
+  resultCode?: string;
   invoicePdf?: string;
 }
 

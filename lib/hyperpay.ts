@@ -18,6 +18,20 @@ export function isHyperPayTestMode(baseUrl: string | undefined) {
   return Boolean(baseUrl?.includes("test.oppwa.com"));
 }
 
+// A completed payment can only be read back for a short time. The next lookup
+// then returns 200.300.404 / "No payment session found" even though the charge
+// already succeeded. JoLimo treats that the same way.
+export function isHyperPaySessionExpired(
+  code: string | undefined,
+  description: string | undefined,
+) {
+  return (
+    code === "200.300.404" ||
+    /no payment session/i.test(description ?? "") ||
+    /session (has )?expired/i.test(description ?? "")
+  );
+}
+
 export interface HyperPayVerifiedPayment {
   outcome: HyperPayOutcome;
   code: string;

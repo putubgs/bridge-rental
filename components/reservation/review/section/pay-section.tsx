@@ -233,14 +233,8 @@ export default function PaySection() {
           `/api/payment/status?resourcePath=${encodeURIComponent(resourcePath)}`,
         );
 
-        console.log("=== RESPONSE IN LOG ===");
-        console.log("response: ", response);
-
         const payment: HyperPayVerifiedPayment & { error?: string } =
           await response.json();
-
-        console.log("=== PAYMENT IN LOG ===");
-        console.log("payment: ", payment);
 
         if (
           payment.outcome !== "success" &&
@@ -253,13 +247,19 @@ export default function PaySection() {
           return;
         }
 
-        console.log("=== PAID CHECKOUT IN LOG ===");
-        console.log("paidCheckout: ", paidCheckout);
-
+        const charged = Number(payment.amount);
+        const expected = Number(paidCheckout.amount);
+        const amountMatches =
+          Number.isFinite(charged) &&
+          (Math.abs(charged - expected) < 0.02 ||
+            Math.abs(charged - Math.round(expected)) < 0.02);
+        const idMatches =
+          !payment.merchantTransactionId ||
+          payment.merchantTransactionId === paidCheckout.merchantTransactionId;
         const matchesCheckout =
-          payment.merchantTransactionId === paidCheckout.merchantTransactionId &&
-          Number(payment.amount) === Number(paidCheckout.amount) &&
-          payment.currency === "JOD";
+          idMatches &&
+          amountMatches &&
+          (!payment.currency || payment.currency === "JOD");
 
         const customer = {
           firstName: formValues.firstName,
@@ -288,6 +288,7 @@ export default function PaySection() {
             cardLast4: payment.card?.last4Digits ?? "",
             cardExpiry,
             paymentReference: payment.paymentId ?? "",
+            resultCode: payment.code,
             vehicle,
             customer,
           });
@@ -309,6 +310,7 @@ export default function PaySection() {
             cardLast4: payment.card?.last4Digits ?? "",
             cardExpiry,
             paymentReference: payment.paymentId ?? "",
+            resultCode: payment.code,
             vehicle,
             customer,
           });
@@ -334,6 +336,7 @@ export default function PaySection() {
             cardLast4: payment.card?.last4Digits ?? "",
             cardExpiry,
             paymentReference: payment.paymentId ?? "",
+            resultCode: payment.code,
             vehicle,
             customer,
           });
@@ -365,10 +368,12 @@ export default function PaySection() {
     setEmailRequest(null);
     void (async () => {
       let invoicePdf = "";
-      try {
-        invoicePdf = await captureInvoicePdf(false);
-      } catch (error) {
-        console.error("Invoice PDF was not created", error);
+      if (request.outcome !== "failed") {
+        try {
+          invoicePdf = await captureInvoicePdf(false);
+        } catch (error) {
+          console.error("Invoice PDF was not created", error);
+        }
       }
       await notifyBooking({ ...noticeFromStores(request), invoicePdf });
     })();

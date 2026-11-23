@@ -1,7 +1,13 @@
 import {
   getHyperPayOutcome,
+  isHyperPaySessionExpired,
   type HyperPayVerifiedPayment,
 } from "@/lib/hyperpay";
+
+const confirmedPayments = new Map<
+  string,
+  { payment: HyperPayVerifiedPayment; at: number }
+>();
 
 export const RESOURCE_PATH_PATTERN =
   /^\/v1\/checkouts\/[A-Za-z0-9.\-_]+\/payment$/;
@@ -52,6 +58,15 @@ export async function verifyHyperPayResource(resourcePath: string): Promise<
           }
         : null,
     };
+
+    if (payment.outcome === "success") {
+      confirmedPayments.set(resourcePath, { payment, at: Date.now() });
+    } else if (isHyperPaySessionExpired(payment.code, payment.description)) {
+      const confirmed = confirmedPayments.get(resourcePath);
+      if (confirmed && Date.now() - confirmed.at < 30 * 60 * 1000) {
+        return { ok: true, payment: confirmed.payment };
+      }
+    }
 
     return { ok: true, payment };
   } catch (error) {

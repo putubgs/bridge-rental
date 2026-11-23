@@ -13,6 +13,7 @@ export function noticeFromStores(input: {
   cardLast4?: string;
   cardExpiry?: string;
   paymentReference?: string;
+  resultCode?: string;
   vehicle?: { model: string; type: string };
 }): BookingNotice {
   const rent = useRentDetailsStore.getState();
@@ -96,6 +97,7 @@ export function noticeFromStores(input: {
     cardLast4: input.cardLast4,
     cardExpiry: input.cardExpiry,
     paymentReference: input.paymentReference,
+    resultCode: input.resultCode,
   };
 }
 

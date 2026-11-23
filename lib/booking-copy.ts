@@ -26,7 +26,7 @@ export function bookingIntro(status: BookingEmailStatus, firstName: string) {
     case "review":
       return `Dear ${firstName}, a payment came back from the bank, but it did not match this booking. Please do not pay again. Contact us and quote the reference. The quote is attached.`;
     default:
-      return `Dear ${firstName}, the card payment was not completed, so this booking is not confirmed. You can try another card, or pay on delivery. The quote is attached.`;
+      return `Dear ${firstName}, the card payment was not completed, so this booking is not confirmed. No charge has been made. You can try another card, or pay on delivery.`;
   }
 }
 

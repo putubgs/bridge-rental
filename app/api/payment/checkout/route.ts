@@ -83,20 +83,20 @@ export async function POST(request: Request) {
   }
 
   const merchantTransactionId = `BR-${Date.now()}-${randomUUID().slice(0, 8)}`;
-
-  const isTestMode =
-  process.env.NEXT_PUBLIC_PAYMENT_BASE_URL?.includes("test.oppwa.com") ||
-  process.env.NEXT_PUBLIC_PAYMENT_BASE_URL?.includes("eu-test.oppwa.com");
+  const testMode = isHyperPayTestMode(baseUrl);
+  // The test gateway only accepts whole amounts. That is the amount the bank
+  // confirms, so the booking must remember this figure rather than the cents
+  // that were rounded away.
+  const gatewayAmount = testMode
+    ? `${Math.round(amount)}.00`
+    : formattedAmount;
 
   const params = new URLSearchParams({
     entityId,
-    amount: isHyperPayTestMode(baseUrl)
-    ? `${Math.round(Number(amount))}.00`
-    : formattedAmount,
-    // amount: "0.01",
+    amount: gatewayAmount,
     currency: "JOD",
     paymentType: "DB",
-    ...(isTestMode && { testMode: "EXTERNAL" }),
+    ...(testMode && { testMode: "EXTERNAL" }),
     merchantTransactionId,
     "customer.email": customer.email,
     "customer.givenName": customer.givenName,
@@ -108,14 +108,6 @@ export async function POST(request: Request) {
     "billing.postcode": billing.postcode,
     "customParameters[3DS2_enrolled]": "true",
   });
-
-  console.log("=== PARAMS IN LOG ===");
-  console.log("params: ", params.toString());
-
-  // if (isHyperPayTestMode(baseUrl)) {
-  //   params.set("testMode", "EXTERNAL");
-  //   params.set("customParameters[3DS2_enrolled]", "true");
-  // }
 
   try {
     const response = await fetch(`${baseUrl}/v1/checkouts`, {
@@ -148,7 +140,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       checkoutId: data.id as string,
       merchantTransactionId,
-      amount: formattedAmount,
+      amount: gatewayAmount,
     });
   } catch (error) {
     console.error("HyperPay checkout network error", error);

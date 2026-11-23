@@ -3,6 +3,9 @@ import path from "path";
 import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/components";
 import BookingEmail from "@/emails/BookingEmail";
+import PaymentFailedEmail, {
+  paymentFailedText,
+} from "@/emails/PaymentFailedEmail";
 import { bookingIntro, bookingSubject } from "@/lib/booking-copy";
 import { formatMoney, type PreparedBooking } from "@/lib/prepare-booking";
 
@@ -20,8 +23,12 @@ export async function sendBookingEmail(
 
   sgMail.setApiKey(apiKey);
 
+  const paymentFailed = booking.status === "failed";
+  const includeInvoice = Boolean(invoicePdf) && !paymentFailed;
   const html = await render(
-    BookingEmail({ booking, includeInvoice: Boolean(invoicePdf) }),
+    paymentFailed
+      ? PaymentFailedEmail({ firstName: booking.firstName })
+      : BookingEmail({ booking, includeInvoice }),
   );
   const logo = fs.readFileSync(
     path.join(process.cwd(), "public/assets/img/brand-logo-email.png"),
@@ -56,7 +63,9 @@ export async function sendBookingEmail(
         },
         subject: bookingSubject(booking.status, booking.reference),
         html,
-        text: plainText(booking, Boolean(invoicePdf)),
+        text: paymentFailed
+          ? paymentFailedText(booking.firstName)
+          : plainText(booking, includeInvoice),
         categories: ["bridge-booking", booking.status],
         headers: {
           "X-Entity-Ref-ID": booking.reference,
@@ -66,7 +75,7 @@ export async function sendBookingEmail(
           openTracking: { enable: true },
         },
         attachments: [
-          ...(invoicePdf
+          ...(includeInvoice && invoicePdf
             ? [
                 {
                   content: invoicePdf,

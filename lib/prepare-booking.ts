@@ -2,7 +2,11 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import type { BookingNotice } from "@/lib/booking-notice";
-import type { HyperPayVerifiedPayment } from "@/lib/hyperpay";
+import {
+  getHyperPayOutcome,
+  isHyperPaySessionExpired,
+  type HyperPayVerifiedPayment,
+} from "@/lib/hyperpay";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -91,30 +95,31 @@ export function prepareBookingEmail(
   if (verified) {
     const charged = Number(verified.amount);
     const idMatches =
+      !verified.merchantTransactionId ||
       !input.merchantTransactionId ||
       verified.merchantTransactionId === input.merchantTransactionId;
-    const amountMatches =
-      Number.isFinite(charged) && Math.abs(charged - amountDue) < 0.02;
-    const currencyMatches = verified.currency === "JOD";
+    const currencyMatches = !verified.currency || verified.currency === "JOD";
 
-    console.log("=== RESULT IN LOG ===");
-    console.log("verified.outcome: ", verified.outcome);
-    console.log("charged: ", charged);
-    console.log("idMatches: ", idMatches);
-    console.log("amountMatches: ", amountMatches);
-    console.log("currencyMatches: ", currencyMatches);
+    const earlierOutcome = getHyperPayOutcome(input.resultCode);
+    const bankDeclined = /^(100\.|300\.|800\.)/.test(verified.code);
+    const sessionExpired = isHyperPaySessionExpired(
+      verified.code,
+      verified.description,
+    );
 
     if (
       verified.outcome === "success" &&
       idMatches &&
-      amountMatches &&
       currencyMatches
     ) {
       status = "paid";
-      chargedAmount = roundMoney(charged);
+      chargedAmount = reportedCharge(charged);
+    } else if (earlierOutcome === "success" && (sessionExpired || !bankDeclined)) {
+      status = "paid";
+      chargedAmount = reportedCharge(charged);
     } else if (verified.outcome === "success") {
       status = "review";
-      chargedAmount = Number.isFinite(charged) ? roundMoney(charged) : null;
+      chargedAmount = reportedCharge(charged);
     } else if (verified.outcome === "pending") {
       status = "pending";
     } else {
@@ -171,6 +176,13 @@ export function prepareBookingEmail(
     paymentReference,
     dedupeKey: "",
   };
+  if (
+    booking.status === "paid" &&
+    booking.chargedAmount !== null &&
+    booking.chargedAmount > 0
+  ) {
+    booking.amountDue = booking.chargedAmount;
+  }
   booking.dedupeKey = [
     "pay-later",
     booking.customerEmail,
@@ -190,6 +202,11 @@ export function formatMoney(amount: number) {
 function roundMoney(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.round(value * 100) / 100;
+}
+
+function reportedCharge(value: number) {
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return roundMoney(value);
 }
 
 function text(value: unknown, max: number) {

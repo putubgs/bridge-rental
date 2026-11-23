@@ -33,9 +33,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: verified.error }, { status: verified.status });
   }
 
-  console.log("=== VERIFIED IN LOG ===");
-  console.log("verified: ", verified);
-
   const prepared = prepareBookingEmail(
     body,
     verified && verified.ok ? verified.payment : null,
